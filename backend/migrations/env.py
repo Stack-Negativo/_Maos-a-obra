@@ -23,9 +23,9 @@ if config.config_file_name is not None:
 import os
 import sys
 
-sys.path.append(os.getcwd())
-from backend.core.config import get_settings
-from backend.core.database import Base
+sys.path.append(os.getcwd())  # This should now add /app/backend
+from core.config import get_settings
+from core.database import Base
 
 target_metadata = Base.metadata
 

@@ -1,12 +1,10 @@
 from contextlib import asynccontextmanager
 
-from backend.core.config import get_settings
-from backend.core.database import AsyncSession, check_db_connection, get_db
+from api import health, users
+from core.config import get_settings
+from core.database import AsyncSession, check_db_connection, get_db
+from core.logging_config import setup_logging
 from fastapi import Depends, FastAPI, HTTPException
-
-# Import API routers
-from backend.api import health
-from backend.core.logging_config import setup_logging
 
 settings = get_settings()
 
@@ -39,3 +37,4 @@ app = FastAPI(
 
 # Include API routers
 app.include_router(health.router, prefix="/api/v1")
+app.include_router(users.router, prefix="/api/v1")

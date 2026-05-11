@@ -19,22 +19,22 @@
 ### Auth
 status: NOT_STARTED
 dependencies: []
-blocks: [Usuarios]
+blocks: []
 progress: 0%
 
 ---
 
 ### Usuarios
-status: BLOCKED
+status: DONE
 dependencies: [Auth]
 blocks: [Prestadores, Ordens_De_Servico]
-progress: 0%
+progress: 100%
 
 ---
 
 ### Prestadores
-status: NOT_STARTED
-dependencies: [Usuarios]
+status: UNBLOCKED
+dependencies: []
 blocks: [Ordens_De_Servico]
 progress: 0%
 
@@ -42,7 +42,7 @@ progress: 0%
 
 ### Ordens_De_Servico
 status: BLOCKED
-dependencies: [Usuarios, Prestadores]
+dependencies: [Prestadores]
 blocks: [Pagamentos, Revisoes]
 progress: 0%
 
@@ -70,8 +70,6 @@ progress: 0%
 ---
 
 ## Bloqueios atuais
-
-- models não criados
 
 ---
 
