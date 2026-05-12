@@ -75,3 +75,22 @@ Nunca utilizar:
 
 ```python
 datetime.now()
+```
+
+---
+
+# AP07 - Uso de type: ignore
+
+`# type: ignore` somente pode ser utilizado quando:
+
+- existir limitação conhecida de typing externo
+- existir incompatibilidade conhecida entre bibliotecas
+- existir falso positivo comprovado
+
+É proibido utilizar `# type: ignore` para:
+
+- ocultar erro arquitetural
+- ocultar problema de tipagem corrigível
+- satisfazer linter sem investigação
+
+Todo uso deve possuir comentário explicando o motivo.

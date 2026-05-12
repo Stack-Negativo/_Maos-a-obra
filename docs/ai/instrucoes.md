@@ -31,6 +31,19 @@ Incluindo:
 
 ---
 
+# Qualidade obrigatória
+
+Todo código gerado em /backend deve:
+
+- passar em Ruff
+- passar em BasedPyright strict
+- evitar APIs deprecated
+- possuir tipagem explícita
+- evitar Any desnecessário
+- respeitar Python 3.12
+
+---
+
 # Regra de Estado do Projeto (OBRIGATÓRIA)
 
 A IA deve SEMPRE consultar e atualizar o arquivo:
