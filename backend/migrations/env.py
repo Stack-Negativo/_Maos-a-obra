@@ -1,9 +1,17 @@
 import asyncio
+import os
+import sys
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import Connection, engine_from_config, pool
 from sqlalchemy.ext.asyncio import AsyncEngine
+
+# set the path to the root of the project
+sys.path.append(os.getcwd())  # This should now add /app/backend
+
+from core.config import get_settings
+from core.database import Base
 
 # this is the Alembic Config object, which provides
 # access to values within the .ini file in use.
@@ -18,14 +26,6 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import Base
 # target_metadata = Base.metadata
-
-# Import your Base from core.database
-import os
-import sys
-
-sys.path.append(os.getcwd())  # This should now add /app/backend
-from core.config import get_settings
-from core.database import Base
 
 target_metadata = Base.metadata
 
@@ -60,7 +60,7 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def do_run_migrations(connection) -> None:
+def do_run_migrations(connection: Connection) -> None:
     context.configure(connection=connection, target_metadata=target_metadata)
 
     with context.begin_transaction():

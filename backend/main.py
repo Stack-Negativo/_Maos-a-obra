@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
 
-from api import health, users
+from fastapi import FastAPI
+
+from api import auth, health, users
 from core.config import get_settings
-from core.database import AsyncSession, check_db_connection, get_db
+from core.database import check_db_connection
 from core.logging_config import setup_logging
-from fastapi import Depends, FastAPI, HTTPException
 
 settings = get_settings()
 
@@ -28,7 +29,9 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Maos a Obra API",
     version="0.1.0",
-    description="API for intermediating residential services between clients and providers.",
+    description=(
+        "API for intermediating residential services between clients and providers."
+    ),
     lifespan=lifespan,
     docs_url="/api/v1/docs",
     redoc_url="/api/v1/redoc",
@@ -38,3 +41,4 @@ app = FastAPI(
 # Include API routers
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1")

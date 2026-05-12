@@ -7,9 +7,13 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     TEST_DATABASE_URL: str = "sqlite+aiosqlite:///./test.db"
 
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
-@lru_cache()
+@lru_cache
 def get_settings():
-    return Settings()
+    return Settings()  # type: ignore

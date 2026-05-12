@@ -9,7 +9,7 @@
 - [x] ADR inicial criado
 - [x] Instruções de IA criadas
 - [x] Backend bootstrap
-- [ ] Auth implementado
+- [x] Auth implementado
 - [ ] OS core implementado
 
 ---
@@ -17,10 +17,10 @@
 ## Módulos
 
 ### Auth
-status: NOT_STARTED
+status: DONE
 dependencies: []
 blocks: []
-progress: 0%
+progress: 100%
 
 ---
 

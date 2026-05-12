@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -7,17 +6,18 @@ from pydantic import BaseModel, ConfigDict
 
 class UserBase(BaseModel):
     email: str
-    full_name: Optional[str] = None
+    nome: str | None = None
+    phone: str | None = None
 
 
 class UserCreate(UserBase):
-    hashed_password: str
+    senha: str
 
 
 class UserUpdate(UserBase):
-    email: Optional[str] = None
-    hashed_password: Optional[str] = None
-    is_active: Optional[bool] = None
+    email: str | None = None
+    hashed_password: str | None = None
+    is_active: bool | None = None
 
 
 class UserResponse(UserBase):
