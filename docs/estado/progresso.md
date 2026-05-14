@@ -32,9 +32,17 @@ progress: 100%
 
 ---
 
+### Especialidades
+status: DONE
+dependencies: []
+blocks: [Prestadores, Ordens_De_Servico]
+progress: 100%
+
+---
+
 ### Prestadores
 status: UNBLOCKED
-dependencies: []
+dependencies: [Especialidades]
 blocks: [Ordens_De_Servico]
 progress: 0%
 
@@ -42,7 +50,7 @@ progress: 0%
 
 ### Ordens_De_Servico
 status: BLOCKED
-dependencies: [Prestadores]
+dependencies: [Prestadores, Especialidades]
 blocks: [Pagamentos, Revisoes]
 progress: 0%
 

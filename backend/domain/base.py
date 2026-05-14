@@ -13,9 +13,11 @@ class BaseEntity:
     Base class which provides uuid, created_at and updated_at attributes
     """
 
-    @declared_attr
+    @declared_attr.directive
     def __tablename__(cls) -> str:
-        return cls.__name__.lower() + "s"
+        # BasedPyright: cls.__name__ access on mixin and return type for
+        # __tablename__ require an ignore due to SQLAlchemy's internal processing.
+        return f"{cls.__name__.lower()}s"  # pyright: ignore[reportAttributeAccessIssue]
 
     id: Mapped[UUID] = mapped_column(
         PG_UUID(as_uuid=True),

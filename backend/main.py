@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from api import auth, health, users
+from api import auth, health, specialties, users
 from core.config import get_settings
 from core.database import check_db_connection
 from core.logging_config import setup_logging
@@ -11,7 +11,7 @@ settings = get_settings()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_app: FastAPI):
     # Setup logging
     setup_logging()
     print("Logging configured.")
@@ -42,3 +42,4 @@ app = FastAPI(
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(specialties.router, prefix="/api/v1")

@@ -15,5 +15,7 @@ class Settings(BaseSettings):
 
 
 @lru_cache
-def get_settings():
+def get_settings() -> Settings:
+    # BasedPyright: Mandatory fields (DATABASE_URL, SECRET_KEY) are expected
+    # to be provided via environment variables at runtime by pydantic-settings.
     return Settings()  # type: ignore
