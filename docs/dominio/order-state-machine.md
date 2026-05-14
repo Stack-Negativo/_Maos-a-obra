@@ -1,32 +1,33 @@
-# State Machine — Ordens de Serviço
+# State Machine — Service Orders
 
 ## Objetivo
 
-Este documento define oficialmente a máquina de estados das Ordens de Serviço (OS).
-
-Toda implementação backend deverá respeitar integralmente estas transições.
+Define as transições de estado permitidas para as Ordens de Serviço.
 
 ---
 
-# Objetivos
+# Estados (Status)
 
-A state machine existe para:
-
-- evitar transições inválidas
-- garantir previsibilidade operacional
-- centralizar fluxo do domínio
-- facilitar auditoria
-- reduzir inconsistência
-
----
-
-# Estados Oficiais
+- `CREATED`: OS criada pelo Cliente.
+- `AWAITING_CANDIDATES`: OS visível no feed.
+- `AWAITING_SELECTION`: Possui ao menos uma candidatura.
+- `PROVIDER_SELECTED`: Cliente escolheu o prestador.
+- `SCHEDULED`: Data e hora oficial confirmada.
+- `IN_PROGRESS`: Serviço sendo executado.
+- `FINISHED`: Serviço concluído e confirmado.
+- `CANCELLED`: Cancelada por uma das partes.
+- `EXPIRED`: Ninguém se candidatou no prazo.
 
 ---
 
-# Estados iniciais
+# Transições Permitidas
 
-```text
-CRIADA
-AGUARDANDO_CANDIDATOS
-AGUARDANDO_ESCOLHA_TOMADOR
+| De | Para | Gatilho |
+|---|---|---|
+| `CREATED` | `AWAITING_CANDIDATES` | Automaticamente após criação. |
+| `AWAITING_CANDIDATES` | `AWAITING_SELECTION` | Primeira candidatura recebida. |
+| `AWAITING_SELECTION` | `PROVIDER_SELECTED` | Cliente aceita uma candidatura. |
+| `PROVIDER_SELECTED` | `SCHEDULED` | Horário oficial registrado. |
+| `SCHEDULED` | `IN_PROGRESS` | Provider inicia o serviço. |
+| `IN_PROGRESS` | `FINISHED` | Provider finaliza + Cliente confirma. |
+| Qualquer (exceto Final) | `CANCELLED` | Solicitação de cancelamento. |

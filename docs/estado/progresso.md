@@ -8,8 +8,10 @@
 - [x] Regras de negócio definidas
 - [x] ADR inicial criado
 - [x] Instruções de IA criadas
-- [ ] Backend bootstrap
-- [ ] Auth implementado
+- [x] Backend bootstrap
+- [x] Auth implementado
+- [x] Especialidades (DONE)
+- [x] Structural Alignment (DONE)
 - [ ] OS core implementado
 
 ---
