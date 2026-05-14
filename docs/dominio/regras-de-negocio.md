@@ -219,31 +219,38 @@ Prestadores suspensos não podem:
 
 ---
 
-# RU01 — Usuário pode possuir múltiplos papéis
+# RU01 — Multiplicidade de Papéis Restrita
 
-Um mesmo usuário pode:
+Um mesmo usuário pode ser simultaneamente:
+- **Client** (Tomador)
+- **Provider** (Prestador)
 
-- ser tomador
-- ser prestador
-- ser administrador
-
-simultaneamente.
+**Restrição Crítica:**
+- Um **Admin** NÃO pode possuir o papel de Client ou Provider.
+- O papel de Admin é exclusivo e destinado apenas à gestão da plataforma.
 
 ---
 
 # RU02 — Usuário inativo não pode autenticar
 
-Usuários inativos devem possuir acesso bloqueado.
+Usuários inativos (`is_active = False`) devem possuir acesso bloqueado.
 
 ---
 
 # RU03 — Senha segura obrigatória
 
 Toda senha deverá possuir:
-
 - mínimo de 8 caracteres
 - pelo menos 1 número
 - pelo menos 1 letra
+
+---
+
+# RU04 — Regras de Admin
+
+- Deve obrigatoriamente utilizar um e-mail do domínio oficial da aplicação (ex: `@maos-a-obra.com`).
+- Não pode se candidatar a Ordens de Serviço.
+- Não pode criar Ordens de Serviço operacionais.
 
 ---
 
@@ -254,18 +261,18 @@ Toda senha deverá possuir:
 # ROS01 — Criação da OS
 
 Toda OS deve possuir:
-
-- tomador válido
-- especialidade válida
+- **Client** (tomador) válido
+- **Specialty** (especialidade) válida
 - título
 - descrição
-- endereço de execução
+- endereço de execução (`address_id`)
+- data desejada (`preferred_date`)
 
 ---
 
 # ROS02 — Prestador inicialmente opcional
 
-Uma OS pode nascer sem prestador associado.
+Uma OS nasce sem prestador associado (`provider_id = NULL`).
 
 ---
 
@@ -278,11 +285,10 @@ Prestador só pode se candidatar a OS compatível com suas especialidades.
 # ROS04 — Fluxo obrigatório da OS
 
 Fluxo principal:
-
-1. criação
+1. criação (com `preferred_date`)
 2. candidaturas
 3. seleção
-4. agendamento
+4. agendamento (define `scheduled_at`)
 5. execução
 6. finalização
 7. pagamento
@@ -293,26 +299,19 @@ Fluxo principal:
 # ROS05 — Status válidos
 
 ## Status iniciais
-
-- CRIADA
-- AGUARDANDO_CANDIDATOS
-- AGUARDANDO_ESCOLHA_TOMADOR
-
----
+- CREATED
+- AWAITING_CANDIDATES
+- AWAITING_SELECTION
 
 ## Status operacionais
-
-- PRESTADOR_SELECIONADO
-- AGENDADA
-- EM_EXECUCAO
-
----
+- PROVIDER_SELECTED
+- SCHEDULED
+- IN_PROGRESS
 
 ## Status finais
-
-- FINALIZADA
-- CANCELADA
-- EXPIRADA
+- FINISHED
+- CANCELLED
+- EXPIRED
 
 ---
 

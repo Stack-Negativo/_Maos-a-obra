@@ -10,6 +10,8 @@
 - [x] Instruções de IA criadas
 - [x] Backend bootstrap
 - [x] Auth implementado
+- [x] Especialidades (DONE)
+- [x] Structural Alignment (DONE)
 - [ ] OS core implementado
 
 ---
@@ -40,7 +42,15 @@ progress: 100%
 
 ---
 
-### Prestadores
+### Endereços (Address)
+status: UNBLOCKED
+dependencies: []
+blocks: [Ordens_De_Servico]
+progress: 0%
+
+---
+
+### Prestadores (Provider)
 status: UNBLOCKED
 dependencies: [Especialidades]
 blocks: [Ordens_De_Servico]
@@ -48,9 +58,9 @@ progress: 0%
 
 ---
 
-### Ordens_De_Servico
+### Ordens_De_Servico (Service Orders)
 status: BLOCKED
-dependencies: [Prestadores, Especialidades]
+dependencies: [Prestadores, Especialidades, Endereços]
 blocks: [Pagamentos, Revisoes]
 progress: 0%
 
@@ -63,7 +73,9 @@ progress: 0%
 
 ## Regras críticas implementadas
 
-- nenhuma
+- Padronização de Nomenclatura (PT/EN)
+- Exclusividade de Papel (Admin vs Client/Provider)
+- Desacoplamento de Agendamento (preferred vs scheduled)
 
 ---
 
@@ -79,17 +91,21 @@ progress: 0%
 
 ## Bloqueios atuais
 
+- Necessário implementar Address e Provider antes de Service Orders.
+
 ---
 
 ## Ordem recomendada de execução
 
-1. backend bootstrap
-2. auth
-3. users
-4. providers
-5. specialties
-6. orders
-7. candidaturas
-8. agenda
-9. pagamentos mock
-10. avaliações
+1. backend bootstrap (DONE)
+2. auth (DONE)
+3. users (DONE)
+4. specialties (DONE)
+5. structural alignment (DONE)
+6. addresses
+7. providers
+8. service orders
+9. candidaturas
+10. agenda
+11. pagamentos mock
+12. avaliações
