@@ -83,6 +83,9 @@ progress: 0%
 - Verificação de Elegibilidade de Prestadores
 - Máquina de Estados de Ordens de Serviço (OrderStateMachine)
 - Validação de Transições de Status e Estados Terminais
+- Infraestrutura Arquitetural de Value Objects formalizada
+- Domínio preparado para Service Orders com tipos semânticos (Money, DateRange)
+- Redução de risco de deriva arquitetural via Anti-Padrões de VOs
 
 ---
 

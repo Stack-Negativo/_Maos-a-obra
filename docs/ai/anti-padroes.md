@@ -79,18 +79,27 @@ datetime.now()
 
 ---
 
-# AP07 - Uso de type: ignore
+# AP07 — Primitivos em vez de Value Objects
 
-`# type: ignore` somente pode ser utilizado quando:
+É proibido utilizar tipos primitivos para representar conceitos semânticos complexos do domínio.
 
-- existir limitação conhecida de typing externo
-- existir incompatibilidade conhecida entre bibliotecas
-- existir falso positivo comprovado
+**Incorreto (Primitivos):**
+- Usar `float` para dinheiro.
+- Usar `datetime` naive (sem timezone).
+- Usar `utcnow()` diretamente no código operacional.
+- Usar `tuple` ou `list` para coordenadas geográficas.
+- Validar ranges temporais (start < end) diretamente em endpoints ou repositories.
+- Lógica de "overlap" de datas espalhada em Services.
+- Usar `dict` genérico para metadados de auditoria.
 
-É proibido utilizar `# type: ignore` para:
+**Correto (Value Objects):**
+- Usar `Money` (VO) para qualquer valor monetário.
+- Usar `DateRange` (VO) para intervalos de tempo.
+- Usar `GeoCoordinates` (VO) para localização.
+- Usar `AuditMetadata` (VO) para rastreabilidade.
 
-- ocultar erro arquitetural
-- ocultar problema de tipagem corrigível
-- satisfazer linter sem investigação
+---
 
-Todo uso deve possuir comentário explicando o motivo.
+# AP08 — Lógica de VO fora do Domínio
+
+Nunca implemente lógica de cálculo monetário ou validação de intervalo temporal fora do respectivo Value Object. Services devem apenas orquestrar o uso desses objetos.
