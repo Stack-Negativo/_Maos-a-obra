@@ -1,0 +1,29 @@
+.login_form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login_form_header {
+  text-align: center;
+}
+
+.login_form_header h1 {
+  color: #111827;
+
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.login_form_header p {
+  margin-top: 8px;
+
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+.login_form_group {
+  display: flex;
+  flex-direction: column;
+}
