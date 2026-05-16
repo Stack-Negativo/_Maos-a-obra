@@ -81,6 +81,11 @@ progress: 0%
 - Módulo de Prestadores com Vínculo de Especialidades
 - Regra de Exclusividade de Admin (Não pode ser Provider)
 - Verificação de Elegibilidade de Prestadores
+- Máquina de Estados de Ordens de Serviço (OrderStateMachine)
+- Validação de Transições de Status e Estados Terminais
+- Infraestrutura Arquitetural de Value Objects formalizada
+- Domínio preparado para Service Orders com tipos semânticos (Money, DateRange)
+- Redução de risco de deriva arquitetural via Anti-Padrões de VOs
 
 ---
 
