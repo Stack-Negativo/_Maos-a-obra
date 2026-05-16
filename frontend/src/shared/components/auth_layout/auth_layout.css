@@ -1,0 +1,22 @@
+.auth_layout {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eff6ff 0%,
+      #dbeafe 100%
+    );
+}
+
+.auth_layout_content {
+  width: 100%;
+  max-width: 420px;
+}
