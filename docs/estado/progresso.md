@@ -83,8 +83,8 @@ progress: 0%
 - Verificação de Elegibilidade de Prestadores
 - Máquina de Estados de Ordens de Serviço (OrderStateMachine)
 - Validação de Transições de Status e Estados Terminais
-- Infraestrutura Arquitetural de Value Objects formalizada
-- Domínio preparado para Service Orders com tipos semânticos (Money, DateRange)
+- Infraestrutura de Value Objects implementada (Money, DateRange, GeoCoordinates, AuditMetadata)
+- Domínio preparado para Service Orders, Pagamentos e Agenda
 - Redução de risco de deriva arquitetural via Anti-Padrões de VOs
 - Auditoria Arquitetural Completa: Consistência de Camadas, Tipagem SQLAlchemy 2.x e Async Correctness validados.
 
@@ -92,7 +92,12 @@ progress: 0%
 
 ## Regras críticas pendentes
 
-- fluxo de OS
+- fluxo de OS (em andamento)
+- agenda do prestador
+- candidatura
+- seleção
+- finalização
+
 - agenda do prestador
 - candidatura
 - seleção
