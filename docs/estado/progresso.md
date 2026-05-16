@@ -30,21 +30,37 @@ progress: 0%
 status: BLOCKED
 dependencies: [Auth]
 blocks: [Prestadores, Ordens_De_Servico]
-progress: 0%
+progress: 100%
 
 ---
 
-### Prestadores
-status: NOT_STARTED
-dependencies: [Usuarios]
+### Especialidades
+status: DONE
+dependencies: []
+blocks: [Prestadores, Ordens_De_Servico]
+progress: 100%
+
+---
+
+### Endereços (Address)
+status: DONE
+dependencies: []
 blocks: [Ordens_De_Servico]
-progress: 0%
+progress: 100%
 
 ---
 
-### Ordens_De_Servico
-status: BLOCKED
-dependencies: [Usuarios, Prestadores]
+### Prestadores (Provider)
+status: DONE
+dependencies: [Especialidades]
+blocks: [Ordens_De_Servico]
+progress: 100%
+
+---
+
+### Ordens_De_Servico (Service Orders)
+status: UNBLOCKED
+dependencies: [Prestadores, Especialidades, Endereços]
 blocks: [Pagamentos, Revisoes]
 progress: 0%
 
@@ -57,7 +73,14 @@ progress: 0%
 
 ## Regras críticas implementadas
 
-- nenhuma
+- Padronização de Nomenclatura (PT/EN)
+- Exclusividade de Papel (Admin vs Client/Provider)
+- Desacoplamento de Agendamento (preferred vs scheduled)
+- Infraestrutura de Exceptions Globais e Error Codes
+- Gestão de Endereços com Regra de Único Padrão
+- Módulo de Prestadores com Vínculo de Especialidades
+- Regra de Exclusividade de Admin (Não pode ser Provider)
+- Verificação de Elegibilidade de Prestadores
 
 ---
 
