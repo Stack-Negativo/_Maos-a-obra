@@ -3,7 +3,6 @@ from uuid import UUID, uuid4
 
 from sqlalchemy import DateTime
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, declarative_mixin, mapped_column
 
 
@@ -12,12 +11,6 @@ class BaseEntity:
     """
     Base class which provides uuid, created_at and updated_at attributes
     """
-
-    @declared_attr.directive
-    def __tablename__(cls) -> str:
-        # BasedPyright: cls.__name__ access on mixin and return type for
-        # __tablename__ require an ignore due to SQLAlchemy's internal processing.
-        return f"{cls.__name__.lower()}s"  # pyright: ignore[reportAttributeAccessIssue]
 
     id: Mapped[UUID] = mapped_column(
         PG_UUID(as_uuid=True),

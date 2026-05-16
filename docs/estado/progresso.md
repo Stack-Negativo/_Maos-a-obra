@@ -51,15 +51,15 @@ progress: 100%
 ---
 
 ### Prestadores (Provider)
-status: UNBLOCKED
+status: DONE
 dependencies: [Especialidades]
 blocks: [Ordens_De_Servico]
-progress: 0%
+progress: 100%
 
 ---
 
 ### Ordens_De_Servico (Service Orders)
-status: BLOCKED
+status: UNBLOCKED
 dependencies: [Prestadores, Especialidades, Endereços]
 blocks: [Pagamentos, Revisoes]
 progress: 0%
@@ -78,6 +78,9 @@ progress: 0%
 - Desacoplamento de Agendamento (preferred vs scheduled)
 - Infraestrutura de Exceptions Globais e Error Codes
 - Gestão de Endereços com Regra de Único Padrão
+- Módulo de Prestadores com Vínculo de Especialidades
+- Regra de Exclusividade de Admin (Não pode ser Provider)
+- Verificação de Elegibilidade de Prestadores
 
 ---
 
