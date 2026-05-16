@@ -139,10 +139,26 @@ Utilizar Pydantic v2.
 Responsável por:
 
 - entidades de domínio
+- **Value Objects (VOs)**
 - enums
 - constantes
 - contratos
 - definições centrais do negócio
+
+---
+
+## Domain Value Objects
+
+Os Value Objects são cidadãos de primeira classe do domínio.
+
+- **Diferença de Entidades:** Ao contrário das Entidades, VOs não possuem ID. Se dois VOs têm os mesmos valores, eles são iguais.
+- **Responsabilidade:** VOs encapsulam a lógica e validação de tipos complexos (Dinheiro, Datas, Coordenadas).
+- **Integração:**
+    - **Entities:** Devem usar VOs para seus atributos internos.
+    - **Services:** Devem operar sobre VOs para garantir que regras como sobreposição de datas ou precisão monetária sejam respeitadas.
+    - **Repositories:** Devem converter VOs para tipos primitivos do banco e vice-versa.
+
+A centralização de regras temporais e monetárias em VOs evita que a lógica de "como calcular" ou "como validar" fique espalhada e inconsistente entre múltiplos Services.
 
 ---
 
