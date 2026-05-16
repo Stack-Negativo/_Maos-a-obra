@@ -59,10 +59,10 @@ progress: 100%
 ---
 
 ### Ordens_De_Servico (Service Orders)
-status: UNBLOCKED
+status: IN_PROGRESS
 dependencies: [Prestadores, Especialidades, Endereços]
 blocks: [Pagamentos, Revisoes]
-progress: 0%
+progress: 10%
 
 ### Pagamentos (mock)
 status: NOT_STARTED
@@ -81,6 +81,8 @@ progress: 0%
 - Módulo de Prestadores com Vínculo de Especialidades
 - Regra de Exclusividade de Admin (Não pode ser Provider)
 - Verificação de Elegibilidade de Prestadores
+- Máquina de Estados de Ordens de Serviço (OrderStateMachine)
+- Validação de Transições de Status e Estados Terminais
 
 ---
 
