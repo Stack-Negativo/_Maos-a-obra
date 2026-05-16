@@ -19,15 +19,15 @@
 ## Módulos
 
 ### Auth
-status: NOT_STARTED
+status: DONE
 dependencies: []
-blocks: [Usuarios]
-progress: 0%
+blocks: []
+progress: 100%
 
 ---
 
 ### Usuarios
-status: BLOCKED
+status: DONE
 dependencies: [Auth]
 blocks: [Prestadores, Ordens_De_Servico]
 progress: 100%
@@ -59,10 +59,10 @@ progress: 100%
 ---
 
 ### Ordens_De_Servico (Service Orders)
-status: IN_PROGRESS
+status: UNBLOCKED
 dependencies: [Prestadores, Especialidades, Endereços]
 blocks: [Pagamentos, Revisoes]
-progress: 10%
+progress: 0%
 
 ### Pagamentos (mock)
 status: NOT_STARTED
@@ -83,8 +83,8 @@ progress: 0%
 - Verificação de Elegibilidade de Prestadores
 - Máquina de Estados de Ordens de Serviço (OrderStateMachine)
 - Validação de Transições de Status e Estados Terminais
-- Infraestrutura Arquitetural de Value Objects formalizada
-- Domínio preparado para Service Orders com tipos semânticos (Money, DateRange)
+- Infraestrutura de Value Objects implementada (Money, DateRange, GeoCoordinates, AuditMetadata)
+- Domínio preparado para Service Orders, Pagamentos e Agenda
 - Redução de risco de deriva arquitetural via Anti-Padrões de VOs
 - Auditoria Arquitetural Completa: Consistência de Camadas, Tipagem SQLAlchemy 2.x e Async Correctness validados.
 
@@ -92,7 +92,12 @@ progress: 0%
 
 ## Regras críticas pendentes
 
-- fluxo de OS
+- fluxo de OS (em andamento)
+- agenda do prestador
+- candidatura
+- seleção
+- finalização
+
 - agenda do prestador
 - candidatura
 - seleção
@@ -102,21 +107,21 @@ progress: 0%
 
 ## Bloqueios atuais
 
-- backend não inicializado
-- models não criados
-- migrations não configuradas
+- Necessário implementar Address e Provider antes de Service Orders.
 
 ---
 
 ## Ordem recomendada de execução
 
-1. backend bootstrap
-2. auth
-3. users
-4. providers
-5. specialties
-6. orders
-7. candidaturas
-8. agenda
-9. pagamentos mock
-10. avaliações
+1. backend bootstrap (DONE)
+2. auth (DONE)
+3. users (DONE)
+4. specialties (DONE)
+5. structural alignment (DONE)
+6. addresses
+7. providers
+8. service orders
+9. candidaturas
+10. agenda
+11. pagamentos mock
+12. avaliações
