@@ -12,6 +12,11 @@ sys.path.append(os.getcwd())  # This should now add /app/backend
 
 from core.config import get_settings
 from core.database import Base
+from models.address import Address  # noqa: F401
+from models.specialty import Specialty  # noqa: F401
+
+# Import all models here for autogenerate support
+from models.user import User  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to values within the .ini file in use.
@@ -24,9 +29,6 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import Base
-# target_metadata = Base.metadata
-
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

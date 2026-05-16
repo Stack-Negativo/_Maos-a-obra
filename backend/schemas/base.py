@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import TypeVar
 
 from pydantic import BaseModel
@@ -10,11 +11,7 @@ class APIResponse[T](BaseModel):
     data: T
 
 
-class APIError(BaseModel):
-    code: str
-    message: str
-
-
 class APIErrorResponse(BaseModel):
-    success: bool = False
-    error: APIError
+    detail: str
+    error_code: str
+    timestamp: datetime
