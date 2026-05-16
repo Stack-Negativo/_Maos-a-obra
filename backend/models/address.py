@@ -8,6 +8,8 @@ from domain.base import BaseEntity
 
 
 class Address(BaseEntity, Base):
+    __tablename__ = "addresses"
+
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"), nullable=False, index=True
     )

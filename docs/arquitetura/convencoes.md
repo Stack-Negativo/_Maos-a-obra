@@ -701,6 +701,24 @@ Preferir:
 
 ---
 
+# RT06 — __tablename__ Explícito Obrigatório
+
+Todas as classes de model (entidades do banco) devem declarar explicitamente o atributo `__tablename__`.
+
+**Motivo:**
+- Evitar falsos-positivos e erros de inferência no `BasedPyright` (modo strict).
+- Garantir clareza absoluta sobre o mapeamento físico do banco de dados.
+- Facilitar a manutenção assistida por IA ao eliminar "mágicas" de inferência de nomes.
+
+**Exemplo:**
+```python
+class User(BaseEntity, Base):
+    __tablename__ = "users"
+    ...
+```
+
+---
+
 # Convenções Futuras
 
 Fluxos ainda sujeitos a refinamento:

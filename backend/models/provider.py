@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 
 
 class Provider(BaseEntity, Base):
+    __tablename__ = "providers"
+
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"), unique=True, nullable=False
     )
@@ -51,6 +53,8 @@ class ProviderSpecialty(Base):
 
 
 class Admin(BaseEntity, Base):
+    __tablename__ = "admins"
+
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"), unique=True, nullable=False
     )
@@ -61,6 +65,8 @@ class Admin(BaseEntity, Base):
 
 
 class Client(BaseEntity, Base):
+    __tablename__ = "clients"
+
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"), unique=True, nullable=False
     )
