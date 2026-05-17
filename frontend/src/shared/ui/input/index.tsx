@@ -1,14 +1,14 @@
 import type {
   ChangeEvent,
+  InputHTMLAttributes,
 } from "react";
 
 import "./styles.css";
 
-type InputProps = {
-  type?: string;
-  placeholder?: string;
-  value?: string;
-
+type InputProps = Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "onChange"
+> & {
   onChange?: (
     event: ChangeEvent<HTMLInputElement>,
   ) => void;
@@ -19,6 +19,8 @@ export function Input({
   placeholder,
   value,
   onChange,
+  className,
+  ...props
 }: InputProps) {
   return (
     <input
@@ -26,7 +28,8 @@ export function Input({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="input"
+      className={className ? `input ${className}` : "input"}
+      {...props}
     />
   );
 }

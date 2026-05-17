@@ -1,17 +1,59 @@
 .auth-layout {
   width: 100%;
   min-height: 100vh;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  background: #111827;
-
-  padding: 24px;
+  padding: 2rem;
+  background: var(--color-surface);
 }
 
 .auth-layout__content {
   width: 100%;
-  max-width: 420px;
+  max-width: 430px;
+}
+
+.auth-layout__brand {
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.auth-layout__brand::before {
+  content: "MO";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 1rem;
+  border-radius: 14px;
+  background: var(--color-brand);
+  color: #ffffff;
+  font-weight: 850;
+}
+
+.auth-layout__brand strong {
+  display: block;
+  color: var(--color-text);
+  font-size: 1.7rem;
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.auth-layout__brand p {
+  margin-top: 0.5rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.auth-layout__footer {
+  margin-top: 1rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.auth-layout__footer a {
+  color: var(--color-brand);
+  text-decoration: none;
+  font-weight: 800;
 }

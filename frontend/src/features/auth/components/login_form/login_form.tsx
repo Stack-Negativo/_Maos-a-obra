@@ -9,6 +9,7 @@ export function LoginForm() {
     email,
     password,
     loading,
+    error,
 
     setEmail,
     setPassword,
@@ -17,36 +18,53 @@ export function LoginForm() {
   } = useAuth();
 
   return (
-    <div className="login-form">
-      <Input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(event) =>
-          setEmail(
-            event.target.value,
-          )
-        }
-      />
+    <form
+      className="login-form"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void handleLogin();
+      }}
+    >
+      <div className="login-form__header">
+        <h1>Bem-vindo de volta</h1>
+        <p>Entre para gerenciar especialidades e validar o fluxo do MVP.</p>
+      </div>
 
-      <Input
-        type="password"
-        placeholder="Senha"
-        value={password}
-        onChange={(event) =>
-          setPassword(
-            event.target.value,
-          )
-        }
-      />
+      {error ? (
+        <p className="login-form__error" role="alert">
+          {error}
+        </p>
+      ) : null}
+
+      <div className="login-form__fields">
+        <Input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          disabled={loading}
+          autoComplete="email"
+        />
+
+        <Input
+          type="password"
+          name="password"
+          placeholder="Senha"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          disabled={loading}
+          autoComplete="current-password"
+        />
+      </div>
 
       <button
-        onClick={handleLogin}
+        type="submit"
+        className="login-form__submit"
+        disabled={loading}
       >
-        {loading
-          ? "Entrando..."
-          : "Entrar"}
+        {loading ? "Entrando..." : "Entrar"}
       </button>
-    </div>
+    </form>
   );
 }

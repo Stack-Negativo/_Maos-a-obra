@@ -1,0 +1,110 @@
+.specialties-page {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.specialties-page__header,
+.specialties-page__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.specialties-page__header {
+  flex-wrap: wrap;
+}
+
+.specialties-page__header h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.55rem;
+  font-weight: 850;
+}
+
+.specialties-page__header p {
+  max-width: 42rem;
+  margin-top: 0.55rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.specialties-page__summary {
+  color: var(--color-brand-dark) !important;
+  font-weight: 700;
+}
+
+.specialties-page__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.specialties-page__back-link {
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--color-text-secondary);
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.specialties-page__actions {
+  flex-wrap: wrap;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.specialties-page__actions .input {
+  max-width: 520px;
+}
+
+.specialties-page__actions button {
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-brand);
+  border-radius: 8px;
+  background: var(--color-brand);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.specialties-page__actions button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.specialties-page__state {
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--color-text-secondary);
+}
+
+.specialties-page__state--error {
+  border-color: #fecaca;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.specialties-page__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .specialties-page__actions {
+    display: grid;
+  }
+
+  .specialties-page__actions .input {
+    max-width: none;
+  }
+}

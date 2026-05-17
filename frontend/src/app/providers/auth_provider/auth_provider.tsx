@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useState } from "react";
 
 import { loginService } from "@/features/auth/services/auth_service";
 
@@ -26,29 +23,26 @@ export function AuthProvider({
   children,
 }: AuthProviderProps) {
   const [user, setUser] =
-    useState<User | null>(null);
+    useState<User | null>(() => {
+      const storedUser =
+        localStorage.getItem("user");
+
+      if (!storedUser) {
+        return null;
+      }
+
+      try {
+        return JSON.parse(storedUser) as User;
+      } catch {
+        localStorage.removeItem("user");
+        return null;
+      }
+    });
 
   const [token, setToken] =
-    useState<string | null>(null);
-
-  useEffect(() => {
-    const storedToken =
-      localStorage.getItem("token");
-
-    const storedUser =
-      localStorage.getItem("user");
-
-    if (
-      storedToken &&
-      storedUser
-    ) {
-      setToken(storedToken);
-
-      setUser(
-        JSON.parse(storedUser),
-      );
-    }
-  }, []);
+    useState<string | null>(() =>
+      localStorage.getItem("token"),
+    );
 
   async function signIn({
     email,
