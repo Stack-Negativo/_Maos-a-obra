@@ -12,7 +12,8 @@
 - [x] Auth implementado
 - [x] Especialidades (DONE)
 - [x] Structural Alignment (DONE)
-- [ ] OS core implementado
+- [x] OS core implementado
+- [x] Candidaturas (DONE)
 
 ---
 
@@ -64,6 +65,12 @@ dependencies: [Prestadores, Especialidades, Endereços]
 blocks: [Pagamentos, Revisoes]
 progress: 100%
 
+### Candidaturas (Applications)
+status: DONE
+dependencies: [Ordens_De_Servico, Prestadores]
+blocks: [Pagamentos, Agenda]
+progress: 100%
+
 ### Pagamentos (mock)
 
 status: NOT_STARTED
@@ -89,6 +96,10 @@ progress: 0%
 - Integração de Service Orders com State Machine e DateRange
 - Automatização de Status CREATED -> AWAITING_CANDIDATES
 - Regras de Cancelamento com Validação de Estado e Propriedade
+- Formalização do Módulo de Candidaturas (Estados, Fluxos e Elegibilidade)
+- Módulo de Candidaturas Completo (Criação, Listagem, Aceite Atômico)
+- Regra de Seleção Única com Rejeição em Massa Atomicamente
+- Bloqueio de Auto-Candidatura e Validação de Especialidade do Prestador
 - Domínio preparado para Service Orders, Pagamentos e Agenda
 - **Auditoria Profunda de Service Orders (Concluída):**
     - Correção de precisão monetária: Migração de `float` para `Decimal` nos modelos e schemas.
@@ -97,27 +108,25 @@ progress: 0%
     - Design validado para suportar os módulos futuros de `Applications` e `Scheduling`.
 - Redução de risco de deriva arquitetural via Anti-Padrões de VOs
 - Auditoria Arquitetural Completa: Consistência de Camadas, Tipagem SQLAlchemy 2.x e Async Correctness validados.
+- **Endurecimento Arquitetural e Tipagem Estrita:**
+    - Formalização da Política de Uso de Ignores (`type: ignore`, `pyright: ignore`, `noqa`).
+    - Definição de padrões para Narrowing Explícito e Contratos de Repositories.
+    - Implementação do Anti-Padrão AP10 — Ignore-Driven Development.
 
 ---
 
 ## Regras críticas pendentes
 
-- fluxo de OS (em andamento)
 - agenda do prestador
-- candidatura
-- seleção
-- finalização
-
-- agenda do prestador
-- candidatura
-- seleção
-- finalização
+- finalização operacional completa
+- fluxo de pagamento mock
+- avaliações 360 (client <-> provider)
 
 ---
 
 ## Bloqueios atuais
 
-- Necessário implementar Address e Provider antes de Service Orders.
+- Nenhum bloqueio crítico imediato.
 
 ---
 
@@ -128,10 +137,10 @@ progress: 0%
 3. users (DONE)
 4. specialties (DONE)
 5. structural alignment (DONE)
-6. addresses
-7. providers
-8. service orders
-9. candidaturas
+6. addresses (DONE)
+7. providers (DONE)
+8. service orders (DONE)
+9. candidaturas (DONE)
 10. agenda
 11. pagamentos mock
 12. avaliações

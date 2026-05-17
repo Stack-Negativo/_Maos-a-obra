@@ -3,13 +3,19 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.exceptions import AuthenticationException
 from core.security import verify_token
 from models.user import User
 from repositories.address_repository import AddressRepository
+from repositories.provider_repository import ProviderRepository
+from repositories.service_order_application_repository import (
+    ServiceOrderApplicationRepository,
+)
 from repositories.service_order_repository import ServiceOrderRepository
 from repositories.specialty_repository import SpecialtyRepository
 from repositories.user_repository import UserRepository
 from schemas.auth import TokenData
+from services.service_order_application_service import ServiceOrderApplicationService
 from services.service_order_service import ServiceOrderService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
@@ -33,12 +39,34 @@ async def get_service_order_repository(
     return ServiceOrderRepository(session)
 
 
+async def get_provider_repository(
+    session: AsyncSession = Depends(get_db),
+) -> ProviderRepository:
+    return ProviderRepository(session)
+
+
+async def get_application_repository(
+    session: AsyncSession = Depends(get_db),
+) -> ServiceOrderApplicationRepository:
+    return ServiceOrderApplicationRepository(session)
+
+
 async def get_service_order_service(
     order_repo: ServiceOrderRepository = Depends(get_service_order_repository),
     address_repo: AddressRepository = Depends(get_address_repository),
     specialty_repo: SpecialtyRepository = Depends(get_specialty_repository),
 ) -> ServiceOrderService:
     return ServiceOrderService(order_repo, address_repo, specialty_repo)
+
+
+async def get_application_service(
+    application_repo: ServiceOrderApplicationRepository = Depends(
+        get_application_repository
+    ),
+    order_repo: ServiceOrderRepository = Depends(get_service_order_repository),
+    provider_repo: ProviderRepository = Depends(get_provider_repository),
+) -> ServiceOrderApplicationService:
+    return ServiceOrderApplicationService(application_repo, order_repo, provider_repo)
 
 
 async def get_current_user(
@@ -53,7 +81,8 @@ async def get_current_user(
     if email is None:
         raise credentials_exception
     token_data = TokenData(email=email)
-
+    if token_data.email is None:
+        raise AuthenticationException("Invalid token payload")
     user_repo = UserRepository(session)
     user = await user_repo.get_by_email(token_data.email)
     if user is None:
