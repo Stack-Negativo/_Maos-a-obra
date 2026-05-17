@@ -15,6 +15,7 @@ from domain.value_objects.money import Money
 
 if TYPE_CHECKING:
     from models.address import Address
+    from models.provider import Provider
     from models.specialty import Specialty
     from models.user import User
 
@@ -24,6 +25,9 @@ class ServiceOrder(BaseEntity, Base):
 
     client_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"), nullable=False, index=True
+    )
+    provider_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("providers.id"), nullable=True, index=True
     )
     address_id: Mapped[UUID] = mapped_column(
         ForeignKey("addresses.id"), nullable=False, index=True
@@ -58,7 +62,10 @@ class ServiceOrder(BaseEntity, Base):
     cancellation_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Relationships
-    client: Mapped["User"] = relationship("User")
+    client: Mapped["User"] = relationship("User", foreign_keys=[client_id])
+    provider: Mapped["Provider | None"] = relationship(
+        "Provider", foreign_keys=[provider_id]
+    )
     address: Mapped["Address"] = relationship("Address")
     specialty: Mapped["Specialty"] = relationship("Specialty")
 

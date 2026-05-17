@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from core.exceptions import InfrastructureException
 from models.provider import Admin, Provider, ProviderSpecialty
 
 
@@ -48,7 +49,12 @@ class ProviderRepository:
         await self.session.commit()
         await self.session.refresh(provider)
         # Re-fetch with specialties loaded
-        return await self.get_by_id(provider.id)  # type: ignore (Provider is not None here)
+        updated_provider = await self.get_by_id(provider.id)
+        if updated_provider is None:
+            raise InfrastructureException(
+                "Provider disappeared after persistence"
+            )
+        return updated_provider
 
     async def update(self, provider: Provider, data: dict[str, Any]) -> Provider:
         for key, value in data.items():

@@ -100,6 +100,24 @@ datetime.now()
 
 ---
 
-# AP08 — Lógica de VO fora do Domínio
+# AP09 — Lógica de VO fora do Domínio
 
 Nunca implemente lógica de cálculo monetário ou validação de intervalo temporal fora do respectivo Value Object. Services devem apenas orquestrar o uso desses objetos.
+
+---
+
+# AP10 — Ignore-Driven Development
+
+É proibido utilizar supressões de erro (`type: ignore`, `pyright: ignore`, `noqa`) como atalho para acelerar a implementação ou esconder falhas arquiteturais.
+
+**Incorreto (Prática Proibida):**
+- Adicionar `# type: ignore` em um erro de `Optional` em vez de usar um guard explicito.
+- Silenciar o BasedPyright em regras de transição de status da State Machine.
+- Ignorar erros de tipagem em ownership checks ou validações financeiras.
+- Usar ignores sem comentário justificando o motivo técnico.
+
+**Correto (Padrão do Projeto):**
+- Resolver o erro de tipagem através de refatoração ou guardas explícitos.
+- Usar supressões apenas para limitações técnicas externas (ex: SQLAlchemy mapper side-effects).
+- Sempre documentar o motivo do ignore com comentário explicativo.
+- Consultar a [Política de Tipagem Estrita](/docs/arquitetura/tipagem-e-ignores.md) para casos permitidos.

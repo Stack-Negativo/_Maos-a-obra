@@ -65,6 +65,10 @@ backend/
 ├── services/
 ```
 
+- **Ordens de Serviço (Service Orders):** Núcleo do sistema, gerencia o ciclo de vida da solicitação de serviço.
+- **Candidaturas (Applications):** Gerencia o interesse e seleção de prestadores para uma OS.
+- **Especialidades:** Taxonomia de serviços oferecidos na plataforma.
+
 ---
 
 # Responsabilidades das Camadas

@@ -380,6 +380,24 @@ Prestadores suspensos ficam bloqueados do fluxo.
 
 ---
 
+# RC06 — Auto-candidatura proibida
+
+O cliente proprietário da OS não pode se candidatar a ela, mesmo que possua perfil de prestador.
+
+---
+
+# RC07 — Atomicidade de Seleção
+
+O aceite de uma candidatura deve automaticamente rejeitar todas as outras candidaturas pendentes daquela OS em uma única transação.
+
+---
+
+# RC08 — Especialidade Obrigatória para Candidatura
+
+O prestador só pode se candidatar a uma OS se possuir a especialidade vinculada à OS em seu cadastro ativo.
+
+---
+
 # Regras de Agendamento
 
 ---
