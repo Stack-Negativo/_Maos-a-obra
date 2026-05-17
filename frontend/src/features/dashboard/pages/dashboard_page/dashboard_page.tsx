@@ -35,9 +35,9 @@ export function DashboardPage() {
             <small>rota protegida</small>
           </article>
           <article className="dashboard-metric dashboard-metric--info">
-            <span>OS Core</span>
-            <strong>Bloq.</strong>
-            <small>aguarda provider</small>
+            <span>Prestadores</span>
+            <strong>3+</strong>
+            <small>perfil mockado</small>
           </article>
         </section>
 
@@ -66,6 +66,28 @@ export function DashboardPage() {
                 </div>
                 <Link to="/addresses">Gerenciar enderecos</Link>
               </article>
+
+              <article className="dashboard-card">
+                <div>
+                  <strong>Prestadores</strong>
+                  <p>
+                    Simule perfis profissionais com bio e especialidades antes
+                    do fluxo real de candidatura.
+                  </p>
+                </div>
+                <Link to="/providers">Ver prestadores</Link>
+              </article>
+
+              <article className="dashboard-card dashboard-card--highlight">
+                <div>
+                  <strong>Ordens de Serviço</strong>
+                  <p>
+                    Crie, gerencie e acompanhe suas ordens de serviço. Revise
+                    candidatos e selecione prestadores qualificados.
+                  </p>
+                </div>
+                <Link to="/orders">Gerenciar ordens</Link>
+              </article>
             </div>
           </div>
 
@@ -73,8 +95,8 @@ export function DashboardPage() {
             <h2>Acoes rapidas</h2>
             <Link to="/specialties">Revisar catalogo</Link>
             <Link to="/addresses">Adicionar endereco</Link>
-            <span>Providers: proxima frente</span>
-            <span>Ordens de servico: bloqueado</span>
+            <Link to="/providers">Cadastrar prestador</Link>
+            <Link to="/orders">Nova ordem de serviço</Link>
           </aside>
         </section>
       </section>
