@@ -59,12 +59,13 @@ progress: 100%
 ---
 
 ### Ordens_De_Servico (Service Orders)
-status: UNBLOCKED
+status: DONE
 dependencies: [Prestadores, Especialidades, Endereços]
 blocks: [Pagamentos, Revisoes]
-progress: 0%
+progress: 100%
 
 ### Pagamentos (mock)
+
 status: NOT_STARTED
 dependencies: [Ordens_De_Servico]
 progress: 0%
@@ -84,6 +85,10 @@ progress: 0%
 - Máquina de Estados de Ordens de Serviço (OrderStateMachine)
 - Validação de Transições de Status e Estados Terminais
 - Infraestrutura de Value Objects implementada (Money, DateRange, GeoCoordinates, AuditMetadata)
+- Núcleo estrutural de Service Orders (Model, Repository, Service, API)
+- Integração de Service Orders com State Machine e DateRange
+- Automatização de Status CREATED -> AWAITING_CANDIDATES
+- Regras de Cancelamento com Validação de Estado e Propriedade
 - Domínio preparado para Service Orders, Pagamentos e Agenda
 - Redução de risco de deriva arquitetural via Anti-Padrões de VOs
 - Auditoria Arquitetural Completa: Consistência de Camadas, Tipagem SQLAlchemy 2.x e Async Correctness validados.
