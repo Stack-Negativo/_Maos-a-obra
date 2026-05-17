@@ -19,30 +19,48 @@ export function useAuth() {
   const [loading, setLoading] =
     useState(false);
 
-  async function handleLogin() {
-    if (
-      !email ||
-      !password
-    ) {
-      alert(
-        "Preencha email e senha",
-      );
+  const [error, setError] =
+    useState<string | null>(null);
 
+  function validateLogin() {
+    if (
+      !email.trim() ||
+      !password.trim()
+    ) {
+      return "Preencha email e senha.";
+    }
+
+    if (!email.includes("@")) {
+      return "Informe um email valido.";
+    }
+
+    return null;
+  }
+
+  async function handleLogin() {
+    const validationError =
+      validateLogin();
+
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     try {
       setLoading(true);
+      setError(null);
 
       await signIn({
-        email,
+        email: email.trim(),
         password,
       });
 
       navigate("/dashboard");
-    } catch {
-      alert(
-        "Erro ao realizar login",
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Erro ao realizar login.",
       );
     } finally {
       setLoading(false);
@@ -53,6 +71,7 @@ export function useAuth() {
     email,
     password,
     loading,
+    error,
 
     setEmail,
     setPassword,

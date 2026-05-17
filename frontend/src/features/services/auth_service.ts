@@ -15,7 +15,6 @@ type LoginResponse = {
 
 export async function loginService({
   email,
-  password,
 }: LoginPayload): Promise<LoginResponse> {
   await new Promise((resolve) =>
     setTimeout(resolve, 1000),

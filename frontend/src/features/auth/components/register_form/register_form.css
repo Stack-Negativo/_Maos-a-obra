@@ -1,6 +1,5 @@
-.login-form {
-  display: flex;
-  flex-direction: column;
+.register-form {
+  display: grid;
   gap: 1rem;
   padding: 1.25rem;
   border: 1px solid var(--color-border);
@@ -8,29 +7,28 @@
   background: #ffffff;
 }
 
-.login-form__header {
+.register-form__header {
   text-align: center;
 }
 
-.login-form__header h1 {
+.register-form__header h1 {
   color: var(--color-text);
   font-size: 1.6rem;
   font-weight: 850;
 }
 
-.login-form__header p {
+.register-form__header p {
   margin-top: 0.45rem;
   color: var(--color-text-secondary);
-  font-size: 0.95rem;
   line-height: 1.6;
 }
 
-.login-form__fields {
+.register-form__fields {
   display: grid;
   gap: 0.85rem;
 }
 
-.login-form__error {
+.register-form__error {
   padding: 0.85rem 1rem;
   border: 1px solid #fecaca;
   border-radius: 8px;
@@ -40,7 +38,7 @@
   line-height: 1.5;
 }
 
-.login-form__submit {
+.register-form__submit {
   width: 100%;
   padding: 0.9rem 1rem;
   border: none;
@@ -52,11 +50,22 @@
   transition: background-color 0.2s ease;
 }
 
-.login-form__submit:hover {
+.register-form__submit:hover {
   background: var(--color-brand-dark);
 }
 
-.login-form__submit:disabled {
+.register-form__submit:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+}
+
+.register-form__footer {
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.register-form__footer a {
+  color: var(--color-brand);
+  text-decoration: none;
+  font-weight: 800;
 }
