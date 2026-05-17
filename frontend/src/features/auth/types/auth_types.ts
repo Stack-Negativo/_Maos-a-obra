@@ -3,6 +3,13 @@ export type LoginPayload = {
   password: string;
 };
 
+export type RegisterPayload = {
+  nome: string;
+  email: string;
+  senha: string;
+  telefone: string;
+};
+
 export type AuthResponse = {
   token: string;
   user: {
