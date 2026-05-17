@@ -1,0 +1,53 @@
+.order-create-page {
+  padding: 32px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.order-create-page__header {
+  margin-bottom: 32px;
+}
+
+.order-create-page__back-btn {
+  padding: 8px 16px;
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.order-create-page__back-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.order-create-page__error {
+  background-color: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .order-create-page {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .order-create-page {
+    padding: 16px;
+  }
+
+  .order-create-page__back-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
