@@ -82,6 +82,23 @@ class BusinessRuleViolation(BaseAppException):
         super().__init__(message, error_code, details)
 
 
+class InvalidStatusTransitionException(BusinessRuleViolation):
+    """Exception raised when an invalid status transition is attempted."""
+
+    def __init__(
+        self,
+        current_status: str,
+        next_status: str,
+        message: str | None = None,
+        details: Any = None,
+    ):
+        self.current_status = current_status
+        self.next_status = next_status
+        if not message:
+            message = f"Transição de status inválida: {current_status} -> {next_status}"
+        super().__init__(message, "INVALID_STATUS_TRANSITION", details)
+
+
 class InfrastructureException(BaseAppException):
     """Exception raised for technical/infrastructure failures."""
 

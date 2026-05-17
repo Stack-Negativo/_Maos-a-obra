@@ -75,3 +75,31 @@ Nunca utilizar:
 
 ```python
 datetime.now()
+```
+
+---
+
+# AP07 — Primitivos em vez de Value Objects
+
+É proibido utilizar tipos primitivos para representar conceitos semânticos complexos do domínio.
+
+**Incorreto (Primitivos):**
+- Usar `float` para dinheiro.
+- Usar `datetime` naive (sem timezone).
+- Usar `utcnow()` diretamente no código operacional.
+- Usar `tuple` ou `list` para coordenadas geográficas.
+- Validar ranges temporais (start < end) diretamente em endpoints ou repositories.
+- Lógica de "overlap" de datas espalhada em Services.
+- Usar `dict` genérico para metadados de auditoria.
+
+**Correto (Value Objects):**
+- Usar `Money` (VO) para qualquer valor monetário.
+- Usar `DateRange` (VO) para intervalos de tempo.
+- Usar `GeoCoordinates` (VO) para localização.
+- Usar `AuditMetadata` (VO) para rastreabilidade.
+
+---
+
+# AP08 — Lógica de VO fora do Domínio
+
+Nunca implemente lógica de cálculo monetário ou validação de intervalo temporal fora do respectivo Value Object. Services devem apenas orquestrar o uso desses objetos.

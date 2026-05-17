@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from api import addresses, auth, health, providers, specialties, users
+from api import addresses, health, providers, service_orders, specialties, users
 from core.config import get_settings
 from core.database import check_db_connection
 from core.exceptions import (
@@ -82,7 +82,9 @@ async def app_exception_handler(_request: Request, exc: BaseAppException):
 # Include API routers
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
-app.include_router(auth.router, prefix="/api/v1")
+app.include_router(providers.router, prefix="/api/v1")
+app.include_router(service_orders.router, prefix="/api/v1")
 app.include_router(specialties.router, prefix="/api/v1")
+
 app.include_router(addresses.router, prefix="/api/v1")
 app.include_router(providers.router, prefix="/api/v1")
