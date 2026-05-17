@@ -1,0 +1,244 @@
+.orders-page {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.orders-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.orders-page__header h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.55rem;
+  font-weight: 850;
+}
+
+.orders-page__header p {
+  max-width: 42rem;
+  margin-top: 0.55rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.orders-page__summary {
+  color: var(--color-brand-dark) !important;
+  font-weight: 700;
+}
+
+.orders-page__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.orders-page__new-order-btn {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-brand);
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.orders-page__new-order-btn:hover {
+  opacity: 0.9;
+}
+
+.orders-page__new-order-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.orders-page__filters {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.orders-page__filters .input {
+  max-width: 100%;
+}
+
+.orders-page__filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.orders-page__filter-tab {
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.orders-page__filter-tab:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.orders-page__filter-tab.active {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #ffffff;
+}
+
+.orders-page__create-btn {
+  flex-shrink: 0;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-brand);
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.orders-page__create-btn:hover {
+  opacity: 0.9;
+}
+
+.orders-page__toolbar {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.orders-page__refresh-btn {
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--color-text-secondary);
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.orders-page__refresh-btn:hover:not(:disabled) {
+  border-color: var(--color-brand);
+}
+
+.orders-page__refresh-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.orders-page__error {
+  padding: 1rem;
+  border: 1px solid var(--color-danger);
+  border-radius: 10px;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.orders-page__error p {
+  margin: 0;
+  flex: 1;
+}
+
+.orders-page__retry-btn {
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-danger);
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.orders-page__retry-btn:hover {
+  opacity: 0.9;
+}
+
+.orders-page__state {
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--color-text-secondary);
+}
+
+.orders-page__loading,
+.orders-page__empty {
+  padding: 2rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #ffffff;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.orders-page__empty p {
+  margin: 0 0 1rem 0;
+}
+
+.orders-page__empty-btn {
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-brand);
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.orders-page__empty-btn:hover {
+  opacity: 0.9;
+}
+
+.orders-page__cta {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-brand);
+  color: #ffffff;
+  font-weight: 800;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.orders-page__cta:hover {
+  opacity: 0.9;
+}
+
+.orders-page__list {
+  display: grid;
+  gap: 0.75rem;
+}

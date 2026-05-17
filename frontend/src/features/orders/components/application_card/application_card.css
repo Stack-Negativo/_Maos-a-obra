@@ -1,0 +1,124 @@
+.application-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.application-card:hover {
+  border-color: var(--color-brand);
+  box-shadow: var(--shadow-card);
+}
+
+.application-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.application-card__provider {
+  display: grid;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.application-card__name {
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.application-card__rating {
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+.application-card__status {
+  flex-shrink: 0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.application-card__status--pending {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.application-card__status--success {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.application-card__status--danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.application-card__bio {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.application-card__specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.application-card__specialty-tag {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: var(--color-brand-light);
+  color: var(--color-brand-dark);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.application-card__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.application-card__btn {
+  height: 40px;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.application-card__btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.application-card__btn--accept {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.application-card__btn--accept:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.application-card__btn--reject {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.application-card__btn--reject:hover:not(:disabled) {
+  opacity: 0.85;
+}

@@ -22,6 +22,10 @@ const navItems = [
     label: "Enderecos",
     to: "/addresses",
   },
+  {
+    label: "Prestadores",
+    to: "/providers",
+  },
 ];
 
 function getInitials(name?: string) {

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useOrders } from "../hooks";
 import { OrdersCard } from "../components";
 import { AppShell } from "@/shared/components";
@@ -7,8 +6,7 @@ import { Input } from "@/shared/ui/input";
 
 import "./orders_page/orders_page.css";
 
-export function OrdersPage() {
-  const navigate = useNavigate();
+export function OrdersAdminPage() {
   const { orders, loading, error, refresh } = useOrders();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<
@@ -41,31 +39,21 @@ export function OrdersPage() {
       <section className="orders-page">
         <header className="orders-page__header">
           <div>
-            <h1>Minhas Ordens de Serviço</h1>
+            <h1>Painel Administrativo - Ordens de Serviço</h1>
             <p>
-              Acompanhe o status de suas ordens, revise candidatos
-              e selecione prestadores qualificados para sua
-              demanda.
+              Monitore todas as ordens de serviço, prestadores e
+              clientes do sistema. Gerencie conflitos e validações.
             </p>
             <p className="orders-page__summary">
               {orders.length} ordem{orders.length === 1 ? "" : "s"}{" "}
-              no total
+              no sistema
             </p>
-          </div>
-
-          <div className="orders-page__header-actions">
-            <button
-              className="orders-page__new-order-btn"
-              onClick={() => navigate("/orders/create")}
-            >
-              + Nova Ordem
-            </button>
           </div>
         </header>
 
         <section className="orders-page__filters">
           <Input
-            placeholder="Buscar por título ou descrição..."
+            placeholder="Buscar ordens..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             disabled={loading}
@@ -147,14 +135,8 @@ export function OrdersPage() {
                 ? "Nenhuma ordem encontrada com esse termo."
                 : filterStatus
                   ? "Nenhuma ordem com este status."
-                  : "Você não tem nenhuma ordem de serviço ainda."}
+                  : "Nenhuma ordem no sistema."}
             </p>
-            <button
-              className="orders-page__empty-btn"
-              onClick={() => navigate("/orders/create")}
-            >
-              Criar Primeira Ordem
-            </button>
           </div>
         ) : (
           <div className="orders-page__list">
