@@ -104,6 +104,10 @@ progress: 0%
     - Design validado para suportar os módulos futuros de `Applications` e `Scheduling`.
 - Redução de risco de deriva arquitetural via Anti-Padrões de VOs
 - Auditoria Arquitetural Completa: Consistência de Camadas, Tipagem SQLAlchemy 2.x e Async Correctness validados.
+- **Endurecimento Arquitetural e Tipagem Estrita:**
+    - Formalização da Política de Uso de Ignores (`type: ignore`, `pyright: ignore`, `noqa`).
+    - Definição de padrões para Narrowing Explícito e Contratos de Repositories.
+    - Implementação do Anti-Padrão AP10 — Ignore-Driven Development.
 
 ---
 
