@@ -90,6 +90,11 @@ progress: 0%
 - Automatização de Status CREATED -> AWAITING_CANDIDATES
 - Regras de Cancelamento com Validação de Estado e Propriedade
 - Domínio preparado para Service Orders, Pagamentos e Agenda
+- **Auditoria Profunda de Service Orders (Concluída):**
+    - Correção de precisão monetária: Migração de `float` para `Decimal` nos modelos e schemas.
+    - Otimização de busca: Adição de índices em `preferred_date_start` e `preferred_date_end`.
+    - Validação de integridade relacional e conformidade com SQLAlchemy 2.x.
+    - Design validado para suportar os módulos futuros de `Applications` e `Scheduling`.
 - Redução de risco de deriva arquitetural via Anti-Padrões de VOs
 - Auditoria Arquitetural Completa: Consistência de Camadas, Tipagem SQLAlchemy 2.x e Async Correctness validados.
 
