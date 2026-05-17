@@ -64,6 +64,12 @@ dependencies: [Prestadores, Especialidades, Endereços]
 blocks: [Pagamentos, Revisoes]
 progress: 100%
 
+### Candidaturas (Applications)
+status: IN_PROGRESS
+dependencies: [Ordens_De_Servico, Prestadores]
+blocks: [Pagamentos, Agenda]
+progress: 20%
+
 ### Pagamentos (mock)
 
 status: NOT_STARTED
@@ -89,6 +95,7 @@ progress: 0%
 - Integração de Service Orders com State Machine e DateRange
 - Automatização de Status CREATED -> AWAITING_CANDIDATES
 - Regras de Cancelamento com Validação de Estado e Propriedade
+- Formalização do Módulo de Candidaturas (Estados, Fluxos e Elegibilidade)
 - Domínio preparado para Service Orders, Pagamentos e Agenda
 - **Auditoria Profunda de Service Orders (Concluída):**
     - Correção de precisão monetária: Migração de `float` para `Decimal` nos modelos e schemas.
