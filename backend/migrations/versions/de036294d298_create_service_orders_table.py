@@ -92,5 +92,5 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_service_orders_client_id"), table_name="service_orders")
     op.drop_index(op.f("ix_service_orders_address_id"), table_name="service_orders")
     op.drop_table("service_orders")
-    # Use sa.Enum().drop(op.get_bind()) if needed, but usually Enum is handled by table drop or shared
+    # Enum is usually handled by table drop or shared
     op.execute("DROP TYPE orderstatus")

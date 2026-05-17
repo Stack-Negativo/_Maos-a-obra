@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -35,14 +36,20 @@ class ServiceOrder(BaseEntity, Base):
     description: Mapped[str] = mapped_column(Text, nullable=False)
 
     # Time Range (Value Object Integration Ready)
-    preferred_date_start: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    preferred_date_end: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    preferred_date_start: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, index=True
+    )
+    preferred_date_end: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, index=True
+    )
 
     scheduled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Financials (Value Object Integration Ready)
-    estimated_price: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
-    final_price: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
+    estimated_price: Mapped[Decimal | None] = mapped_column(
+        Numeric(10, 2), nullable=True
+    )
+    final_price: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
 
     status: Mapped[OrderStatus] = mapped_column(
         SQLEnum(OrderStatus), default=OrderStatus.CREATED, nullable=False, index=True
@@ -70,8 +77,8 @@ class ServiceOrder(BaseEntity, Base):
     def estimated_money(self) -> Money | None:
         if self.estimated_price is None:
             return None
-        return Money.from_str(str(self.estimated_price))
+        return Money(self.estimated_price)
 
     @estimated_money.setter
     def estimated_money(self, value: Money | None) -> None:
-        self.estimated_price = float(value.to_decimal()) if value else None
+        self.estimated_price = value.to_decimal() if value else None

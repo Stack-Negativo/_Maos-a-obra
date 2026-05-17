@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from uuid import uuid4
 
 from domain.enums import OrderStatus
@@ -49,7 +50,7 @@ def test_service_order_money_integration():
         preferred_date_start=datetime.now(UTC),
         preferred_date_end=datetime.now(UTC) + timedelta(hours=1),
         status=OrderStatus.CREATED,
-        estimated_price=150.50,
+        estimated_price=Decimal("150.50"),
     )
 
     expected_money = Money.from_str("150.50")
@@ -57,5 +58,5 @@ def test_service_order_money_integration():
 
     new_money = Money.from_str("200.00")
     order.estimated_money = new_money
-    assert order.estimated_price == 200.00
+    assert order.estimated_price == Decimal("200.00")
     assert order.estimated_money == new_money

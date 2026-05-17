@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import Self
 from uuid import UUID
 
@@ -57,8 +58,8 @@ class ServiceOrderResponse(ServiceOrderBase):
     client_id: UUID
     status: OrderStatus
     scheduled_at: datetime | None = None
-    estimated_price: float | None = None
-    final_price: float | None = None
+    estimated_price: Decimal | None = None
+    final_price: Decimal | None = None
     cancellation_reason: str | None = None
     created_at: datetime
     updated_at: datetime
