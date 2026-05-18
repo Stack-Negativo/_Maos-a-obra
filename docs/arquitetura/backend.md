@@ -221,9 +221,26 @@ No MVP:
 
 O objetivo é permitir validação do fluxo de negócio antes da integração definitiva.
 
----
+# Estratégia de Mensageria e Eventos
 
-# Estratégia de Matching de Prestadores
+O sistema está preparado para evoluir de um modelo monolítico síncrono para uma arquitetura orientada a eventos (Event-Driven).
+
+### Estratégia Atual (Monolito Síncrono)
+
+Atualmente, o sistema opera de forma **síncrona e monolítica**.
+
+*   **Execução:** Quando um serviço chama outro (ex: `OrderService` chamando `PaymentService`), a execução ocorre na mesma thread/transação de banco de dados.
+*   **Comunicação de Eventos:** Não há um broker (como RabbitMQ ou Kafka). A "notificação" de um evento ocorre via chamadas de método diretas ou atualização de estado no banco de dados.
+*   **Consistência:** A consistência é garantida via transações ACID do PostgreSQL dentro de cada request.
+
+### Estratégia Futura (Arquitetura Orientada a Eventos)
+
+O design atual permite a evolução para um modelo assíncrono sem alterar a lógica de negócio:
+
+1.  **Outbox Pattern:** Para garantir que um evento de domínio seja enviado apenas se a transação do banco de dados tiver sucesso.
+2.  **Mensageria (Pub/Sub):** Introdução de um broker (RabbitMQ/Kafka) para distribuir eventos para workers externos.
+3.  **Processamento Assíncrono:** Transições de estado que dependem de confirmações externas (como pagamentos reais) passarão a ser processadas via workers, reagindo a eventos de retorno do gateway.
+4.  **Retries e DLQ:** Implementação de políticas de re-tentativa automática para eventos que falharam no processamento (ex: falha de notificação).
 
 Fluxo principal:
 
