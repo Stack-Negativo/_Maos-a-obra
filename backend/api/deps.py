@@ -8,6 +8,7 @@ from core.security import verify_token
 from models.user import User
 from repositories.address_repository import AddressRepository
 from repositories.provider_repository import ProviderRepository
+from repositories.scheduling_repository import SchedulingRepository
 from repositories.service_order_application_repository import (
     ServiceOrderApplicationRepository,
 )
@@ -15,6 +16,7 @@ from repositories.service_order_repository import ServiceOrderRepository
 from repositories.specialty_repository import SpecialtyRepository
 from repositories.user_repository import UserRepository
 from schemas.auth import TokenData
+from services.scheduling_service import SchedulingService
 from services.service_order_application_service import ServiceOrderApplicationService
 from services.service_order_service import ServiceOrderService
 
@@ -51,6 +53,12 @@ async def get_application_repository(
     return ServiceOrderApplicationRepository(session)
 
 
+async def get_scheduling_repository(
+    session: AsyncSession = Depends(get_db),
+) -> SchedulingRepository:
+    return SchedulingRepository(session)
+
+
 async def get_service_order_service(
     order_repo: ServiceOrderRepository = Depends(get_service_order_repository),
     address_repo: AddressRepository = Depends(get_address_repository),
@@ -67,6 +75,14 @@ async def get_application_service(
     provider_repo: ProviderRepository = Depends(get_provider_repository),
 ) -> ServiceOrderApplicationService:
     return ServiceOrderApplicationService(application_repo, order_repo, provider_repo)
+
+
+async def get_scheduling_service(
+    scheduling_repo: SchedulingRepository = Depends(get_scheduling_repository),
+    order_repo: ServiceOrderRepository = Depends(get_service_order_repository),
+    provider_repo: ProviderRepository = Depends(get_provider_repository),
+) -> SchedulingService:
+    return SchedulingService(scheduling_repo, order_repo, provider_repo)
 
 
 async def get_current_user(

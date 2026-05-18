@@ -402,15 +402,66 @@ O prestador só pode se candidatar a uma OS se possuir a especialidade vinculada
 
 ---
 
-# RA01 — Não sobreposição
+## RS01 — Não pode haver overlap
 
-Prestador não pode possuir conflitos de horário.
+Um prestador não pode possuir conflitos de horário em sua agenda operacional. Isso inclui:
+- Duas Ordens de Serviço agendadas para o mesmo período.
+- Bloqueios manuais que conflitem com agendamentos.
+- Qualquer intervalo temporal que se sobreponha a outro já existente.
+
+A validação de sobreposição deve utilizar obrigatoriamente o método `DateRange.overlaps()`.
 
 ---
 
-# RA02 — Exclusividade operacional
+## RS02 — Agendamento exige Provider selecionado
 
-Prestador somente pode executar uma OS por vez.
+Uma Ordem de Serviço somente poderá transicionar para o status `SCHEDULED` se:
+- Existir um prestador aceito (`provider_id` não nulo).
+- Existir uma candidatura com status `ACCEPTED`.
+- O status atual da OS for `PROVIDER_SELECTED`.
+
+---
+
+## RS03 — Estados terminais bloqueiam agendamento
+
+Ordens de Serviço nos estados `CANCELLED`, `FINISHED` ou `EXPIRED` não podem:
+- Ser agendadas ou reagendadas.
+- Gerar ou manter Busy Slots na agenda do prestador.
+- Sofrer qualquer alteração relacionada à agenda operacional.
+
+---
+
+## RS04 — Agendamento deve ser transacional
+
+A criação de um agendamento deve ser uma operação atômica e transacional, garantindo que:
+- O Busy Slot seja criado na agenda do prestador.
+- O status da OS seja alterado para `SCHEDULED`.
+- Os horários oficiais sejam registrados na OS.
+Se qualquer uma dessas etapas falhar, toda a operação deve ser revertida.
+
+---
+
+## RS05 — UTC obrigatório
+
+Todo e qualquer registro temporal de agendamento:
+- Deve ser armazenado e processado em UTC.
+- Deve utilizar objetos `datetime` *timezone-aware*.
+- É terminantemente proibido o uso de `datetime` *naive*.
+
+---
+
+## RS06 — Agendamento passado proibido
+
+O sistema não deve permitir a criação de agendamentos ou Busy Slots com data de início no passado em relação ao momento da transação.
+
+---
+
+## RS07 — Ownership operacional
+
+Somente os seguintes atores possuem permissão para confirmar ou alterar um agendamento:
+- O Cliente (tomador) proprietário da Ordem de Serviço.
+- O Prestador selecionado para a execução do serviço.
+- Administradores do sistema (para fins de suporte e moderação).
 
 ---
 
