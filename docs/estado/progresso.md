@@ -70,6 +70,11 @@ dependencies: [Ordens_De_Servico, Prestadores]
 blocks: [Pagamentos, Agenda]
 progress: 20%
 
+### Agenda (Scheduling)
+status: IN_PROGRESS (Documentation Formalized)
+dependencies: [Candidaturas, Ordens_De_Servico]
+progress: 10%
+
 ### Pagamentos (mock)
 
 status: NOT_STARTED
@@ -97,6 +102,11 @@ progress: 0%
 - Regras de Cancelamento com Validação de Estado e Propriedade
 - Formalização do Módulo de Candidaturas (Estados, Fluxos e Elegibilidade)
 - Domínio preparado para Service Orders, Pagamentos e Agenda
+- **Formalização do Módulo de Agendamento (Concluída):**
+    - Definição de regras RS01-RS07 para integridade temporal e concorrência.
+    - Criação da documentação oficial do domínio de agendamento.
+    - Alinhamento de anti-padrões e requisitos transacionais.
+    - Preparação para implementação de Busy Slots e prevenção de overlap.
 - **Auditoria Profunda de Service Orders (Concluída):**
     - Correção de precisão monetária: Migração de `float` para `Decimal` nos modelos e schemas.
     - Otimização de busca: Adição de índices em `preferred_date_start` e `preferred_date_end`.

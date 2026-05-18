@@ -1,0 +1,123 @@
+# =========================
+# SISTEMA OPERACIONAL
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# =========================
+# VSCODE
+# =========================
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# =========================
+# LOGS
+# =========================
+
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# FRONTEND - NODE / VITE
+# =========================
+
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+
+# ENV
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# TYPESCRIPT
+frontend/*.tsbuildinfo
+
+# =========================
+# BACKEND - PYTHON / FASTAPI
+# =========================
+
+backend/__pycache__/
+backend/**/*.pyo
+backend/**/*.pyc
+backend/**/*.pyd
+*.egg-info
+
+# VENV
+backend/venv/
+backend/.venv/
+backend/env/
+
+# PYTHON CACHE
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# FASTAPI / UVICORN
+backend/.coverage
+backend/htmlcov/
+
+# ENV
+backend/.env
+
+# =========================
+# DATABASES
+# =========================
+
+*.sqlite3
+*.db
+
+# =========================
+# DOCKER
+# =========================
+
+docker-data/
+*.pid
+
+# =========================
+# BUILD
+# =========================
+
+build/
+dist/
+
+# =========================
+# TEMP
+# =========================
+
+tmp/
+temp/
+
+# =========================
+# IDE
+# =========================
+
+.idea/
+
+# =========================
+# PACKAGE LOCKS OPCIONAIS
+# =========================
+
+# descomente caso decidam NÃO versionar locks
+
+package-lock.json
+poetry.lock
+bun.lock
+
+# =========================
+# UV
+# =========================
+
+backend/uv.lock
+backend/*.toml
+backend/.python-version
+
