@@ -7,6 +7,7 @@ from api import (
     addresses,
     health,
     providers,
+    scheduling,
     service_order_applications,
     service_orders,
     specialties,
@@ -91,6 +92,7 @@ async def app_exception_handler(_request: Request, exc: BaseAppException):
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(providers.router, prefix="/api/v1")
+app.include_router(scheduling.router, prefix="/api/v1")
 app.include_router(service_orders.router, prefix="/api/v1")
 app.include_router(service_order_applications.router, prefix="/api/v1")
 app.include_router(specialties.router, prefix="/api/v1")

@@ -13,6 +13,10 @@ sys.path.append(os.getcwd())  # This should now add /app/backend
 from core.config import get_settings
 from core.database import Base
 from models.address import Address  # noqa: F401
+from models.provider import Provider  # noqa: F401
+from models.scheduling import ProviderBusySlot  # noqa: F401
+from models.service_order import ServiceOrder  # noqa: F401
+from models.service_order_application import ServiceOrderApplication  # noqa: F401
 from models.specialty import Specialty  # noqa: F401
 
 # Import all models here for autogenerate support

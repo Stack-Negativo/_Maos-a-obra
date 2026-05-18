@@ -14,6 +14,7 @@
 - [x] Structural Alignment (DONE)
 - [x] OS core implementado
 - [x] Candidaturas (DONE)
+- [x] Agenda operacional (DONE)
 
 ---
 
@@ -72,9 +73,9 @@ blocks: [Pagamentos, Agenda]
 progress: 100%
 
 ### Agenda (Scheduling)
-status: IN_PROGRESS (Documentation Formalized)
+status: DONE
 dependencies: [Candidaturas, Ordens_De_Servico]
-progress: 10%
+progress: 100%
 
 ### Pagamentos (mock)
 
@@ -106,11 +107,12 @@ progress: 0%
 - Regra de Seleção Única com Rejeição em Massa Atomicamente
 - Bloqueio de Auto-Candidatura e Validação de Especialidade do Prestador
 - Domínio preparado para Service Orders, Pagamentos e Agenda
-- **Formalização do Módulo de Agendamento (Concluída):**
-    - Definição de regras RS01-RS07 para integridade temporal e concorrência.
-    - Criação da documentação oficial do domínio de agendamento.
-    - Alinhamento de anti-padrões e requisitos transacionais.
-    - Preparação para implementação de Busy Slots e prevenção de overlap.
+- **Formalização e Implementação do Módulo de Agendamento (Concluída):**
+    - Definição e implementação das regras RS01-RS07 para integridade temporal.
+    - Implementação de `ProviderBusySlot` com suporte a `overlaps` eficientes.
+    - Transição atômica `PROVIDER_SELECTED` -> `SCHEDULED` dentro de transação.
+    - Garantia de uso obrigatório de UTC e Timezone-aware datetimes via `DateRange`.
+    - API de agendamento e consulta de disponibilidade implementada e testada.
 - **Auditoria Profunda de Service Orders (Concluída):**
     - Correção de precisão monetária: Migração de `float` para `Decimal` nos modelos e schemas.
     - Otimização de busca: Adição de índices em `preferred_date_start` e `preferred_date_end`.
@@ -127,7 +129,6 @@ progress: 0%
 
 ## Regras críticas pendentes
 
-- agenda do prestador
 - finalização operacional completa
 - fluxo de pagamento mock
 - avaliações 360 (client <-> provider)
@@ -151,6 +152,6 @@ progress: 0%
 7. providers (DONE)
 8. service orders (DONE)
 9. candidaturas (DONE)
-10. agenda
+10. agenda (DONE)
 11. pagamentos mock
 12. avaliações
