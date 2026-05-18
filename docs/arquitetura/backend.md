@@ -67,6 +67,7 @@ backend/
 
 - **Ordens de Serviço (Service Orders):** Núcleo do sistema, gerencia o ciclo de vida da solicitação de serviço.
 - **Candidaturas (Applications):** Gerencia o interesse e seleção de prestadores para uma OS.
+- **Agendamento (Scheduling):** Gerencia a agenda operacional dos prestadores, controle de disponibilidade e prevenção de conflitos temporais.
 - **Especialidades:** Taxonomia de serviços oferecidos na plataforma.
 
 ---

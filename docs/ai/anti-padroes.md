@@ -121,3 +121,27 @@ Nunca implemente lógica de cálculo monetário ou validação de intervalo temp
 - Usar supressões apenas para limitações técnicas externas (ex: SQLAlchemy mapper side-effects).
 - Sempre documentar o motivo do ignore com comentário explicativo.
 - Consultar a [Política de Tipagem Estrita](/docs/arquitetura/tipagem-e-ignores.md) para casos permitidos.
+
+---
+
+# AP11 — Agendamento sem transação
+
+É proibido realizar a mudança de status para `SCHEDULED` e a criação de slots de agenda em transações separadas ou fora de um contexto transacional.
+
+---
+
+# AP12 — Overlap validado fora da transação
+
+A verificação de sobreposição de horários deve ocorrer obrigatoriamente dentro da transação que persiste o agendamento, para evitar race conditions onde dois agendamentos ocupam o mesmo slot.
+
+---
+
+# AP13 — Uso de datetime naive
+
+É terminantemente proibido o uso de `datetime` sem timezone (naive) em qualquer parte do módulo de agendamento. Todo cálculo e persistência deve ser em UTC.
+
+---
+
+# AP14 — Regras temporais fora de Value Objects
+
+Validações de intervalo (start < end) ou lógica de sobreposição não devem ser implementadas em Services ou Repositories. Essas responsabilidades pertencem exclusivamente ao Value Object `DateRange`.
