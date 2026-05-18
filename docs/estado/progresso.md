@@ -143,7 +143,12 @@ progress: 0%
 
 ---
 
-## Ordem recomendada de execução
+## Auditoria de Higiene de Tipagem e Financeira (Concluída)
+
+- [x] Formalização de eventos de domínio
+- [x] Política de idempotência para operações financeiras
+- [x] Preparação para arquitetura orientada a eventos (Event-Driven)
+- [x] Preparação para integração com gateways externos
 
 1. backend bootstrap (DONE)
 2. auth (DONE)
