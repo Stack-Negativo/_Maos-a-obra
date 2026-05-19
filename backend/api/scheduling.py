@@ -1,8 +1,8 @@
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
-from api.deps import get_current_user, get_provider_repository, get_scheduling_service
 from core.exceptions import NotFoundException
 from models.user import User
 from repositories.provider_repository import ProviderRepository
@@ -12,6 +12,8 @@ from schemas.scheduling import (
     ScheduleOrderInput,
 )
 from services.scheduling_service import SchedulingService
+
+from .deps import get_current_user, get_provider_repository, get_scheduling_service
 
 router = APIRouter(prefix="/scheduling", tags=["Scheduling"])
 
@@ -24,8 +26,8 @@ router = APIRouter(prefix="/scheduling", tags=["Scheduling"])
 async def schedule_order(
     order_id: UUID,
     data: ScheduleOrderInput,
-    current_user: User = Depends(get_current_user),
-    service: SchedulingService = Depends(get_scheduling_service),
+    current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[SchedulingService, Depends(get_scheduling_service)],
 ):
     """
     Officializes a service order schedule.
@@ -38,8 +40,8 @@ async def schedule_order(
 @router.get("/providers/{provider_id}", response_model=ProviderScheduleResponse)
 async def get_provider_schedule(
     provider_id: UUID,
-    _current_user: User = Depends(get_current_user),
-    service: SchedulingService = Depends(get_scheduling_service),
+    _current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[SchedulingService, Depends(get_scheduling_service)],
 ):
     """
     Returns the full schedule for a provider.
@@ -50,9 +52,9 @@ async def get_provider_schedule(
 
 @router.get("/me", response_model=ProviderScheduleResponse)
 async def get_my_schedule(
-    current_user: User = Depends(get_current_user),
-    service: SchedulingService = Depends(get_scheduling_service),
-    provider_repo: ProviderRepository = Depends(get_provider_repository),
+    current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[SchedulingService, Depends(get_scheduling_service)],
+    provider_repo: Annotated[ProviderRepository, Depends(get_provider_repository)],
 ):
     """
     Returns the schedule of the authenticated provider.

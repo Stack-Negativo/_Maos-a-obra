@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +9,7 @@ from core.exceptions import AuthenticationException
 from core.security import verify_token
 from models.user import User
 from repositories.address_repository import AddressRepository
+from repositories.payment_repository import PaymentRepository
 from repositories.provider_repository import ProviderRepository
 from repositories.scheduling_repository import SchedulingRepository
 from repositories.service_order_application_repository import (
@@ -16,6 +19,7 @@ from repositories.service_order_repository import ServiceOrderRepository
 from repositories.specialty_repository import SpecialtyRepository
 from repositories.user_repository import UserRepository
 from schemas.auth import TokenData
+from services.payment_service import PaymentService
 from services.scheduling_service import SchedulingService
 from services.service_order_application_service import ServiceOrderApplicationService
 from services.service_order_service import ServiceOrderService
@@ -24,69 +28,86 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
 async def get_address_repository(
-    session: AsyncSession = Depends(get_db),
+    session: Annotated[AsyncSession, Depends(get_db)],
 ) -> AddressRepository:
     return AddressRepository(session)
 
 
 async def get_specialty_repository(
-    session: AsyncSession = Depends(get_db),
+    session: Annotated[AsyncSession, Depends(get_db)],
 ) -> SpecialtyRepository:
     return SpecialtyRepository(session)
 
 
 async def get_service_order_repository(
-    session: AsyncSession = Depends(get_db),
+    session: Annotated[AsyncSession, Depends(get_db)],
 ) -> ServiceOrderRepository:
     return ServiceOrderRepository(session)
 
 
 async def get_provider_repository(
-    session: AsyncSession = Depends(get_db),
+    session: Annotated[AsyncSession, Depends(get_db)],
 ) -> ProviderRepository:
     return ProviderRepository(session)
 
 
 async def get_application_repository(
-    session: AsyncSession = Depends(get_db),
+    session: Annotated[AsyncSession, Depends(get_db)],
 ) -> ServiceOrderApplicationRepository:
     return ServiceOrderApplicationRepository(session)
 
 
 async def get_scheduling_repository(
-    session: AsyncSession = Depends(get_db),
+    session: Annotated[AsyncSession, Depends(get_db)],
 ) -> SchedulingRepository:
     return SchedulingRepository(session)
 
 
 async def get_service_order_service(
-    order_repo: ServiceOrderRepository = Depends(get_service_order_repository),
-    address_repo: AddressRepository = Depends(get_address_repository),
-    specialty_repo: SpecialtyRepository = Depends(get_specialty_repository),
+    order_repo: Annotated[
+        ServiceOrderRepository, Depends(get_service_order_repository)
+    ],
+    address_repo: Annotated[AddressRepository, Depends(get_address_repository)],
+    specialty_repo: Annotated[SpecialtyRepository, Depends(get_specialty_repository)],
 ) -> ServiceOrderService:
     return ServiceOrderService(order_repo, address_repo, specialty_repo)
 
 
 async def get_application_service(
-    application_repo: ServiceOrderApplicationRepository = Depends(
-        get_application_repository
-    ),
-    order_repo: ServiceOrderRepository = Depends(get_service_order_repository),
-    provider_repo: ProviderRepository = Depends(get_provider_repository),
+    application_repo: Annotated[
+        ServiceOrderApplicationRepository, Depends(get_application_repository)
+    ],
+    order_repo: Annotated[
+        ServiceOrderRepository, Depends(get_service_order_repository)
+    ],
+    provider_repo: Annotated[ProviderRepository, Depends(get_provider_repository)],
 ) -> ServiceOrderApplicationService:
     return ServiceOrderApplicationService(application_repo, order_repo, provider_repo)
 
 
 async def get_scheduling_service(
-    scheduling_repo: SchedulingRepository = Depends(get_scheduling_repository),
-    order_repo: ServiceOrderRepository = Depends(get_service_order_repository),
-    provider_repo: ProviderRepository = Depends(get_provider_repository),
+    scheduling_repo: Annotated[
+        SchedulingRepository, Depends(get_scheduling_repository)
+    ],
+    order_repo: Annotated[
+        ServiceOrderRepository, Depends(get_service_order_repository)
+    ],
+    provider_repo: Annotated[ProviderRepository, Depends(get_provider_repository)],
 ) -> SchedulingService:
     return SchedulingService(scheduling_repo, order_repo, provider_repo)
 
 
+async def get_payment_service(
+    session: Annotated[AsyncSession, Depends(get_db)],
+) -> PaymentService:
+    payment_repo = PaymentRepository(session)
+    order_repo = ServiceOrderRepository(session)
+    return PaymentService(session, payment_repo, order_repo)
+
+
 async def get_current_user(
-    session: AsyncSession = Depends(get_db), token: str = Depends(oauth2_scheme)
+    session: Annotated[AsyncSession, Depends(get_db)],
+    token: Annotated[str, Depends(oauth2_scheme)],
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -107,7 +128,7 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user: User = Depends(get_current_user),
+    current_user: Annotated[User, Depends(get_current_user)],
 ) -> User:
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")

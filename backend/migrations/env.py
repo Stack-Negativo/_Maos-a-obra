@@ -12,15 +12,22 @@ sys.path.append(os.getcwd())  # This should now add /app/backend
 
 from core.config import get_settings
 from core.database import Base
-from models.address import Address  # noqa: F401
-from models.provider import Provider  # noqa: F401
-from models.scheduling import ProviderBusySlot  # noqa: F401
-from models.service_order import ServiceOrder  # noqa: F401
-from models.service_order_application import ServiceOrderApplication  # noqa: F401
-from models.specialty import Specialty  # noqa: F401
+from models.address import Address as Address  # noqa: F401
+from models.idempotency_key import IdempotencyKey as IdempotencyKey  # noqa: F401
+from models.payment import Payment as Payment  # noqa: F401
+from models.payment_transaction import (
+    PaymentTransaction as PaymentTransaction,  # noqa: F401
+)
+from models.provider import Provider as Provider  # noqa: F401
+from models.scheduling import ProviderBusySlot as ProviderBusySlot  # noqa: F401
+from models.service_order import ServiceOrder as ServiceOrder  # noqa: F401
+from models.service_order_application import (
+    ServiceOrderApplication as ServiceOrderApplication,
+)  # noqa: F401
+from models.specialty import Specialty as Specialty  # noqa: F401
 
 # Import all models here for autogenerate support
-from models.user import User  # noqa: F401
+from models.user import User as User  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to values within the .ini file in use.

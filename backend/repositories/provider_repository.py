@@ -51,9 +51,7 @@ class ProviderRepository:
         # Re-fetch with specialties loaded
         updated_provider = await self.get_by_id(provider.id)
         if updated_provider is None:
-            raise InfrastructureException(
-                "Provider disappeared after persistence"
-            )
+            raise InfrastructureException("Provider disappeared after persistence")
         return updated_provider
 
     async def update(self, provider: Provider, data: dict[str, Any]) -> Provider:

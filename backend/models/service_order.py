@@ -41,13 +41,14 @@ class ServiceOrder(BaseEntity, Base):
 
     # Time Range (Value Object Integration Ready)
     preferred_date_start: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, index=True
+        DateTime(timezone=True), nullable=False, index=True
     )
     preferred_date_end: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, index=True
+        DateTime(timezone=True), nullable=False, index=True
     )
-
-    scheduled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    scheduled_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     # Financials (Value Object Integration Ready)
     estimated_price: Mapped[Decimal | None] = mapped_column(

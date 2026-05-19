@@ -9,14 +9,14 @@ from core.exceptions import (
     ConflictException,
 )
 from domain.enums import OrderStatus
-from models.address import Address as _Address  # noqa: F401
+from models.address import Address as Address  # noqa: F401
 from models.provider import Provider
 from models.scheduling import ProviderBusySlot
 from models.service_order import ServiceOrder
-from models.specialty import Specialty as _Specialty  # noqa: F401
+from models.specialty import Specialty as Specialty  # noqa: F401
 
 # Standard SQLAlchemy initialization requires all related models to be loaded
-from models.user import User as _User  # noqa: F401
+from models.user import User as User  # noqa: F401
 from services.scheduling_service import SchedulingService
 
 

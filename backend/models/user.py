@@ -20,4 +20,6 @@ class User(BaseEntity, Base):
     is_email_verified: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False
     )
-    last_login_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_login_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )

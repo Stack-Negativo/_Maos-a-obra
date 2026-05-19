@@ -54,8 +54,9 @@ def test_money_comparison():
 
 def test_money_immutability():
     m = Money(Decimal("10.00"))
+    attr_name = "amount"
     with pytest.raises(AttributeError):
-        m.amount = Decimal("20.00")  # type: ignore
+        setattr(m, attr_name, Decimal("20.00"))
 
 
 def test_money_equality():

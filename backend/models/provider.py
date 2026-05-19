@@ -25,7 +25,9 @@ class Provider(BaseEntity, Base):
     )
     total_reviews: Mapped[int] = mapped_column(default=0, nullable=False)
     is_suspended: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    suspended_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    suspended_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     # Relationships
     user: Mapped["User"] = relationship("User")
@@ -44,7 +46,7 @@ class ProviderSpecialty(Base):
         ForeignKey("specialties.id"), primary_key=True
     )
     linked_at: Mapped[datetime] = mapped_column(
-        DateTime, default=lambda: datetime.now(UTC), nullable=False
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )
 
     # Relationships
