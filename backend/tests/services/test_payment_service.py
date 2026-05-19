@@ -21,6 +21,7 @@ from services.payment_service import PaymentService
 @pytest.fixture
 def payment_service():
     session = AsyncMock()
+    session.add = MagicMock()  # session.add is synchronous
     payment_repo = MagicMock(spec=PaymentRepository)
     order_repo = MagicMock(spec=ServiceOrderRepository)
     return (
@@ -73,14 +74,14 @@ async def test_create_payment_success(payment_service):
     assert payment.amount == amount
     assert payment.status == PaymentStatus.PENDING
     assert session.add.call_count >= 3  # payment, transaction, idempotency_key
-    assert session.commit.call_count >= 2
-    # one for primary creation, one for updating idempotency key
+    assert session.commit.call_count >= 1
+    # Hardened version uses a single commit for everything
     payment_repo.get_idempotency_key.assert_called_once_with(idempotency_key)
 
 
 @pytest.mark.asyncio
 async def test_create_payment_idempotency_hit(payment_service):
-    service, session, payment_repo, _ = payment_service
+    service, _session, payment_repo, _ = payment_service
     idempotency_key = "existing-key"
 
     payment_repo.get_idempotency_key = AsyncMock(
@@ -88,10 +89,35 @@ async def test_create_payment_idempotency_hit(payment_service):
             key=idempotency_key,
             actor_id=uuid4(),
             created_at=datetime.now(UTC),
+            status_code=201,  # Success previously
         )
     )
 
     with pytest.raises(ConflictException, match="already used"):
+        await service.create_payment(
+            client_id=uuid4(),
+            service_order_id=uuid4(),
+            amount=Decimal("10.00"),
+            idempotency_key_str=idempotency_key,
+            actor_id=uuid4(),
+        )
+
+
+@pytest.mark.asyncio
+async def test_create_payment_idempotency_failed_previously(payment_service):
+    service, _session, payment_repo, _ = payment_service
+    idempotency_key = "failed-key"
+
+    payment_repo.get_idempotency_key = AsyncMock(
+        return_value=IdempotencyKey(
+            key=idempotency_key,
+            actor_id=uuid4(),
+            created_at=datetime.now(UTC),
+            status_code=None,  # Or 500
+        )
+    )
+
+    with pytest.raises(ConflictException, match="failed previously"):
         await service.create_payment(
             client_id=uuid4(),
             service_order_id=uuid4(),
@@ -119,7 +145,7 @@ async def test_process_payment_mock_success(payment_service):
         updated_at=datetime.now(UTC),
     )
 
-    payment_repo.get_payment_by_id = AsyncMock(return_value=payment)
+    payment_repo.get_payment_by_id_for_update = AsyncMock(return_value=payment)
     order_repo.get_by_id = AsyncMock(
         return_value=ServiceOrder(
             id=payment.service_order_id, client_id=payment.client_id
@@ -132,7 +158,7 @@ async def test_process_payment_mock_success(payment_service):
     )
 
     assert processed_payment.status == PaymentStatus.APPROVED
-    assert session.commit.call_count >= 2  # once for PROCESSING, once for APPROVED
+    assert session.commit.call_count >= 1  # consolidated
 
 
 @pytest.mark.asyncio
@@ -153,7 +179,7 @@ async def test_refund_payment_success(payment_service):
         updated_at=datetime.now(UTC),
     )
 
-    payment_repo.get_payment_by_id = AsyncMock(return_value=payment)
+    payment_repo.get_payment_by_id_for_update = AsyncMock(return_value=payment)
 
     refunded_payment = await service.refund_payment(
         payment_id=payment_id,
@@ -166,8 +192,9 @@ async def test_refund_payment_success(payment_service):
 
 @pytest.mark.asyncio
 async def test_refund_payment_invalid_status(payment_service):
-    service, session, payment_repo, _ = payment_service
+    service, _session, payment_repo, _ = payment_service
     payment_id = uuid4()
+    actor_id = uuid4()
 
     payment = Payment(
         id=payment_id,
@@ -181,10 +208,10 @@ async def test_refund_payment_invalid_status(payment_service):
         updated_at=datetime.now(UTC),
     )
 
-    payment_repo.get_payment_by_id = AsyncMock(return_value=payment)
+    payment_repo.get_payment_by_id_for_update = AsyncMock(return_value=payment)
 
     with pytest.raises(BusinessRuleViolation, match="Only approved payments"):
         await service.refund_payment(
             payment_id=payment_id,
-            actor_id=uuid4(),
+            actor_id=actor_id,
         )

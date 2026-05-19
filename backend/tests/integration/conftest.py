@@ -1,25 +1,28 @@
-import asyncio
 from collections.abc import AsyncGenerator
 from datetime import UTC, datetime, timedelta
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from core.config import get_settings
 from domain.enums import OrderStatus
-from models.address import Address  # noqa: F401
-from models.idempotency_key import IdempotencyKey  # noqa: F401
-from models.payment import Payment  # noqa: F401
-from models.payment_transaction import PaymentTransaction  # noqa: F401
-from models.provider import Provider  # noqa: F401
-from models.scheduling import ProviderBusySlot  # noqa: F401
-from models.service_order import ServiceOrder  # noqa: F401
-from models.service_order_application import ServiceOrderApplication  # noqa: F401
-from models.specialty import Specialty  # noqa: F401
+from models.address import Address as Address  # noqa: F401
+from models.idempotency_key import IdempotencyKey as IdempotencyKey  # noqa: F401
+from models.payment import Payment as Payment  # noqa: F401
+from models.payment_transaction import (
+    PaymentTransaction as PaymentTransaction,  # noqa: F401
+)
+from models.provider import Provider as Provider  # noqa: F401
+from models.scheduling import ProviderBusySlot as ProviderBusySlot  # noqa: F401
+from models.service_order import ServiceOrder as ServiceOrder  # noqa: F401
+from models.service_order_application import (
+    ServiceOrderApplication as ServiceOrderApplication,
+)  # noqa: F401
+from models.specialty import Specialty as Specialty  # noqa: F401
 
 # Import all models to ensure registry is complete
-from models.user import User  # noqa: F401
+from models.user import User as User  # noqa: F401
 
 settings = get_settings()
 
@@ -51,7 +54,7 @@ async def db_session(engine) -> AsyncGenerator[AsyncSession, None]:
 
 @pytest_asyncio.fixture
 async def create_user(db_session: AsyncSession):
-    async def _create(email: str = None):
+    async def _create(email: str | None = None):
         user = User(
             id=uuid4(),
             full_name="Test User",
@@ -87,7 +90,7 @@ async def create_specialty(db_session: AsyncSession):
 
 @pytest_asyncio.fixture
 async def create_address(db_session: AsyncSession):
-    async def _create(user_id: uuid4):
+    async def _create(user_id: UUID):
         addr = Address(
             id=uuid4(),
             user_id=user_id,
@@ -109,7 +112,7 @@ async def create_address(db_session: AsyncSession):
 
 @pytest_asyncio.fixture
 async def create_service_order(db_session: AsyncSession):
-    async def _create(client_id: uuid4, specialty_id: uuid4, address_id: uuid4):
+    async def _create(client_id: UUID, specialty_id: UUID, address_id: UUID):
         so = ServiceOrder(
             id=uuid4(),
             client_id=client_id,
