@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from typing import Annotated
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends
@@ -13,7 +14,9 @@ from services.user_service import UserService
 router = APIRouter()
 
 
-async def get_user_service(session: AsyncSession = Depends(get_db)) -> UserService:
+async def get_user_service(
+    session: Annotated[AsyncSession, Depends(get_db)],
+) -> UserService:
     user_repository = UserRepository(session)
     return UserService(user_repository)
 
@@ -23,7 +26,9 @@ async def get_user_service(session: AsyncSession = Depends(get_db)) -> UserServi
     response_model=APIResponse[UserResponse],
     summary="Get current user details (mocked)",
 )
-async def read_users_me(_user_service: UserService = Depends(get_user_service)):
+async def read_users_me(
+    _user_service: Annotated[UserService, Depends(get_user_service)],
+):
     # For now, return a mocked user as authentication is not implemented
     # In a real scenario, the authenticated user's ID would be retrieved
     # and then fetched from the database using user_service.get_user_by_id(user_id)

@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -39,10 +40,10 @@ class ProviderBusySlot(BaseEntity, Base):
         ForeignKey("service_orders.id"), nullable=True, index=True
     )
 
-    start_at: Mapped[DateTime] = mapped_column(
+    start_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, index=True
     )
-    end_at: Mapped[DateTime] = mapped_column(
+    end_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, index=True
     )
 

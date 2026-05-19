@@ -25,6 +25,7 @@ class PaymentStatus(StrEnum):
     PROCESSING = "PROCESSING"
     APPROVED = "APPROVED"
     DECLINED = "DECLINED"
+    FAILED = "FAILED"
     REFUNDED = "REFUNDED"
 
 

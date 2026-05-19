@@ -13,9 +13,10 @@ from api import (
     specialties,
     users,
 )
-from core.config import get_settings
-from core.database import check_db_connection
-from core.exceptions import (
+
+from .core.config import get_settings
+from .core.database import check_db_connection
+from .core.exceptions import (
     AuthenticationException,
     AuthorizationException,
     BaseAppException,
@@ -25,7 +26,7 @@ from core.exceptions import (
     NotFoundException,
     ValidationException,
 )
-from core.logging_config import setup_logging
+from .core.logging_config import setup_logging
 
 settings = get_settings()
 

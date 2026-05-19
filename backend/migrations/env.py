@@ -13,6 +13,9 @@ sys.path.append(os.getcwd())  # This should now add /app/backend
 from core.config import get_settings
 from core.database import Base
 from models.address import Address  # noqa: F401
+from models.idempotency_key import IdempotencyKey  # noqa: F401
+from models.payment import Payment  # noqa: F401
+from models.payment_transaction import PaymentTransaction  # noqa: F401
 from models.provider import Provider  # noqa: F401
 from models.scheduling import ProviderBusySlot  # noqa: F401
 from models.service_order import ServiceOrder  # noqa: F401

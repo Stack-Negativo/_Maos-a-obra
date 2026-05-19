@@ -17,14 +17,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # 1. Create Enums
-    op.execute(
-        "CREATE TYPE busyslotsource AS ENUM "
-        "('SERVICE_ORDER', 'MANUAL_BLOCK', 'UNAVAILABILITY')"
-    )
-    op.execute("CREATE TYPE busyslotstatus AS ENUM ('CONFIRMED', 'TENTATIVE')")
-
-    # 2. Create provider_busy_slots table
+    # 1. Create provider_busy_slots table
     op.create_table(
         "provider_busy_slots",
         sa.Column("id", sa.UUID(), nullable=False),

@@ -1,22 +1,19 @@
-from fastapi import APIRouter, Depends, Header, status
+from typing import Annotated
 from uuid import UUID
-from typing import Optional
 
-from backend.api.deps import (
-    get_current_active_user,
-    get_payment_service,
-    get_payment_repository,
-)
-from backend.models.user import User
-from backend.schemas.payment import (
+from fastapi import APIRouter, Depends, Header, status
+
+from models.user import User
+from schemas.payment import (
     PaymentCreate,
     PaymentResponse,
-    PaymentProcessRequest,
-    PaymentRefundRequest,
 )
-from backend.services.payment_service import PaymentService
-from backend.repositories.payment_repository import PaymentRepository
+from services.payment_service import PaymentService
 
+from .deps import (
+    get_current_active_user,
+    get_payment_service,
+)
 
 router = APIRouter(prefix="/payments", tags=["Payments"])
 
@@ -28,10 +25,10 @@ router = APIRouter(prefix="/payments", tags=["Payments"])
 )
 async def create_payment(
     payload: PaymentCreate,
-    current_user: User = Depends(get_current_active_user),
-    idempotency_key: str = Header(..., alias="X-Idempotency-Key"),
-    correlation_id: Optional[UUID] = Header(None, alias="X-Correlation-ID"),
-    payment_service: PaymentService = Depends(get_payment_service),
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    payment_service: Annotated[PaymentService, Depends(get_payment_service)],
+    idempotency_key: Annotated[str, Header(alias="X-Idempotency-Key")],
+    correlation_id: Annotated[UUID | None, Header(alias="X-Correlation-ID")] = None,
 ) -> PaymentResponse:
     """
     Create a new payment for a Service Order.
@@ -45,7 +42,7 @@ async def create_payment(
         actor_id=current_user.id,
         correlation_id=correlation_id,
     )
-    return payment
+    return PaymentResponse.model_validate(payment)
 
 
 @router.post(
@@ -54,9 +51,9 @@ async def create_payment(
 )
 async def process_payment_mock(
     payment_id: UUID,
-    current_user: User = Depends(get_current_active_user),
-    correlation_id: Optional[UUID] = Header(None, alias="X-Correlation-ID"),
-    payment_service: PaymentService = Depends(get_payment_service),
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    payment_service: Annotated[PaymentService, Depends(get_payment_service)],
+    correlation_id: Annotated[UUID | None, Header(alias="X-Correlation-ID")] = None,
 ) -> PaymentResponse:
     """
     Simulate payment processing (Mock).
@@ -66,7 +63,7 @@ async def process_payment_mock(
         actor_id=current_user.id,
         correlation_id=correlation_id,
     )
-    return payment
+    return PaymentResponse.model_validate(payment)
 
 
 @router.post(
@@ -75,9 +72,9 @@ async def process_payment_mock(
 )
 async def refund_payment(
     payment_id: UUID,
-    current_user: User = Depends(get_current_active_user),
-    correlation_id: Optional[UUID] = Header(None, alias="X-Correlation-ID"),
-    payment_service: PaymentService = Depends(get_payment_service),
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    payment_service: Annotated[PaymentService, Depends(get_payment_service)],
+    correlation_id: Annotated[UUID | None, Header(alias="X-Correlation-ID")] = None,
 ) -> PaymentResponse:
     """
     Refund an approved payment.
@@ -87,7 +84,7 @@ async def refund_payment(
         actor_id=current_user.id,
         correlation_id=correlation_id,
     )
-    return payment
+    return PaymentResponse.model_validate(payment)
 
 
 @router.get(
@@ -96,9 +93,10 @@ async def refund_payment(
 )
 async def get_payment(
     payment_id: UUID,
-    payment_service: PaymentService = Depends(get_payment_service),
+    payment_service: Annotated[PaymentService, Depends(get_payment_service)],
 ) -> PaymentResponse:
     """
     Get payment details.
     """
-    return await payment_service.get_payment(payment_id)
+    payment = await payment_service.get_payment(payment_id)
+    return PaymentResponse.model_validate(payment)

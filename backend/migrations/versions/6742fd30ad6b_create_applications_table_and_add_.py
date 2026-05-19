@@ -17,13 +17,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # 1. Create ApplicationStatus enum
-    op.execute(
-        "CREATE TYPE applicationstatus AS ENUM "
-        "('PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED')"
-    )
-
-    # 2. Add provider_id to service_orders
+    # 1. Add provider_id to service_orders
     op.add_column("service_orders", sa.Column("provider_id", sa.UUID(), nullable=True))
     op.create_foreign_key(
         "fk_service_orders_provider_id",

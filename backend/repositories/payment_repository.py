@@ -1,13 +1,12 @@
-from collections.abc import Sequence
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from models.idempotency_key import IdempotencyKey
 from models.payment import Payment
 from models.payment_transaction import PaymentTransaction
-from models.idempotency_key import IdempotencyKey
 
 
 class PaymentRepository:
@@ -16,8 +15,6 @@ class PaymentRepository:
 
     async def create_payment(self, payment: Payment) -> Payment:
         self.session.add(payment)
-        await self.session.commit()
-        await self.session.refresh(payment)
         return payment
 
     async def get_payment_by_id(self, payment_id: UUID) -> Payment | None:
@@ -26,7 +23,15 @@ class PaymentRepository:
         )
         return result.scalars().first()
 
-    async def get_payment_by_service_order_id(self, service_order_id: UUID) -> Payment | None:
+    async def get_payment_by_id_for_update(self, payment_id: UUID) -> Payment | None:
+        result = await self.session.execute(
+            select(Payment).where(Payment.id == payment_id).with_for_update()
+        )
+        return result.scalars().first()
+
+    async def get_payment_by_service_order_id(
+        self, service_order_id: UUID
+    ) -> Payment | None:
         result = await self.session.execute(
             select(Payment).where(Payment.service_order_id == service_order_id)
         )
@@ -35,14 +40,12 @@ class PaymentRepository:
     async def update_payment(self, payment: Payment, data: dict[str, Any]) -> Payment:
         for key, value in data.items():
             setattr(payment, key, value)
-        await self.session.commit()
-        await self.session.refresh(payment)
         return payment
 
-    async def create_transaction(self, transaction: PaymentTransaction) -> PaymentTransaction:
+    async def create_transaction(
+        self, transaction: PaymentTransaction
+    ) -> PaymentTransaction:
         self.session.add(transaction)
-        await self.session.commit()
-        await self.session.refresh(transaction)
         return transaction
 
     async def get_idempotency_key(self, key: str) -> IdempotencyKey | None:
@@ -51,8 +54,8 @@ class PaymentRepository:
         )
         return result.scalars().first()
 
-    async def create_idempotency_key(self, idempotency_key: IdempotencyKey) -> IdempotencyKey:
+    async def create_idempotency_key(
+        self, idempotency_key: IdempotencyKey
+    ) -> IdempotencyKey:
         self.session.add(idempotency_key)
-        await self.session.commit()
-        await self.session.refresh(idempotency_key)
         return idempotency_key
