@@ -16,6 +16,7 @@
 - [x] Candidaturas (DONE)
 - [x] Agenda operacional (DONE)
 - [x] Módulo de Avaliações (DONE)
+- [x] Auditoria de Status (DONE)
 - [/] Pagamentos Mock (Em implementação)
 
 ---
@@ -71,6 +72,7 @@ progress: 100%
 *   [x] State Machine
 *   [x] Cancelamento
 *   [x] Ciclo Operacional (IN_PROGRESS -> FINISHED)
+*   [x] Auditoria de Status (RAD01)
 
 ### Candidaturas (Applications)
 status: IN_PROGRESS
@@ -135,6 +137,10 @@ progress: 100%
     - Implementação de avaliações 360 (Client <-> Provider).
     - Regras de negócio: apenas após OS finalizada, sem autoavaliação, avaliação única por direção.
     - Automação: atualização de média de estrelas e suspensão automática para média < 3 em 10 OS.
+- [x] **Auditoria de Status (Concluída):**
+    - Implementação do histórico de auditoria para Ordens de Serviço (RAD01).
+    - Registro automático de transições de status em `ServiceOrderService`, `ApplicationService` e `SchedulingService`.
+    - Endpoint para consulta de histórico por OS validado por ownership.
 - **Formalização e Implementação do Módulo de Agendamento (Concluída):**
     - Definição e implementação das regras RS01-RS07 para integridade temporal.
     - Implementação de `ProviderBusySlot` com suporte a `overlaps` eficientes.
@@ -158,7 +164,6 @@ progress: 100%
 ## Regras críticas pendentes
 
 - [ ] **Integração de Pagamento:** Acionamento automático do `PaymentService` ao finalizar OS.
-- [ ] **Auditoria de Status da OS:** Registro histórico de transições de status (RAD01).
 
 ---
 
@@ -179,5 +184,4 @@ progress: 100%
 
 ## Próximos Passos (Backend)
 
-1.  **Auditoria de Status (OS History):** Criar mecanismo de log para transições de status da OS.
-2.  **Integração de Pagamento:** Vincular a finalização operacional ao processamento do pagamento mock.
+1.  **Integração de Pagamento:** Vincular a finalização operacional ao processamento do pagamento mock.
