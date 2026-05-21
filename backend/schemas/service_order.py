@@ -58,6 +58,7 @@ class ServiceOrderResponse(ServiceOrderBase):
     client_id: UUID
     status: OrderStatus
     scheduled_at: datetime | None = None
+    provider_finished_at: datetime | None = None
     estimated_price: Decimal | None = None
     final_price: Decimal | None = None
     cancellation_reason: str | None = None

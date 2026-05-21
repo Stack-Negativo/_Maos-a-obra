@@ -6,10 +6,12 @@ from uuid import uuid4
 import pytest
 
 from core.exceptions import (
+    BusinessRuleViolation,
     ValidationException,
 )
 from domain.enums import OrderStatus
 from models.address import Address
+from models.provider import Provider
 from models.service_order import ServiceOrder
 from models.specialty import Specialty
 from models.user import (
@@ -19,11 +21,25 @@ from schemas.service_order import ServiceOrderCreate
 from services.service_order_service import ServiceOrderService
 
 
+class AsyncContextManagerMock:
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        pass
+
+
 @pytest.fixture
 def service_order_service():
     order_repo = MagicMock()
     address_repo = MagicMock()
     specialty_repo = MagicMock()
+
+    # Mock session for begin() context manager
+    session_mock = MagicMock()
+    session_mock.begin.return_value = AsyncContextManagerMock()
+    order_repo.session = session_mock
+
     return (
         ServiceOrderService(order_repo, address_repo, specialty_repo),
         order_repo,
@@ -103,7 +119,7 @@ async def test_cancel_order_success(service_order_service):
         id=order_id, client_id=client_id, status=OrderStatus.AWAITING_CANDIDATES
     )
 
-    order_repo.get_by_id = AsyncMock(return_value=order)
+    order_repo.get_by_id_for_update = AsyncMock(return_value=order)
 
     def update_mock(obj: ServiceOrder, data: dict[str, Any]) -> ServiceOrder:
         for key, value in data.items():
@@ -121,19 +137,106 @@ async def test_cancel_order_success(service_order_service):
 
 
 @pytest.mark.asyncio
-async def test_cancel_order_invalid_transition(service_order_service):
+async def test_start_execution_success(service_order_service):
+    service, order_repo, _, _ = service_order_service
+    provider_user_id = uuid4()
+    order_id = uuid4()
+    provider_id = uuid4()
+
+    provider = Provider(id=provider_id, user_id=provider_user_id)
+    order = ServiceOrder(
+        id=order_id,
+        provider_id=provider_id,
+        provider=provider,
+        status=OrderStatus.SCHEDULED,
+    )
+
+    order_repo.get_by_id_for_update = AsyncMock(return_value=order)
+
+    started_order = await service.start_execution(order_id, provider_user_id)
+
+    assert started_order.status == OrderStatus.IN_PROGRESS
+
+
+@pytest.mark.asyncio
+async def test_start_execution_unauthorized(service_order_service):
+    service, order_repo, _, _ = service_order_service
+    other_user_id = uuid4()
+    order_id = uuid4()
+    provider_id = uuid4()
+
+    provider = Provider(id=provider_id, user_id=uuid4())  # Different user
+    order = ServiceOrder(
+        id=order_id,
+        provider_id=provider_id,
+        provider=provider,
+        status=OrderStatus.SCHEDULED,
+    )
+
+    order_repo.get_by_id_for_update = AsyncMock(return_value=order)
+
+    with pytest.raises(BusinessRuleViolation, match="Apenas o prestador selecionado"):
+        await service.start_execution(order_id, other_user_id)
+
+
+@pytest.mark.asyncio
+async def test_complete_execution_success(service_order_service):
+    service, order_repo, _, _ = service_order_service
+    provider_user_id = uuid4()
+    order_id = uuid4()
+    provider_id = uuid4()
+
+    provider = Provider(id=provider_id, user_id=provider_user_id)
+    order = ServiceOrder(
+        id=order_id,
+        provider_id=provider_id,
+        provider=provider,
+        status=OrderStatus.IN_PROGRESS,
+    )
+
+    order_repo.get_by_id_for_update = AsyncMock(return_value=order)
+
+    completed_order = await service.complete_execution(order_id, provider_user_id)
+
+    assert completed_order.provider_finished_at is not None
+    assert completed_order.status == OrderStatus.IN_PROGRESS  # Status doesn't change
+
+
+@pytest.mark.asyncio
+async def test_confirm_execution_success(service_order_service):
     service, order_repo, _, _ = service_order_service
     client_id = uuid4()
     order_id = uuid4()
 
-    # Terminal state
-    order = ServiceOrder(id=order_id, client_id=client_id, status=OrderStatus.FINISHED)
+    order = ServiceOrder(
+        id=order_id,
+        client_id=client_id,
+        status=OrderStatus.IN_PROGRESS,
+        provider_finished_at=datetime.now(UTC),
+    )
 
-    order_repo.get_by_id = AsyncMock(return_value=order)
+    order_repo.get_by_id_for_update = AsyncMock(return_value=order)
 
-    from core.exceptions import InvalidStatusTransitionException
+    confirmed_order = await service.confirm_execution(order_id, client_id)
 
-    with pytest.raises(InvalidStatusTransitionException):
-        await service.cancel_order(
-            order_id, client_id, "Tentar cancelar o que já terminou"
-        )
+    assert confirmed_order.status == OrderStatus.FINISHED
+
+
+@pytest.mark.asyncio
+async def test_confirm_execution_missing_provider_finish(service_order_service):
+    service, order_repo, _, _ = service_order_service
+    client_id = uuid4()
+    order_id = uuid4()
+
+    # Provider hasn't finished yet
+    order = ServiceOrder(
+        id=order_id,
+        client_id=client_id,
+        status=OrderStatus.IN_PROGRESS,
+        provider_finished_at=None,
+    )
+
+    order_repo.get_by_id_for_update = AsyncMock(return_value=order)
+
+    with pytest.raises(BusinessRuleViolation, match="sinalizada pelo prestador"):
+        await service.confirm_execution(order_id, client_id)

@@ -49,6 +49,9 @@ class ServiceOrder(BaseEntity, Base):
     scheduled_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    provider_finished_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     # Financials (Value Object Integration Ready)
     estimated_price: Mapped[Decimal | None] = mapped_column(
