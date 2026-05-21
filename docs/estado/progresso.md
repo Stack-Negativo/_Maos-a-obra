@@ -12,9 +12,10 @@
 - [x] Auth implementado
 - [x] Especialidades (DONE)
 - [x] Structural Alignment (DONE)
-- [x] OS core implementado
+- [x] OS core implementado (Estrutura básica)
 - [x] Candidaturas (DONE)
 - [x] Agenda operacional (DONE)
+- [/] Pagamentos Mock (Em implementação)
 
 ---
 
@@ -61,10 +62,14 @@ progress: 100%
 ---
 
 ### Ordens_De_Servico (Service Orders)
-status: DONE
+status: IN_PROGRESS
 dependencies: [Prestadores, Especialidades, Endereços]
 blocks: [Pagamentos, Revisoes]
-progress: 100%
+progress: 85%
+*   [x] CRUD básico
+*   [x] State Machine
+*   [x] Cancelamento
+*   [ ] Ciclo Operacional (IN_PROGRESS -> FINISHED)
 
 ### Candidaturas (Applications)
 status: IN_PROGRESS
@@ -83,7 +88,14 @@ dependencies: [Candidaturas, Ordens_De_Servico]
 progress: 100%
 
 ### Pagamentos (mock)
+status: IN_PROGRESS
+dependencies: [Ordens_De_Servico]
+progress: 80%
+*   [x] Service/Repo/API de Pagamento
+*   [x] Idempotência e Auditoria
+*   [ ] Integração com Fluxo de Finalização de OS
 
+### Avaliações (Reviews)
 status: NOT_STARTED
 dependencies: [Ordens_De_Servico]
 progress: 0%
@@ -131,9 +143,11 @@ progress: 0%
 
 ## Regras críticas pendentes
 
-- finalização operacional completa
-- fluxo de pagamento mock
-- avaliações 360 (client <-> provider)
+- [ ] **Finalização Operacional:** Implementar `start_execution` e `finish_order` no `ServiceOrderService`.
+- [ ] **Integração de Pagamento:** Acionamento automático do `PaymentService` ao finalizar OS.
+- [ ] **Módulo de Avaliações:** Implementar domínio completo de Reviews (RN05).
+- [ ] **Auditoria de Status da OS:** Registro histórico de transições de status (RAD01).
+- [ ] **Suspensão por Desempenho:** Lógica de monitoramento de média de estrelas (RN04).
 
 ---
 
@@ -150,15 +164,12 @@ progress: 0%
 - [x] Preparação para arquitetura orientada a eventos (Event-Driven)
 - [x] Preparação para integração com gateways externos
 
-1. backend bootstrap (DONE)
-2. auth (DONE)
-3. users (DONE)
-4. specialties (DONE)
-5. structural alignment (DONE)
-6. addresses (DONE)
-7. providers (DONE)
-8. service orders (DONE)
-9. candidaturas (DONE)
-10. agenda (DONE)
-11. pagamentos mock
-12. avaliações
+---
+
+## Próximos Passos (Backend)
+
+1.  **Ciclo Operacional de OS:** Completar transições de status no `ServiceOrderService` (`IN_PROGRESS`, `FINISHED`).
+2.  **Módulo de Avaliações (Reviews):** Implementar Model, Repository, Service e API para avaliações 360.
+3.  **Auditoria de Status (OS History):** Criar mecanismo de log para transições de status da OS.
+4.  **Integração de Pagamento:** Vincular a finalização operacional ao processamento do pagamento mock.
+5.  **Regras de Performance:** Implementar lógica de suspensão automática baseada em avaliações.
