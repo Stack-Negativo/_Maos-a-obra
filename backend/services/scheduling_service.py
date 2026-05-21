@@ -10,8 +10,10 @@ from domain.enums import OrderStatus
 from domain.order_state_machine import OrderStateMachine
 from domain.value_objects.date_range import DateRange
 from models.scheduling import BusySlotSource, BusySlotStatus, ProviderBusySlot
+from models.service_order_history import ServiceOrderHistory
 from repositories.provider_repository import ProviderRepository
 from repositories.scheduling_repository import SchedulingRepository
+from repositories.service_order_history_repository import ServiceOrderHistoryRepository
 from repositories.service_order_repository import ServiceOrderRepository
 
 
@@ -26,10 +28,12 @@ class SchedulingService:
         scheduling_repository: SchedulingRepository,
         order_repository: ServiceOrderRepository,
         provider_repository: ProviderRepository,
+        history_repository: ServiceOrderHistoryRepository,
     ):
         self.scheduling_repository = scheduling_repository
         self.order_repository = order_repository
         self.provider_repository = provider_repository
+        self.history_repository = history_repository
 
     async def schedule_order(
         self, order_id: UUID, user_id: UUID, start_at: datetime, end_at: datetime
@@ -84,7 +88,8 @@ class SchedulingService:
         # RS04 — Agendamento deve ser transacional
         async with self.scheduling_repository.session.begin():
             # Update Order Status (PROVIDER_SELECTED -> SCHEDULED)
-            OrderStateMachine.validate_transition(order.status, OrderStatus.SCHEDULED)
+            old_status = order.status
+            OrderStateMachine.validate_transition(old_status, OrderStatus.SCHEDULED)
             order.status = OrderStatus.SCHEDULED
             order.scheduled_at = start_at
 
@@ -98,6 +103,16 @@ class SchedulingService:
                 status=BusySlotStatus.CONFIRMED,
                 description=f"Agendamento OS: {order.title}",
             )
+
+            # Record History
+            history = ServiceOrderHistory(
+                service_order_id=order_id,
+                old_status=old_status,
+                new_status=order.status,
+                actor_id=user_id,
+                reason=f"Scheduled for {start_at.isoformat()}",
+            )
+            await self.history_repository.create(history)
 
             return await self.scheduling_repository.create_busy_slot(busy_slot)
 

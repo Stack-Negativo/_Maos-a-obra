@@ -1,14 +1,14 @@
-"""create reviews table
+"""create service_order_history table
 
-Revision ID: eff1b033855f
-Revises: 609724dd16c5
-Create Date: 2026-05-21 11:50:11.140267
+Revision ID: 49bc4169a8b4
+Revises: eff1b033855f
+Create Date: 2026-05-21 12:14:09.514936
 
 """
 
 # revision identifiers, used by Alembic.
-revision = "eff1b033855f"
-down_revision = "609724dd16c5"
+revision = "49bc4169a8b4"
+down_revision = "eff1b033855f"
 branch_labels = None
 depends_on = None
 
