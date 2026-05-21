@@ -15,6 +15,7 @@ from repositories.service_order_history_repository import ServiceOrderHistoryRep
 from repositories.service_order_repository import ServiceOrderRepository
 from repositories.specialty_repository import SpecialtyRepository
 from schemas.service_order import ServiceOrderCreate
+from services.payment_service import PaymentService
 
 
 class ServiceOrderService:
@@ -24,11 +25,13 @@ class ServiceOrderService:
         address_repository: AddressRepository,
         specialty_repository: SpecialtyRepository,
         history_repository: ServiceOrderHistoryRepository,
+        payment_service: PaymentService,
     ):
         self.order_repository = order_repository
         self.address_repository = address_repository
         self.specialty_repository = specialty_repository
         self.history_repository = history_repository
+        self.payment_service = payment_service
 
     async def _record_history(
         self,
@@ -210,6 +213,7 @@ class ServiceOrderService:
         """
         Confirm finalization by the client.
         Transitions OS to FINISHED and requires provider_finished_at to be set.
+        Triggers payment processing.
         """
         async with self.order_repository.session.begin():
             order = await self.order_repository.get_by_id_for_update(order_id)
@@ -239,12 +243,22 @@ class ServiceOrderService:
 
             order.status = OrderStatus.FINISHED
 
+            # Trigger Payment (Mock)
+            # RI03 — Gatilho de pagamento automático
+            if order.estimated_price:
+                await self.payment_service.auto_create_and_process_payment(
+                    client_id=order.client_id,
+                    service_order_id=order.id,
+                    amount=order.estimated_price,
+                    actor_id=user_id,
+                )
+
             await self._record_history(
                 order_id=order.id,
                 new_status=order.status,
                 old_status=old_status,
                 actor_id=user_id,
-                reason="Client confirmed finalization",
+                reason="Client confirmed finalization and payment triggered",
             )
 
             return order

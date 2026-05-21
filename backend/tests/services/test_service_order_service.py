@@ -34,6 +34,8 @@ def service_order_service():
     specialty_repo = MagicMock()
     history_repo = MagicMock()
     history_repo.create = AsyncMock()
+    payment_service = MagicMock()
+    payment_service.auto_create_and_process_payment = AsyncMock()
 
     # Mock session for begin() context manager
     session_mock = MagicMock()
@@ -41,17 +43,20 @@ def service_order_service():
     order_repo.session = session_mock
 
     return (
-        ServiceOrderService(order_repo, address_repo, specialty_repo, history_repo),
+        ServiceOrderService(
+            order_repo, address_repo, specialty_repo, history_repo, payment_service
+        ),
         order_repo,
         address_repo,
         specialty_repo,
         history_repo,
+        payment_service,
     )
 
 
 @pytest.mark.asyncio
 async def test_create_order_success(service_order_service):
-    service, order_repo, address_repo, specialty_repo, history_repo = (
+    service, order_repo, address_repo, specialty_repo, history_repo, _ = (
         service_order_service
     )
     client_id = uuid4()
@@ -92,7 +97,7 @@ async def test_create_order_success(service_order_service):
 
 @pytest.mark.asyncio
 async def test_create_order_invalid_address(service_order_service):
-    service, _, address_repo, _, _ = service_order_service
+    service, _, address_repo, _, _, _ = service_order_service
     client_id = uuid4()
     other_user_id = uuid4()
     address_id = uuid4()
@@ -116,7 +121,7 @@ async def test_create_order_invalid_address(service_order_service):
 
 @pytest.mark.asyncio
 async def test_cancel_order_success(service_order_service):
-    service, order_repo, _, _, history_repo = service_order_service
+    service, order_repo, _, _, history_repo, _ = service_order_service
     client_id = uuid4()
     order_id = uuid4()
 
@@ -136,7 +141,7 @@ async def test_cancel_order_success(service_order_service):
 
 @pytest.mark.asyncio
 async def test_start_execution_success(service_order_service):
-    service, order_repo, _, _, history_repo = service_order_service
+    service, order_repo, _, _, history_repo, _ = service_order_service
     provider_user_id = uuid4()
     order_id = uuid4()
     provider_id = uuid4()
@@ -159,7 +164,7 @@ async def test_start_execution_success(service_order_service):
 
 @pytest.mark.asyncio
 async def test_complete_execution_success(service_order_service):
-    service, order_repo, _, _, history_repo = service_order_service
+    service, order_repo, _, _, history_repo, _ = service_order_service
     provider_user_id = uuid4()
     order_id = uuid4()
     provider_id = uuid4()
@@ -183,7 +188,7 @@ async def test_complete_execution_success(service_order_service):
 
 @pytest.mark.asyncio
 async def test_confirm_execution_success(service_order_service):
-    service, order_repo, _, _, history_repo = service_order_service
+    service, order_repo, _, _, history_repo, payment_service = service_order_service
     client_id = uuid4()
     order_id = uuid4()
 
@@ -192,6 +197,7 @@ async def test_confirm_execution_success(service_order_service):
         client_id=client_id,
         status=OrderStatus.IN_PROGRESS,
         provider_finished_at=datetime.now(UTC),
+        estimated_price=100.0,
     )
 
     order_repo.get_by_id_for_update = AsyncMock(return_value=order)
@@ -200,3 +206,4 @@ async def test_confirm_execution_success(service_order_service):
 
     assert confirmed_order.status == OrderStatus.FINISHED
     history_repo.create.assert_called_once()
+    payment_service.auto_create_and_process_payment.assert_called_once()

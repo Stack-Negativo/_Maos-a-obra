@@ -78,6 +78,14 @@ async def get_history_repository(
     return ServiceOrderHistoryRepository(session)
 
 
+async def get_payment_service(
+    session: Annotated[AsyncSession, Depends(get_db)],
+) -> PaymentService:
+    payment_repo = PaymentRepository(session)
+    order_repo = ServiceOrderRepository(session)
+    return PaymentService(session, payment_repo, order_repo)
+
+
 async def get_service_order_service(
     order_repo: Annotated[
         ServiceOrderRepository, Depends(get_service_order_repository)
@@ -87,8 +95,11 @@ async def get_service_order_service(
     history_repo: Annotated[
         ServiceOrderHistoryRepository, Depends(get_history_repository)
     ],
+    payment_service: Annotated[PaymentService, Depends(get_payment_service)],
 ) -> ServiceOrderService:
-    return ServiceOrderService(order_repo, address_repo, specialty_repo, history_repo)
+    return ServiceOrderService(
+        order_repo, address_repo, specialty_repo, history_repo, payment_service
+    )
 
 
 async def get_application_service(
@@ -121,14 +132,6 @@ async def get_scheduling_service(
     ],
 ) -> SchedulingService:
     return SchedulingService(scheduling_repo, order_repo, provider_repo, history_repo)
-
-
-async def get_payment_service(
-    session: Annotated[AsyncSession, Depends(get_db)],
-) -> PaymentService:
-    payment_repo = PaymentRepository(session)
-    order_repo = ServiceOrderRepository(session)
-    return PaymentService(session, payment_repo, order_repo)
 
 
 async def get_review_service(
