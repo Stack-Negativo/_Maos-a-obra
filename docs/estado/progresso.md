@@ -17,7 +17,7 @@
 - [x] Agenda operacional (DONE)
 - [x] Módulo de Avaliações (DONE)
 - [x] Auditoria de Status (DONE)
-- [/] Pagamentos Mock (Em implementação)
+- [x] Pagamentos Mock Integrados (DONE)
 
 ---
 
@@ -91,12 +91,12 @@ dependencies: [Candidaturas, Ordens_De_Servico]
 progress: 100%
 
 ### Pagamentos (mock)
-status: IN_PROGRESS
+status: DONE
 dependencies: [Ordens_De_Servico]
-progress: 80%
+progress: 100%
 *   [x] Service/Repo/API de Pagamento
 *   [x] Idempotência e Auditoria
-*   [ ] Integração com Fluxo de Finalização de OS
+*   [x] Integração com Fluxo de Finalização de OS (RI03)
 
 ### Avaliações (Reviews)
 status: DONE
@@ -118,7 +118,7 @@ progress: 100%
 - Gestão de Endereços com Regra de Único Padrão
 - Módulo de Prestadores com Vínculo de Especialidades
 - Regra de Exclusividade de Admin (Não pode ser Provider)
-- Verificação de Elegibilidade de Prestadores
+- Verification de Elegibilidade de Prestadores
 - Máquina de Estados de Ordens de Serviço (OrderStateMachine)
 - Validação de Transições de Status e Estados Terminais
 - Infraestrutura de Value Objects implementada (Money, DateRange, GeoCoordinates, AuditMetadata)
@@ -141,6 +141,10 @@ progress: 100%
     - Implementação do histórico de auditoria para Ordens de Serviço (RAD01).
     - Registro automático de transições de status em `ServiceOrderService`, `ApplicationService` e `SchedulingService`.
     - Endpoint para consulta de histórico por OS validado por ownership.
+- [x] **Integração de Pagamento (Concluída):**
+    - Gatilho automático de pagamento mock ao finalizar OS (RI03).
+    - Garantia de transacionalidade atômica: OS finaliza apenas se o pagamento for registrado.
+    - Rastreabilidade total: Histórico da OS registra o gatilho financeiro.
 - **Formalização e Implementação do Módulo de Agendamento (Concluída):**
     - Definição e implementação das regras RS01-RS07 para integridade temporal.
     - Implementação de `ProviderBusySlot` com suporte a `overlaps` eficientes.
@@ -163,7 +167,7 @@ progress: 100%
 
 ## Regras críticas pendentes
 
-- [ ] **Integração de Pagamento:** Acionamento automático do `PaymentService` ao finalizar OS.
+- Nenhuma pendência crítica para o MVP do Backend.
 
 ---
 
@@ -182,6 +186,8 @@ progress: 100%
 
 ---
 
-## Próximos Passos (Backend)
+## Próximos Passos (Geral)
 
-1.  **Integração de Pagamento:** Vincular a finalização operacional ao processamento do pagamento mock.
+1.  **Validação de MVP:** Testes de integração de ponta a ponta (E2E).
+2.  **Frontend:** Implementação das interfaces de usuário baseadas nos contratos de API estáveis.
+3.  **Deploy:** Preparação de ambiente de homologação.
