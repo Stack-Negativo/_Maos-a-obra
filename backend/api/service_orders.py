@@ -4,14 +4,24 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 
 from models.user import User
+from schemas.review import (
+    ReviewCreate,
+    ReviewListResponse,
+    ReviewResponse,
+)
 from schemas.service_order import (
     ServiceOrderCreate,
     ServiceOrderListResponse,
     ServiceOrderResponse,
 )
+from services.review_service import ReviewService
 from services.service_order_service import ServiceOrderService
 
-from .deps import get_current_user, get_service_order_service
+from .deps import (
+    get_current_user,
+    get_review_service,
+    get_service_order_service,
+)
 
 router = APIRouter(prefix="/orders", tags=["Service Orders"])
 
@@ -97,3 +107,32 @@ async def confirm_execution(
     This will transition the order to FINISHED.
     """
     return await service.confirm_execution(id, current_user.id)
+
+
+@router.post(
+    "/{id}/reviews",
+    response_model=ReviewResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_review(
+    id: UUID,
+    payload: ReviewCreate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[ReviewService, Depends(get_review_service)],
+):
+    """
+    Create a review for a finished Service Order.
+    """
+    return await service.create_review(current_user.id, id, payload)
+
+
+@router.get("/{id}/reviews", response_model=ReviewListResponse)
+async def list_order_reviews(
+    id: UUID,
+    service: Annotated[ReviewService, Depends(get_review_service)],
+):
+    """
+    List all reviews for a specific Service Order.
+    """
+    reviews = await service.list_order_reviews(id)
+    return {"reviews": reviews}

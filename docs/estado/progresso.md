@@ -15,6 +15,7 @@
 - [x] OS core implementado (DONE)
 - [x] Candidaturas (DONE)
 - [x] Agenda operacional (DONE)
+- [x] Módulo de Avaliações (DONE)
 - [/] Pagamentos Mock (Em implementação)
 
 ---
@@ -91,9 +92,13 @@ progress: 80%
 *   [ ] Integração com Fluxo de Finalização de OS
 
 ### Avaliações (Reviews)
-status: NOT_STARTED
+status: DONE
 dependencies: [Ordens_De_Servico]
-progress: 0%
+progress: 100%
+*   [x] Model e Repository
+*   [x] Service com regras RN05, RAV05, RI06
+*   [x] API Endpoints (POST/GET)
+*   [x] Atualização de Rating e Suspensão Automática (RN04)
 
 ---
 
@@ -124,6 +129,10 @@ progress: 0%
     - Garantia de transacionalidade em todo o ciclo de vida da OS.
     - Validação de ownership e regras de transição de estado.
     - Adição de rastreabilidade de conclusão via `provider_finished_at`.
+- [x] **Módulo de Avaliações (Concluído):**
+    - Implementação de avaliações 360 (Client <-> Provider).
+    - Regras de negócio: apenas após OS finalizada, sem autoavaliação, avaliação única por direção.
+    - Automação: atualização de média de estrelas e suspensão automática para média < 3 em 10 OS.
 - **Formalização e Implementação do Módulo de Agendamento (Concluída):**
     - Definição e implementação das regras RS01-RS07 para integridade temporal.
     - Implementação de `ProviderBusySlot` com suporte a `overlaps` eficientes.
@@ -147,9 +156,7 @@ progress: 0%
 ## Regras críticas pendentes
 
 - [ ] **Integração de Pagamento:** Acionamento automático do `PaymentService` ao finalizar OS.
-- [ ] **Módulo de Avaliações:** Implementar domínio completo de Reviews (RN05).
 - [ ] **Auditoria de Status da OS:** Registro histórico de transições de status (RAD01).
-- [ ] **Suspensão por Desempenho:** Lógica de monitoramento de média de estrelas (RN04).
 
 ---
 
@@ -170,7 +177,5 @@ progress: 0%
 
 ## Próximos Passos (Backend)
 
-1.  **Módulo de Avaliações (Reviews):** Implementar Model, Repository, Service e API para avaliações 360.
-2.  **Auditoria de Status (OS History):** Criar mecanismo de log para transições de status da OS.
-3.  **Integração de Pagamento:** Vincular a finalização operacional ao processamento do pagamento mock.
-4.  **Regras de Performance:** Implementar lógica de suspensão automática baseada em avaliações.
+1.  **Auditoria de Status (OS History):** Criar mecanismo de log para transições de status da OS.
+2.  **Integração de Pagamento:** Vincular a finalização operacional ao processamento do pagamento mock.

@@ -11,6 +11,7 @@ from models.user import User
 from repositories.address_repository import AddressRepository
 from repositories.payment_repository import PaymentRepository
 from repositories.provider_repository import ProviderRepository
+from repositories.review_repository import ReviewRepository
 from repositories.scheduling_repository import SchedulingRepository
 from repositories.service_order_application_repository import (
     ServiceOrderApplicationRepository,
@@ -20,6 +21,7 @@ from repositories.specialty_repository import SpecialtyRepository
 from repositories.user_repository import UserRepository
 from schemas.auth import TokenData
 from services.payment_service import PaymentService
+from services.review_service import ReviewService
 from services.scheduling_service import SchedulingService
 from services.service_order_application_service import ServiceOrderApplicationService
 from services.service_order_service import ServiceOrderService
@@ -63,6 +65,12 @@ async def get_scheduling_repository(
     return SchedulingRepository(session)
 
 
+async def get_review_repository(
+    session: Annotated[AsyncSession, Depends(get_db)],
+) -> ReviewRepository:
+    return ReviewRepository(session)
+
+
 async def get_service_order_service(
     order_repo: Annotated[
         ServiceOrderRepository, Depends(get_service_order_repository)
@@ -103,6 +111,16 @@ async def get_payment_service(
     payment_repo = PaymentRepository(session)
     order_repo = ServiceOrderRepository(session)
     return PaymentService(session, payment_repo, order_repo)
+
+
+async def get_review_service(
+    review_repo: Annotated[ReviewRepository, Depends(get_review_repository)],
+    order_repo: Annotated[
+        ServiceOrderRepository, Depends(get_service_order_repository)
+    ],
+    provider_repo: Annotated[ProviderRepository, Depends(get_provider_repository)],
+) -> ReviewService:
+    return ReviewService(review_repo, order_repo, provider_repo)
 
 
 async def get_current_user(
