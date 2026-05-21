@@ -9,7 +9,9 @@ from core.exceptions import (
 from domain.enums import OrderStatus
 from domain.order_state_machine import OrderStateMachine
 from models.service_order import ServiceOrder
+from models.service_order_history import ServiceOrderHistory
 from repositories.address_repository import AddressRepository
+from repositories.service_order_history_repository import ServiceOrderHistoryRepository
 from repositories.service_order_repository import ServiceOrderRepository
 from repositories.specialty_repository import SpecialtyRepository
 from schemas.service_order import ServiceOrderCreate
@@ -21,10 +23,29 @@ class ServiceOrderService:
         order_repository: ServiceOrderRepository,
         address_repository: AddressRepository,
         specialty_repository: SpecialtyRepository,
+        history_repository: ServiceOrderHistoryRepository,
     ):
         self.order_repository = order_repository
         self.address_repository = address_repository
         self.specialty_repository = specialty_repository
+        self.history_repository = history_repository
+
+    async def _record_history(
+        self,
+        order_id: UUID,
+        new_status: OrderStatus,
+        old_status: OrderStatus | None = None,
+        actor_id: UUID | None = None,
+        reason: str | None = None,
+    ) -> None:
+        history = ServiceOrderHistory(
+            service_order_id=order_id,
+            old_status=old_status,
+            new_status=new_status,
+            actor_id=actor_id,
+            reason=reason,
+        )
+        await self.history_repository.create(history)
 
     async def create_order(
         self, client_id: UUID, data: ServiceOrderCreate
@@ -61,7 +82,16 @@ class ServiceOrderService:
 
         # Transactional commit
         async with self.order_repository.session.begin():
-            return await self.order_repository.create(order)
+            await self.order_repository.create(order)
+            # Record history
+            await self._record_history(
+                order_id=order.id,
+                new_status=order.status,
+                old_status=None,  # First record
+                actor_id=client_id,
+                reason="Order creation",
+            )
+            return order
 
     async def get_order(self, order_id: UUID) -> ServiceOrder:
         order = await self.order_repository.get_by_id(order_id)
@@ -91,11 +121,21 @@ class ServiceOrderService:
                 raise ValidationException("O motivo do cancelamento é obrigatório.")
 
             # Validate transition via StateMachine
-            OrderStateMachine.validate_transition(order.status, OrderStatus.CANCELLED)
+            old_status = order.status
+            OrderStateMachine.validate_transition(old_status, OrderStatus.CANCELLED)
 
-            return await self.order_repository.update(
-                order, {"status": OrderStatus.CANCELLED, "cancellation_reason": reason}
+            order.status = OrderStatus.CANCELLED
+            order.cancellation_reason = reason
+
+            await self._record_history(
+                order_id=order.id,
+                new_status=order.status,
+                old_status=old_status,
+                actor_id=client_id,
+                reason=reason,
             )
+
+            return order
 
     async def start_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
         """
@@ -115,9 +155,19 @@ class ServiceOrderService:
                 )
 
             # Validate transition
-            OrderStateMachine.validate_transition(order.status, OrderStatus.IN_PROGRESS)
+            old_status = order.status
+            OrderStateMachine.validate_transition(old_status, OrderStatus.IN_PROGRESS)
 
             order.status = OrderStatus.IN_PROGRESS
+
+            await self._record_history(
+                order_id=order.id,
+                new_status=order.status,
+                old_status=old_status,
+                actor_id=user_id,
+                reason="Execution started",
+            )
+
             return order
 
     async def complete_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
@@ -144,6 +194,16 @@ class ServiceOrderService:
                 )
 
             order.provider_finished_at = datetime.now(UTC)
+
+            # Record as an event in history even without status change
+            await self._record_history(
+                order_id=order.id,
+                new_status=order.status,
+                old_status=order.status,
+                actor_id=user_id,
+                reason="Provider marked as finished",
+            )
+
             return order
 
     async def confirm_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
@@ -172,9 +232,26 @@ class ServiceOrderService:
                 )
 
             # Validate transition via StateMachine with operational_confirmation=True
+            old_status = order.status
             OrderStateMachine.validate_transition(
-                order.status, OrderStatus.FINISHED, operational_confirmation=True
+                old_status, OrderStatus.FINISHED, operational_confirmation=True
             )
 
             order.status = OrderStatus.FINISHED
+
+            await self._record_history(
+                order_id=order.id,
+                new_status=order.status,
+                old_status=old_status,
+                actor_id=user_id,
+                reason="Client confirmed finalization",
+            )
+
             return order
+
+    async def list_order_history(self, order_id: UUID) -> list[ServiceOrderHistory]:
+        """
+        Lists all status transitions and operational events for an OS.
+        """
+        history = await self.history_repository.list_by_order(order_id)
+        return list(history)

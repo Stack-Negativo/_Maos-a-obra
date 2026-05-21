@@ -25,6 +25,8 @@ def scheduling_service():
     scheduling_repo = MagicMock()
     order_repo = MagicMock()
     provider_repo = MagicMock()
+    history_repo = MagicMock()
+    history_repo.create = AsyncMock()
 
     # Mocking the session and transaction context
     session = MagicMock()
@@ -40,16 +42,17 @@ def scheduling_service():
     scheduling_repo.session = session
 
     return (
-        SchedulingService(scheduling_repo, order_repo, provider_repo),
+        SchedulingService(scheduling_repo, order_repo, provider_repo, history_repo),
         scheduling_repo,
         order_repo,
         provider_repo,
+        history_repo,
     )
 
 
 @pytest.mark.asyncio
 async def test_schedule_order_success(scheduling_service):
-    service, scheduling_repo, order_repo, _ = scheduling_service
+    service, scheduling_repo, order_repo, _, history_repo = scheduling_service
 
     client_id = uuid4()
     provider_id = uuid4()
@@ -91,11 +94,12 @@ async def test_schedule_order_success(scheduling_service):
     assert busy_slot.provider_id == provider_id
     assert busy_slot.service_order_id == order_id
     scheduling_repo.create_busy_slot.assert_called_once()
+    history_repo.create.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_schedule_order_overlap_conflict(scheduling_service):
-    service, scheduling_repo, order_repo, _ = scheduling_service
+    service, scheduling_repo, order_repo, _, _ = scheduling_service
 
     client_id = uuid4()
     provider_id = uuid4()
@@ -132,7 +136,7 @@ async def test_schedule_order_overlap_conflict(scheduling_service):
 
 @pytest.mark.asyncio
 async def test_schedule_order_past_date_prohibited(scheduling_service):
-    service, _, _, _ = scheduling_service
+    service, _, _, _, _ = scheduling_service
 
     client_id = uuid4()
     order_id = uuid4()
@@ -147,7 +151,7 @@ async def test_schedule_order_past_date_prohibited(scheduling_service):
 
 @pytest.mark.asyncio
 async def test_schedule_order_invalid_status(scheduling_service):
-    service, _, order_repo, _ = scheduling_service
+    service, _, order_repo, _, _ = scheduling_service
 
     client_id = uuid4()
     order_id = uuid4()
@@ -168,7 +172,7 @@ async def test_schedule_order_invalid_status(scheduling_service):
 
 @pytest.mark.asyncio
 async def test_schedule_order_permission_denied(scheduling_service):
-    service, _, order_repo, _ = scheduling_service
+    service, _, order_repo, _, _ = scheduling_service
 
     other_user_id = uuid4()
     order_id = uuid4()

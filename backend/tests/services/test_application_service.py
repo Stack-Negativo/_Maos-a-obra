@@ -25,6 +25,8 @@ def application_service():
     app_repo = MagicMock()
     order_repo = MagicMock()
     provider_repo = MagicMock()
+    history_repo = MagicMock()
+    history_repo.create = AsyncMock()
 
     # Mock session for transactional block
     app_repo.session = MagicMock()
@@ -33,16 +35,19 @@ def application_service():
     app_repo.session.begin.return_value.__aexit__ = AsyncMock()
 
     return (
-        ServiceOrderApplicationService(app_repo, order_repo, provider_repo),
+        ServiceOrderApplicationService(
+            app_repo, order_repo, provider_repo, history_repo
+        ),
         app_repo,
         order_repo,
         provider_repo,
+        history_repo,
     )
 
 
 @pytest.mark.asyncio
 async def test_apply_for_order_success(application_service):
-    service, app_repo, order_repo, provider_repo = application_service
+    service, app_repo, order_repo, provider_repo, history_repo = application_service
     provider_user_id = uuid4()
     order_id = uuid4()
     specialty_id = uuid4()
@@ -75,11 +80,12 @@ async def test_apply_for_order_success(application_service):
     assert application.service_order_id == order_id
     assert application.provider_id == provider.id
     assert order.status == OrderStatus.AWAITING_SELECTION
+    history_repo.create.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_apply_for_order_self_application(application_service):
-    service, _, order_repo, provider_repo = application_service
+    service, _, order_repo, provider_repo, _ = application_service
     user_id = uuid4()
     order_id = uuid4()
 
@@ -97,7 +103,7 @@ async def test_apply_for_order_self_application(application_service):
 
 @pytest.mark.asyncio
 async def test_accept_application_success(application_service):
-    service, app_repo, order_repo, _ = application_service
+    service, app_repo, order_repo, _, history_repo = application_service
     client_user_id = uuid4()
     order_id = uuid4()
     provider_id = uuid4()
@@ -123,11 +129,12 @@ async def test_accept_application_success(application_service):
     assert order.status == OrderStatus.PROVIDER_SELECTED
     assert order.provider_id == provider_id
     app_repo.reject_others.assert_called_once_with(order_id, application_id)
+    history_repo.create.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_apply_for_order_incompatible_specialty(application_service):
-    service, _, order_repo, provider_repo = application_service
+    service, _, order_repo, provider_repo, _ = application_service
     provider_user_id = uuid4()
     order_id = uuid4()
 

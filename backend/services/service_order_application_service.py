@@ -8,10 +8,12 @@ from core.exceptions import (
 from domain.enums import ApplicationStatus, OrderStatus
 from domain.order_state_machine import OrderStateMachine
 from models.service_order_application import ServiceOrderApplication
+from models.service_order_history import ServiceOrderHistory
 from repositories.provider_repository import ProviderRepository
 from repositories.service_order_application_repository import (
     ServiceOrderApplicationRepository,
 )
+from repositories.service_order_history_repository import ServiceOrderHistoryRepository
 from repositories.service_order_repository import ServiceOrderRepository
 
 
@@ -21,10 +23,12 @@ class ServiceOrderApplicationService:
         application_repository: ServiceOrderApplicationRepository,
         order_repository: ServiceOrderRepository,
         provider_repository: ProviderRepository,
+        history_repository: ServiceOrderHistoryRepository,
     ):
         self.application_repository = application_repository
         self.order_repository = order_repository
         self.provider_repository = provider_repository
+        self.history_repository = history_repository
 
     async def apply_for_order(
         self, provider_user_id: UUID, order_id: UUID
@@ -93,8 +97,18 @@ class ServiceOrderApplicationService:
 
             # Transition OS from AWAITING_CANDIDATES to AWAITING_SELECTION if needed
             if order.status == OrderStatus.AWAITING_CANDIDATES:
+                old_status = order.status
                 order.status = OrderStatus.AWAITING_SELECTION
-                # We update the order directly since it's in the session
+
+                # Record History
+                history = ServiceOrderHistory(
+                    service_order_id=order_id,
+                    old_status=old_status,
+                    new_status=order.status,
+                    actor_id=provider_user_id,
+                    reason="First application received",
+                )
+                await self.history_repository.create(history)
 
             return created
 
@@ -134,8 +148,19 @@ class ServiceOrderApplicationService:
             await self.application_repository.reject_others(order.id, application.id)
 
             # 3. Update OS provider and status
+            old_status = order.status
             order.provider_id = application.provider_id
             order.status = OrderStatus.PROVIDER_SELECTED
+
+            # Record History
+            history = ServiceOrderHistory(
+                service_order_id=order.id,
+                old_status=old_status,
+                new_status=order.status,
+                actor_id=client_user_id,
+                reason="Provider selected",
+            )
+            await self.history_repository.create(history)
 
             return application
 

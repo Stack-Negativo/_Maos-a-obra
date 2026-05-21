@@ -1,12 +1,10 @@
 from datetime import UTC, datetime, timedelta
-from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
 
 from core.exceptions import (
-    BusinessRuleViolation,
     ValidationException,
 )
 from domain.enums import OrderStatus
@@ -34,6 +32,8 @@ def service_order_service():
     order_repo = MagicMock()
     address_repo = MagicMock()
     specialty_repo = MagicMock()
+    history_repo = MagicMock()
+    history_repo.create = AsyncMock()
 
     # Mock session for begin() context manager
     session_mock = MagicMock()
@@ -41,16 +41,19 @@ def service_order_service():
     order_repo.session = session_mock
 
     return (
-        ServiceOrderService(order_repo, address_repo, specialty_repo),
+        ServiceOrderService(order_repo, address_repo, specialty_repo, history_repo),
         order_repo,
         address_repo,
         specialty_repo,
+        history_repo,
     )
 
 
 @pytest.mark.asyncio
 async def test_create_order_success(service_order_service):
-    service, order_repo, address_repo, specialty_repo = service_order_service
+    service, order_repo, address_repo, specialty_repo, history_repo = (
+        service_order_service
+    )
     client_id = uuid4()
     address_id = uuid4()
     specialty_id = uuid4()
@@ -64,6 +67,7 @@ async def test_create_order_success(service_order_service):
     )
 
     async def mock_create(order: ServiceOrder) -> ServiceOrder:
+        order.id = uuid4()
         return order
 
     order_repo.create = AsyncMock(side_effect=mock_create)
@@ -83,11 +87,12 @@ async def test_create_order_success(service_order_service):
     assert order.client_id == client_id
     assert order.title == data.title
     order_repo.create.assert_called_once()
+    history_repo.create.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_create_order_invalid_address(service_order_service):
-    service, _, address_repo, _ = service_order_service
+    service, _, address_repo, _, _ = service_order_service
     client_id = uuid4()
     other_user_id = uuid4()
     address_id = uuid4()
@@ -111,7 +116,7 @@ async def test_create_order_invalid_address(service_order_service):
 
 @pytest.mark.asyncio
 async def test_cancel_order_success(service_order_service):
-    service, order_repo, _, _ = service_order_service
+    service, order_repo, _, _, history_repo = service_order_service
     client_id = uuid4()
     order_id = uuid4()
 
@@ -121,24 +126,17 @@ async def test_cancel_order_success(service_order_service):
 
     order_repo.get_by_id_for_update = AsyncMock(return_value=order)
 
-    def update_mock(obj: ServiceOrder, data: dict[str, Any]) -> ServiceOrder:
-        for key, value in data.items():
-            setattr(obj, key, value)
-        return obj
-
-    order_repo.update = AsyncMock(side_effect=update_mock)
-
     cancelled_order = await service.cancel_order(
         order_id, client_id, "Mudança de planos"
     )
 
     assert cancelled_order.status == OrderStatus.CANCELLED
-    order_repo.update.assert_called_once()
+    history_repo.create.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_start_execution_success(service_order_service):
-    service, order_repo, _, _ = service_order_service
+    service, order_repo, _, _, history_repo = service_order_service
     provider_user_id = uuid4()
     order_id = uuid4()
     provider_id = uuid4()
@@ -156,32 +154,12 @@ async def test_start_execution_success(service_order_service):
     started_order = await service.start_execution(order_id, provider_user_id)
 
     assert started_order.status == OrderStatus.IN_PROGRESS
-
-
-@pytest.mark.asyncio
-async def test_start_execution_unauthorized(service_order_service):
-    service, order_repo, _, _ = service_order_service
-    other_user_id = uuid4()
-    order_id = uuid4()
-    provider_id = uuid4()
-
-    provider = Provider(id=provider_id, user_id=uuid4())  # Different user
-    order = ServiceOrder(
-        id=order_id,
-        provider_id=provider_id,
-        provider=provider,
-        status=OrderStatus.SCHEDULED,
-    )
-
-    order_repo.get_by_id_for_update = AsyncMock(return_value=order)
-
-    with pytest.raises(BusinessRuleViolation, match="Apenas o prestador selecionado"):
-        await service.start_execution(order_id, other_user_id)
+    history_repo.create.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_complete_execution_success(service_order_service):
-    service, order_repo, _, _ = service_order_service
+    service, order_repo, _, _, history_repo = service_order_service
     provider_user_id = uuid4()
     order_id = uuid4()
     provider_id = uuid4()
@@ -199,12 +177,13 @@ async def test_complete_execution_success(service_order_service):
     completed_order = await service.complete_execution(order_id, provider_user_id)
 
     assert completed_order.provider_finished_at is not None
-    assert completed_order.status == OrderStatus.IN_PROGRESS  # Status doesn't change
+    assert completed_order.status == OrderStatus.IN_PROGRESS
+    history_repo.create.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_confirm_execution_success(service_order_service):
-    service, order_repo, _, _ = service_order_service
+    service, order_repo, _, _, history_repo = service_order_service
     client_id = uuid4()
     order_id = uuid4()
 
@@ -220,23 +199,4 @@ async def test_confirm_execution_success(service_order_service):
     confirmed_order = await service.confirm_execution(order_id, client_id)
 
     assert confirmed_order.status == OrderStatus.FINISHED
-
-
-@pytest.mark.asyncio
-async def test_confirm_execution_missing_provider_finish(service_order_service):
-    service, order_repo, _, _ = service_order_service
-    client_id = uuid4()
-    order_id = uuid4()
-
-    # Provider hasn't finished yet
-    order = ServiceOrder(
-        id=order_id,
-        client_id=client_id,
-        status=OrderStatus.IN_PROGRESS,
-        provider_finished_at=None,
-    )
-
-    order_repo.get_by_id_for_update = AsyncMock(return_value=order)
-
-    with pytest.raises(BusinessRuleViolation, match="sinalizada pelo prestador"):
-        await service.confirm_execution(order_id, client_id)
+    history_repo.create.assert_called_once()

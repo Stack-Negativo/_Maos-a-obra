@@ -14,6 +14,7 @@ from schemas.service_order import (
     ServiceOrderListResponse,
     ServiceOrderResponse,
 )
+from schemas.service_order_history import ServiceOrderHistoryListResponse
 from services.review_service import ReviewService
 from services.service_order_service import ServiceOrderService
 
@@ -136,3 +137,28 @@ async def list_order_reviews(
     """
     reviews = await service.list_order_reviews(id)
     return {"reviews": reviews}
+
+
+@router.get("/{id}/history", response_model=ServiceOrderHistoryListResponse)
+async def list_order_history(
+    id: UUID,
+    current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
+):
+    """
+    List all status transitions and events for an OS.
+    """
+    # Validation: only owner, provider or admin can see history
+    order = await service.get_order(id)
+    is_client = order.client_id == current_user.id
+    is_provider = order.provider and order.provider.user_id == current_user.id
+
+    if not (is_client or is_provider):
+        from core.exceptions import AuthorizationException
+
+        raise AuthorizationException(
+            "Você não tem permissão para acessar o histórico desta ordem."
+        )
+
+    history = await service.list_order_history(id)
+    return {"history": history}

@@ -16,6 +16,7 @@ from repositories.scheduling_repository import SchedulingRepository
 from repositories.service_order_application_repository import (
     ServiceOrderApplicationRepository,
 )
+from repositories.service_order_history_repository import ServiceOrderHistoryRepository
 from repositories.service_order_repository import ServiceOrderRepository
 from repositories.specialty_repository import SpecialtyRepository
 from repositories.user_repository import UserRepository
@@ -71,14 +72,23 @@ async def get_review_repository(
     return ReviewRepository(session)
 
 
+async def get_history_repository(
+    session: Annotated[AsyncSession, Depends(get_db)],
+) -> ServiceOrderHistoryRepository:
+    return ServiceOrderHistoryRepository(session)
+
+
 async def get_service_order_service(
     order_repo: Annotated[
         ServiceOrderRepository, Depends(get_service_order_repository)
     ],
     address_repo: Annotated[AddressRepository, Depends(get_address_repository)],
     specialty_repo: Annotated[SpecialtyRepository, Depends(get_specialty_repository)],
+    history_repo: Annotated[
+        ServiceOrderHistoryRepository, Depends(get_history_repository)
+    ],
 ) -> ServiceOrderService:
-    return ServiceOrderService(order_repo, address_repo, specialty_repo)
+    return ServiceOrderService(order_repo, address_repo, specialty_repo, history_repo)
 
 
 async def get_application_service(
@@ -89,8 +99,13 @@ async def get_application_service(
         ServiceOrderRepository, Depends(get_service_order_repository)
     ],
     provider_repo: Annotated[ProviderRepository, Depends(get_provider_repository)],
+    history_repo: Annotated[
+        ServiceOrderHistoryRepository, Depends(get_history_repository)
+    ],
 ) -> ServiceOrderApplicationService:
-    return ServiceOrderApplicationService(application_repo, order_repo, provider_repo)
+    return ServiceOrderApplicationService(
+        application_repo, order_repo, provider_repo, history_repo
+    )
 
 
 async def get_scheduling_service(
@@ -101,8 +116,11 @@ async def get_scheduling_service(
         ServiceOrderRepository, Depends(get_service_order_repository)
     ],
     provider_repo: Annotated[ProviderRepository, Depends(get_provider_repository)],
+    history_repo: Annotated[
+        ServiceOrderHistoryRepository, Depends(get_history_repository)
+    ],
 ) -> SchedulingService:
-    return SchedulingService(scheduling_repo, order_repo, provider_repo)
+    return SchedulingService(scheduling_repo, order_repo, provider_repo, history_repo)
 
 
 async def get_payment_service(
