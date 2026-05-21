@@ -193,6 +193,75 @@ class PaymentService:
         await self.session.refresh(payment)
         return payment
 
+    async def auto_create_and_process_payment(
+        self,
+        client_id: UUID,
+        service_order_id: UUID,
+        amount: Decimal,
+        actor_id: UUID,
+        correlation_id: UUID | None = None,
+        source: str = "internal",
+    ) -> Payment:
+        """
+        Automated flow: Create PENDING payment and immediately process it (mock).
+        Used when a Service Order is finalized.
+        Does not use IdempotencyKey (internal trigger).
+        """
+        # 1. Create PENDING payment
+        audit_metadata = AuditMetadata(
+            actor_id=actor_id,
+            timestamp=datetime.now(UTC),
+            source=source,
+            correlation_id=correlation_id,
+        )
+
+        payment = Payment(
+            service_order_id=service_order_id,
+            client_id=client_id,
+            amount=amount,
+            status=PaymentStatus.PENDING,
+            actor_id=audit_metadata.actor_id,
+            correlation_id=audit_metadata.correlation_id,
+            source=audit_metadata.source,
+            created_at=audit_metadata.timestamp,
+            updated_at=audit_metadata.timestamp,
+        )
+
+        transaction_pending = PaymentTransaction(
+            payment=payment,
+            previous_status=None,
+            new_status=PaymentStatus.PENDING,
+            amount=amount,
+            reason="Automated payment trigger (OS Finalized)",
+            actor_id=audit_metadata.actor_id,
+            correlation_id=audit_metadata.correlation_id,
+            source=audit_metadata.source,
+            created_at=audit_metadata.timestamp,
+        )
+
+        # 2. Immediately Approve (Mock)
+        payment.status = PaymentStatus.APPROVED
+        payment.updated_at = audit_metadata.timestamp
+
+        transaction_approved = PaymentTransaction(
+            payment=payment,
+            previous_status=PaymentStatus.PENDING,
+            new_status=PaymentStatus.APPROVED,
+            amount=amount,
+            reason="Automated mock approval",
+            actor_id=audit_metadata.actor_id,
+            correlation_id=audit_metadata.correlation_id,
+            source=audit_metadata.source,
+            created_at=audit_metadata.timestamp,
+        )
+
+        # Save everything
+        self.session.add(payment)
+        self.session.add(transaction_pending)
+        self.session.add(transaction_approved)
+        # We don't commit here: part of ServiceOrder finalization transaction
+        return payment
+
     async def refund_payment(
         self,
         payment_id: UUID,
