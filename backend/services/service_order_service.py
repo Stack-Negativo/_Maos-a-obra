@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from uuid import UUID
 
 from core.exceptions import (
@@ -58,7 +59,9 @@ class ServiceOrderService:
             OrderStateMachine.validate_transition(OrderStatus.CREATED, next_status)
             order.status = next_status
 
-        return await self.order_repository.create(order)
+        # Transactional commit
+        async with self.order_repository.session.begin():
+            return await self.order_repository.create(order)
 
     async def get_order(self, order_id: UUID) -> ServiceOrder:
         order = await self.order_repository.get_by_id(order_id)
@@ -73,20 +76,105 @@ class ServiceOrderService:
     async def cancel_order(
         self, order_id: UUID, client_id: UUID, reason: str
     ) -> ServiceOrder:
-        order = await self.get_order(order_id)
+        async with self.order_repository.session.begin():
+            order = await self.order_repository.get_by_id_for_update(order_id)
+            if not order:
+                raise NotFoundException("Ordem de Serviço não encontrada.")
 
-        if order.client_id != client_id:
-            # In a real scenario, an admin could also cancel
-            raise BusinessRuleViolation(
-                "Apenas o cliente proprietário pode cancelar esta ordem."
+            if order.client_id != client_id:
+                # In a real scenario, an admin could also cancel
+                raise BusinessRuleViolation(
+                    "Apenas o cliente proprietário pode cancelar esta ordem."
+                )
+
+            if not reason:
+                raise ValidationException("O motivo do cancelamento é obrigatório.")
+
+            # Validate transition via StateMachine
+            OrderStateMachine.validate_transition(order.status, OrderStatus.CANCELLED)
+
+            return await self.order_repository.update(
+                order, {"status": OrderStatus.CANCELLED, "cancellation_reason": reason}
             )
 
-        if not reason:
-            raise ValidationException("O motivo do cancelamento é obrigatório.")
+    async def start_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
+        """
+        Transition OS from SCHEDULED to IN_PROGRESS.
+        Only the selected provider can start execution.
+        """
+        async with self.order_repository.session.begin():
+            order = await self.order_repository.get_by_id_for_update(order_id)
+            if not order:
+                raise NotFoundException("Ordem de Serviço não encontrada.")
 
-        # Validate transition via StateMachine
-        OrderStateMachine.validate_transition(order.status, OrderStatus.CANCELLED)
+            # Validate actor: only the selected provider can start
+            if not order.provider or order.provider.user_id != user_id:
+                raise BusinessRuleViolation(
+                    "Apenas o prestador selecionado pode iniciar a execução.",
+                    error_code="PERMISSION_DENIED",
+                )
 
-        return await self.order_repository.update(
-            order, {"status": OrderStatus.CANCELLED, "cancellation_reason": reason}
-        )
+            # Validate transition
+            OrderStateMachine.validate_transition(order.status, OrderStatus.IN_PROGRESS)
+
+            order.status = OrderStatus.IN_PROGRESS
+            return order
+
+    async def complete_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
+        """
+        Mark execution as completed by the provider.
+        Does not change status, but sets provider_finished_at flag.
+        """
+        async with self.order_repository.session.begin():
+            order = await self.order_repository.get_by_id_for_update(order_id)
+            if not order:
+                raise NotFoundException("Ordem de Serviço não encontrada.")
+
+            # Only the selected provider can mark as completed
+            if not order.provider or order.provider.user_id != user_id:
+                raise BusinessRuleViolation(
+                    "Apenas o prestador selecionado pode marcar como concluída.",
+                    error_code="PERMISSION_DENIED",
+                )
+
+            if order.status != OrderStatus.IN_PROGRESS:
+                raise BusinessRuleViolation(
+                    "A ordem deve estar em execução para ser marcada como concluída.",
+                    error_code="INVALID_ORDER_STATUS",
+                )
+
+            order.provider_finished_at = datetime.now(UTC)
+            return order
+
+    async def confirm_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
+        """
+        Confirm finalization by the client.
+        Transitions OS to FINISHED and requires provider_finished_at to be set.
+        """
+        async with self.order_repository.session.begin():
+            order = await self.order_repository.get_by_id_for_update(order_id)
+            if not order:
+                raise NotFoundException("Ordem de Serviço não encontrada.")
+
+            # Only the client owner can confirm
+            if order.client_id != user_id:
+                raise BusinessRuleViolation(
+                    "Apenas o cliente proprietário pode confirmar a finalização.",
+                    error_code="PERMISSION_DENIED",
+                )
+
+            # Check if provider marked as finished
+            if not order.provider_finished_at:
+                raise BusinessRuleViolation(
+                    "A finalização deve ser sinalizada pelo prestador "
+                    "antes da confirmação.",
+                    error_code="PROVIDER_NOT_FINISHED",
+                )
+
+            # Validate transition via StateMachine with operational_confirmation=True
+            OrderStateMachine.validate_transition(
+                order.status, OrderStatus.FINISHED, operational_confirmation=True
+            )
+
+            order.status = OrderStatus.FINISHED
+            return order

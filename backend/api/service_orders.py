@@ -59,3 +59,41 @@ async def cancel_order(
     service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
 ):
     return await service.cancel_order(id, current_user.id, reason)
+
+
+@router.post("/{id}/start", response_model=ServiceOrderResponse)
+async def start_execution(
+    id: UUID,
+    current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
+):
+    """
+    Start service order execution.
+    Only allowed for the selected provider.
+    """
+    return await service.start_execution(id, current_user.id)
+
+
+@router.post("/{id}/finish", response_model=ServiceOrderResponse)
+async def complete_execution(
+    id: UUID,
+    current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
+):
+    """
+    Mark service order as completed (Provider side).
+    """
+    return await service.complete_execution(id, current_user.id)
+
+
+@router.post("/{id}/confirm", response_model=ServiceOrderResponse)
+async def confirm_execution(
+    id: UUID,
+    current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
+):
+    """
+    Confirm service order finalization (Client side).
+    This will transition the order to FINISHED.
+    """
+    return await service.confirm_execution(id, current_user.id)
