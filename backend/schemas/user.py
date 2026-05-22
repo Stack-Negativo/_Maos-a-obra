@@ -5,13 +5,13 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserBase(BaseModel):
-    nome: str | None = None
+    full_name: str | None = None
     phone: str | None = None
 
 
 class UserCreate(UserBase):
     email: EmailStr
-    senha: str
+    password: str
 
 
 class UserUpdate(UserBase):

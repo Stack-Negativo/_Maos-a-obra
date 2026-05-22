@@ -35,7 +35,7 @@ async def read_users_me(
     mock_user_data = UserResponse(
         id=uuid4(),
         email="mockuser@email.com",
-        nome="Mock User",
+        full_name="Mock User",
         phone="79999999999",
         is_active=True,
         created_at=datetime.now(UTC),

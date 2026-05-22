@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 
 from api import (
     addresses,
+    auth,
     health,
     providers,
     scheduling,
@@ -13,10 +14,9 @@ from api import (
     specialties,
     users,
 )
-
-from .core.config import get_settings
-from .core.database import check_db_connection
-from .core.exceptions import (
+from core.config import get_settings
+from core.database import check_db_connection
+from core.exceptions import (
     AuthenticationException,
     AuthorizationException,
     BaseAppException,
@@ -26,7 +26,7 @@ from .core.exceptions import (
     NotFoundException,
     ValidationException,
 )
-from .core.logging_config import setup_logging
+from core.logging_config import setup_logging
 
 settings = get_settings()
 
@@ -89,12 +89,13 @@ async def app_exception_handler(_request: Request, exc: BaseAppException):
     )
 
 
-# Include API routers
+# Include API routers - Explicit Mapping
 app.include_router(health.router, prefix="/api/v1")
-app.include_router(users.router, prefix="/api/v1")
-app.include_router(providers.router, prefix="/api/v1")
-app.include_router(scheduling.router, prefix="/api/v1")
-app.include_router(service_orders.router, prefix="/api/v1")
-app.include_router(service_order_applications.router, prefix="/api/v1")
-app.include_router(specialties.router, prefix="/api/v1")
-app.include_router(addresses.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1/auth")
+app.include_router(users.router, prefix="/api/v1/users")
+app.include_router(providers.router, prefix="/api/v1/providers")
+app.include_router(scheduling.router, prefix="/api/v1/scheduling")
+app.include_router(service_orders.router, prefix="/api/v1/orders")
+app.include_router(service_order_applications.router, prefix="/api/v1/applications")
+app.include_router(specialties.router, prefix="/api/v1/specialties")
+app.include_router(addresses.router, prefix="/api/v1/addresses")

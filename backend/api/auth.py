@@ -14,7 +14,7 @@ from services.auth_service import AuthService
 
 from .deps import get_current_active_user
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(tags=["auth"])
 
 
 async def get_auth_service(

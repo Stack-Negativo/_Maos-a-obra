@@ -85,36 +85,38 @@ class SchedulingService:
                 error_code="SCHEDULE_OVERLAP",
             )
 
-        # RS04 — Agendamento deve ser transacional
-        async with self.scheduling_repository.session.begin():
-            # Update Order Status (PROVIDER_SELECTED -> SCHEDULED)
-            old_status = order.status
-            OrderStateMachine.validate_transition(old_status, OrderStatus.SCHEDULED)
-            order.status = OrderStatus.SCHEDULED
-            order.scheduled_at = start_at
+        # Update Order Status (PROVIDER_SELECTED -> SCHEDULED)
+        old_status = order.status
+        OrderStateMachine.validate_transition(old_status, OrderStatus.SCHEDULED)
+        order.status = OrderStatus.SCHEDULED
+        order.scheduled_at = start_at
 
-            # Create Busy Slot
-            busy_slot = ProviderBusySlot(
-                provider_id=provider_id,
-                service_order_id=order_id,
-                start_at=start_at,
-                end_at=end_at,
-                source=BusySlotSource.SERVICE_ORDER,
-                status=BusySlotStatus.CONFIRMED,
-                description=f"Agendamento OS: {order.title}",
-            )
+        # Create Busy Slot
+        busy_slot = ProviderBusySlot(
+            provider_id=provider_id,
+            service_order_id=order_id,
+            start_at=start_at,
+            end_at=end_at,
+            source=BusySlotSource.SERVICE_ORDER,
+            status=BusySlotStatus.CONFIRMED,
+            description=f"Agendamento OS: {order.title}",
+        )
 
-            # Record History
-            history = ServiceOrderHistory(
-                service_order_id=order_id,
-                old_status=old_status,
-                new_status=order.status,
-                actor_id=user_id,
-                reason=f"Scheduled for {start_at.isoformat()}",
-            )
-            await self.history_repository.create(history)
+        # Record History
+        history = ServiceOrderHistory(
+            service_order_id=order_id,
+            old_status=old_status,
+            new_status=order.status,
+            actor_id=user_id,
+            reason=f"Scheduled for {start_at.isoformat()}",
+        )
+        await self.history_repository.create(history)
 
-            return await self.scheduling_repository.create_busy_slot(busy_slot)
+        created_slot = await self.scheduling_repository.create_busy_slot(busy_slot)
+
+        await self.scheduling_repository.session.commit()
+        await self.scheduling_repository.session.refresh(created_slot)
+        return created_slot
 
     async def get_provider_schedule(self, provider_id: UUID) -> list[ProviderBusySlot]:
         """Returns the full schedule for a provider."""

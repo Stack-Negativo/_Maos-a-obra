@@ -34,11 +34,14 @@ class AuthService:
                 detail="Email already registered",
             )
 
-        hashed_password = get_password_hash(user_data.senha)
+        hashed_password = get_password_hash(user_data.password)
+
         user_in_db = await self.user_repository.create(
-            user_data.model_dump(exclude={"senha"})
+            user_data.model_dump(exclude={"password"})
             | {"hashed_password": hashed_password}
         )
+        await self.user_repository.session.commit()
+        await self.user_repository.session.refresh(user_in_db)
 
         access_token_expires = timedelta(minutes=30)
         access_token = create_access_token(

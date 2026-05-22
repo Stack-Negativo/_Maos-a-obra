@@ -20,11 +20,12 @@ class ServiceOrderHistory(BaseEntity, Base):
     service_order_id: Mapped[UUID] = mapped_column(
         ForeignKey("service_orders.id"), nullable=False, index=True
     )
+    # Use native_enum=False to avoid migration issues with Postgres types
     old_status: Mapped[OrderStatus | None] = mapped_column(
-        SQLEnum(OrderStatus), nullable=True
+        SQLEnum(OrderStatus, native_enum=False), nullable=True
     )
     new_status: Mapped[OrderStatus] = mapped_column(
-        SQLEnum(OrderStatus), nullable=False
+        SQLEnum(OrderStatus, native_enum=False), nullable=False
     )
     actor_id: Mapped[UUID | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)

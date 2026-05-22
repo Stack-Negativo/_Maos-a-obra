@@ -4,6 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from models.service_order import ServiceOrder
 
@@ -18,13 +19,18 @@ class ServiceOrderRepository:
 
     async def get_by_id(self, order_id: UUID) -> ServiceOrder | None:
         result = await self.session.execute(
-            select(ServiceOrder).where(ServiceOrder.id == order_id)
+            select(ServiceOrder)
+            .where(ServiceOrder.id == order_id)
+            .options(selectinload(ServiceOrder.provider))
         )
         return result.scalars().first()
 
     async def get_by_id_for_update(self, order_id: UUID) -> ServiceOrder | None:
         result = await self.session.execute(
-            select(ServiceOrder).where(ServiceOrder.id == order_id).with_for_update()
+            select(ServiceOrder)
+            .where(ServiceOrder.id == order_id)
+            .options(selectinload(ServiceOrder.provider))
+            .with_for_update()
         )
         return result.scalars().first()
 
@@ -33,6 +39,7 @@ class ServiceOrderRepository:
             select(ServiceOrder)
             .where(ServiceOrder.client_id == client_id)
             .order_by(ServiceOrder.created_at.desc())
+            .options(selectinload(ServiceOrder.provider))
         )
         return result.scalars().all()
 

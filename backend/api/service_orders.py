@@ -24,7 +24,7 @@ from .deps import (
     get_service_order_service,
 )
 
-router = APIRouter(prefix="/orders", tags=["Service Orders"])
+router = APIRouter(tags=["Service Orders"])
 
 
 @router.post(

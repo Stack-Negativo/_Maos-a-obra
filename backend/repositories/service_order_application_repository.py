@@ -16,8 +16,6 @@ class ServiceOrderApplicationRepository:
         self, application: ServiceOrderApplication
     ) -> ServiceOrderApplication:
         self.session.add(application)
-        await self.session.commit()
-        await self.session.refresh(application)
         return application
 
     async def get_by_id(self, application_id: UUID) -> ServiceOrderApplication | None:

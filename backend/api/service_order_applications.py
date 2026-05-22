@@ -16,7 +16,7 @@ router = APIRouter(tags=["Service Order Applications"])
 
 
 @router.post(
-    "/orders/{order_id}/apply",
+    "/{order_id}/apply",
     response_model=ApplicationResponse,
     status_code=status.HTTP_201_CREATED,
 )
@@ -31,7 +31,7 @@ async def apply_for_order(
 
 
 @router.get(
-    "/orders/{order_id}/applications",
+    "/{order_id}/list",
     response_model=ApplicationListResponse,
 )
 async def list_order_applications(
@@ -46,7 +46,7 @@ async def list_order_applications(
 
 
 @router.post(
-    "/applications/{application_id}/accept",
+    "/{application_id}/accept",
     response_model=ApplicationResponse,
 )
 async def accept_application(

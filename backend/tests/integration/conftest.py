@@ -3,10 +3,12 @@ from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from core.config import get_settings
 from domain.enums import OrderStatus
+from main import app
 from models.address import Address as Address  # noqa: F401
 from models.idempotency_key import IdempotencyKey as IdempotencyKey  # noqa: F401
 from models.payment import Payment as Payment  # noqa: F401
@@ -39,6 +41,20 @@ async def engine():
     _engine = create_async_engine(get_test_url(), echo=False)
     yield _engine
     await _engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def client() -> AsyncGenerator[AsyncClient, None]:
+    """
+    Async client for E2E tests.
+    Uses the real FastAPI application but can override dependencies if needed.
+    """
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+        follow_redirects=True,
+    ) as ac:
+        yield ac
 
 
 @pytest_asyncio.fixture

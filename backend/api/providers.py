@@ -13,7 +13,7 @@ from services.provider_service import ProviderService
 
 from .deps import get_current_active_user
 
-router = APIRouter(prefix="/providers", tags=["providers"])
+router = APIRouter(tags=["providers"])
 
 
 async def get_provider_service(

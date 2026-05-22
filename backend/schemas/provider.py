@@ -19,6 +19,7 @@ class ProviderCreate(ProviderBase):
 class ProviderUpdate(BaseModel):
     bio: str | None = None
     is_suspended: bool | None = None
+    specialty_ids: list[UUID] | None = None
 
 
 class ProviderSpecialtyResponse(BaseModel):

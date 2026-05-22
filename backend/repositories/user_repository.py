@@ -26,17 +26,15 @@ class UserRepository:
     async def create(self, user_data: dict[str, Any]) -> User:
         user = User(**user_data)
         self.session.add(user)
-        await self.session.commit()
-        await self.session.refresh(user)
+        # No commit here
         return user
 
     async def update(self, user: User, user_data: dict[str, Any]) -> User:
         for key, value in user_data.items():
             setattr(user, key, value)
-        await self.session.commit()
-        await self.session.refresh(user)
+        # No commit here
         return user
 
     async def delete(self, user: User) -> None:
         await self.session.delete(user)
-        await self.session.commit()
+        # No commit here

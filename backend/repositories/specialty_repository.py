@@ -34,8 +34,6 @@ class SpecialtyRepository:
     async def create(self, specialty_data: dict[str, Any]) -> Specialty:
         specialty = Specialty(**specialty_data)
         self.session.add(specialty)
-        await self.session.commit()
-        await self.session.refresh(specialty)
         return specialty
 
     async def update(
@@ -44,10 +42,7 @@ class SpecialtyRepository:
         for key, value in specialty_data.items():
             if value is not None:
                 setattr(specialty, key, value)
-        await self.session.commit()
-        await self.session.refresh(specialty)
         return specialty
 
     async def delete(self, specialty: Specialty) -> None:
         await self.session.delete(specialty)
-        await self.session.commit()

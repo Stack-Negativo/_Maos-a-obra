@@ -29,21 +29,16 @@ class AddressRepository:
     async def create(self, user_id: UUID, address_data: dict[str, Any]) -> Address:
         address = Address(user_id=user_id, **address_data)
         self.session.add(address)
-        await self.session.commit()
-        await self.session.refresh(address)
         return address
 
     async def update(self, address: Address, address_data: dict[str, Any]) -> Address:
         for key, value in address_data.items():
             if value is not None:
                 setattr(address, key, value)
-        await self.session.commit()
-        await self.session.refresh(address)
         return address
 
     async def delete(self, address: Address) -> None:
         await self.session.delete(address)
-        await self.session.commit()
 
     async def unset_default_for_user(self, user_id: UUID) -> None:
         await self.session.execute(
@@ -51,7 +46,6 @@ class AddressRepository:
             .where(Address.user_id == user_id, Address.is_default.is_(True))
             .values(is_default=False)
         )
-        await self.session.commit()
 
     async def get_default_by_user_id(self, user_id: UUID) -> Address | None:
         result = await self.session.execute(
