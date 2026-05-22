@@ -115,6 +115,5 @@ temp/
 # =========================
 
 uv.lock
-*.toml
 .python-version
 
