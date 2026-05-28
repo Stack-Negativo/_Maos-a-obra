@@ -4,7 +4,7 @@
   padding: 1.25rem;
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--color-card);
 }
 
 .register-form__header {
@@ -28,6 +28,90 @@
   gap: 0.85rem;
 }
 
+.register-form__role-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.register-form__role-card {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 104px;
+  padding: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.register-form__role-card strong {
+  color: var(--color-text);
+  font-size: 0.94rem;
+}
+
+.register-form__role-card span {
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.register-form__role-card--active {
+  border-color: var(--color-brand);
+  background: var(--color-brand-light);
+  color: var(--color-text);
+}
+
+.register-form__provider-fields {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.register-form__provider-fields label,
+.register-form__provider-fields fieldset {
+  display: grid;
+  gap: 0.4rem;
+  border: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.register-form__provider-fields textarea {
+  min-height: 92px;
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-card);
+  color: var(--color-text);
+  resize: vertical;
+}
+
+.register-form__specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.register-form__specialties label {
+  display: inline-flex;
+  grid-template-columns: none;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 34px;
+  padding: 0 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
 .register-form__error {
   padding: 0.85rem 1rem;
   border: 1px solid #fecaca;
@@ -44,19 +128,25 @@
   border: none;
   border-radius: 8px;
   background: var(--color-brand);
-  color: #fff;
+  color: var(--color-on-brand);
   font-weight: 800;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .register-form__submit:hover {
-  background: var(--color-brand-dark);
+  background: var(--color-brand-hover);
 }
 
 .register-form__submit:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+}
+
+@media (max-width: 560px) {
+  .register-form__role-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .register-form__footer {

@@ -4,6 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 from schemas.specialty import SpecialtyResponse
+from schemas.user import UserResponse
 
 
 class ProviderBase(BaseModel):
@@ -19,6 +20,7 @@ class ProviderCreate(ProviderBase):
 class ProviderUpdate(BaseModel):
     bio: str | None = None
     is_suspended: bool | None = None
+    specialty_ids: list[UUID] | None = None
 
 
 class ProviderSpecialtyResponse(BaseModel):
@@ -31,6 +33,7 @@ class ProviderSpecialtyResponse(BaseModel):
 class ProviderResponse(ProviderBase):
     id: UUID
     user_id: UUID
+    user: UserResponse
     rating_average: float
     total_reviews: int
     is_suspended: bool

@@ -10,6 +10,9 @@ import type { Specialty } from "@/features/specialties/types/specialty_types";
 import {
   createProviderProfile,
   listProviders,
+  PROVIDERS_CHANGED_EVENT,
+  suspendProvider,
+  unsuspendProvider,
 } from "../services/providers_service";
 import type { ProviderProfile } from "../types/provider_types";
 
@@ -33,6 +36,9 @@ export function useProviders() {
   const [specialtyFilter, setSpecialtyFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [updatingProviderId, setUpdatingProviderId] = useState<string | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
 
   async function refresh() {
@@ -53,7 +59,9 @@ export function useProviders() {
         specialtyData.filter((specialty) => specialty.isActive),
       );
     } catch {
-      setError("Nao foi possivel carregar prestadores mockados.");
+      setError(
+        "Não foi possível carregar os prestadores. Verifique sua conexão e tente novamente.",
+      );
     } finally {
       setLoading(false);
     }
@@ -63,9 +71,25 @@ export function useProviders() {
     const timeoutId = window.setTimeout(() => {
       void refresh();
     }, 0);
+    const handleProvidersChanged = () => {
+      void refresh();
+    };
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === "mock_providers") {
+        void refresh();
+      }
+    };
+
+    window.addEventListener(PROVIDERS_CHANGED_EVENT, handleProvidersChanged);
+    window.addEventListener("storage", handleStorage);
 
     return () => {
       window.clearTimeout(timeoutId);
+      window.removeEventListener(
+        PROVIDERS_CHANGED_EVENT,
+        handleProvidersChanged,
+      );
+      window.removeEventListener("storage", handleStorage);
     };
   }, []);
 
@@ -140,9 +164,81 @@ export function useProviders() {
       ]);
       setForm(INITIAL_FORM);
     } catch {
-      setError("Nao foi possivel salvar o prestador mockado.");
+      setError(
+        "Não foi possível salvar o prestador. Verifique sua conexão e tente novamente.",
+      );
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function suspend(providerId: string) {
+    setUpdatingProviderId(providerId);
+    setError(null);
+    setProviders((currentProviders) =>
+      currentProviders.map((currentProvider) =>
+        currentProvider.id === providerId
+          ? {
+              ...currentProvider,
+              isSuspended: true,
+            }
+          : currentProvider,
+      ),
+    );
+
+    try {
+      const provider = await suspendProvider(providerId);
+      setProviders((currentProviders) =>
+        currentProviders.map((currentProvider) =>
+          currentProvider.id === providerId
+            ? {
+                ...currentProvider,
+                ...provider,
+              }
+            : currentProvider,
+        ),
+      );
+    } catch {
+      setError(
+        "Prestador suspenso visualmente. Não foi possível confirmar no backend agora.",
+      );
+    } finally {
+      setUpdatingProviderId(null);
+    }
+  }
+
+  async function unsuspend(providerId: string) {
+    setUpdatingProviderId(providerId);
+    setError(null);
+    setProviders((currentProviders) =>
+      currentProviders.map((currentProvider) =>
+        currentProvider.id === providerId
+          ? {
+              ...currentProvider,
+              isSuspended: false,
+            }
+          : currentProvider,
+      ),
+    );
+
+    try {
+      const provider = await unsuspendProvider(providerId);
+      setProviders((currentProviders) =>
+        currentProviders.map((currentProvider) =>
+          currentProvider.id === providerId
+            ? {
+                ...currentProvider,
+                ...provider,
+              }
+            : currentProvider,
+        ),
+      );
+    } catch {
+      setError(
+        "Prestador reativado visualmente. Não foi possível confirmar no backend agora.",
+      );
+    } finally {
+      setUpdatingProviderId(null);
     }
   }
 
@@ -171,22 +267,31 @@ export function useProviders() {
       return matchesSearch && matchesSpecialty;
     });
   }, [providers, search, specialtyFilter]);
+  const suspendedProviders = providers.filter(
+    (provider) => provider.isSuspended,
+  ).length;
+  const activeProviders = Math.max(providers.length - suspendedProviders, 0);
 
   return {
     providers: filteredProviders,
     totalProviders: providers.length,
+    activeProviders,
+    suspendedProviders,
     specialties,
     form,
     search,
     specialtyFilter,
     loading,
     submitting,
+    updatingProviderId,
     error,
     setSearch,
     setSpecialtyFilter,
     updateField,
     toggleSpecialty,
     submitProvider,
+    suspendProvider: suspend,
+    unsuspendProvider: unsuspend,
     refresh,
   };
 }

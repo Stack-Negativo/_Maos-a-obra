@@ -94,34 +94,33 @@ class ReviewService:
             comment=data.comment,
         )
 
-        async with self.review_repository.session.begin():
-            await self.review_repository.create(review)
+        await self.review_repository.create(review)
 
-            # 4. Update Provider Stats if direction is CLIENT_TO_PROVIDER
-            if data.direction == ReviewDirection.CLIENT_TO_PROVIDER:
-                # We already have 'provider' loaded
-                # We need a flush to see the new review in aggregate queries (func.avg)
-                await self.review_repository.session.flush()
+        # 4. Update Provider Stats if direction is CLIENT_TO_PROVIDER
+        if data.direction == ReviewDirection.CLIENT_TO_PROVIDER:
+            # We already have 'provider' loaded
+            # We need a flush to see the new review in aggregate queries (func.avg)
+            await self.review_repository.session.flush()
 
-                new_avg, new_total = await self.review_repository.get_provider_stats(
-                    reviewed_id
+            new_avg, new_total = await self.review_repository.get_provider_stats(
+                reviewed_id
+            )
+
+            provider.rating_average = new_avg
+            provider.total_reviews = new_total
+
+            # RN04 — Suspensão por Desempenho (last 10)
+            if new_total >= 10:
+                last_10_avg = await self.review_repository.get_last_n_reviews_average(
+                    reviewed_id, 10
                 )
+                if last_10_avg is not None and last_10_avg < 3.0:
+                    provider.is_suspended = True
+                    provider.suspended_at = datetime.now(UTC)
 
-                provider.rating_average = new_avg
-                provider.total_reviews = new_total
-
-                # RN04 — Suspensão por Desempenho (last 10)
-                if new_total >= 10:
-                    last_10_avg = (
-                        await self.review_repository.get_last_n_reviews_average(
-                            reviewed_id, 10
-                        )
-                    )
-                    if last_10_avg is not None and last_10_avg < 3.0:
-                        provider.is_suspended = True
-                        provider.suspended_at = datetime.now(UTC)
-
-            return review
+        await self.review_repository.session.commit()
+        await self.review_repository.session.refresh(review)
+        return review
 
     async def list_order_reviews(self, order_id: UUID) -> list[Review]:
         reviews = await self.review_repository.list_by_order(order_id)

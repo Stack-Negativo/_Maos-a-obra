@@ -1,14 +1,10 @@
 import { useState } from "react";
 
 import { loginService } from "@/features/auth/services/auth_service";
+import type { User } from "@/features/auth/types/auth_types";
+import { UserRole } from "@/features/auth/types/auth_types";
 
 import { AuthContext } from "./auth_context";
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-};
 
 type AuthProviderProps = {
   children: React.ReactNode;
@@ -32,7 +28,21 @@ export function AuthProvider({
       }
 
       try {
-        return JSON.parse(storedUser) as User;
+        const parsedUser =
+          JSON.parse(storedUser) as Partial<User>;
+
+        return {
+          id: parsedUser.id ?? "mock-client",
+          name: parsedUser.name ?? "Mariana Cliente",
+          email: parsedUser.email ?? "cliente@maosaobra.local",
+          role: parsedUser.role ?? UserRole.CLIENT,
+          providerId: parsedUser.providerId,
+          bio: parsedUser.bio,
+          isProvider:
+            parsedUser.isProvider ?? parsedUser.role === "PROVIDER",
+          isAdmin: parsedUser.isAdmin ?? false,
+          specialties: parsedUser.specialties ?? [],
+        };
       } catch {
         localStorage.removeItem("user");
         return null;
@@ -59,16 +69,32 @@ export function AuthProvider({
       response.token,
     );
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify(
-        response.user,
-      ),
-    );
+    const userWithRole: User = {
+      ...response.user,
+      role:
+        response.user.role ??
+        (response.user.isAdmin
+          ? UserRole.ADMIN
+          : response.user.isProvider
+            ? UserRole.PROVIDER
+            : UserRole.CLIENT),
+      isProvider: response.user.isProvider ?? false,
+      isAdmin: response.user.isAdmin ?? false,
+      specialties: response.user.specialties ?? [],
+    };
+
+    updateUser(userWithRole);
 
     setToken(response.token);
+  }
 
-    setUser(response.user);
+  function updateUser(nextUser: User) {
+    localStorage.setItem(
+      "user",
+      JSON.stringify(nextUser),
+    );
+
+    setUser(nextUser);
   }
 
   function signOut() {
@@ -92,6 +118,7 @@ export function AuthProvider({
         token,
 
         signIn,
+        updateUser,
         signOut,
       }}
     >

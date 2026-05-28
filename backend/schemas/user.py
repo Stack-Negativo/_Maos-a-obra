@@ -5,13 +5,13 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserBase(BaseModel):
-    nome: str | None = None
+    full_name: str | None = None
     phone: str | None = None
 
 
 class UserCreate(UserBase):
     email: EmailStr
-    senha: str
+    password: str
 
 
 class UserUpdate(UserBase):
@@ -24,6 +24,9 @@ class UserResponse(UserBase):
     id: UUID
     email: EmailStr
     is_active: bool
+    is_provider: bool = False
+    is_admin: bool = False
+    role: str = "CLIENT"
     created_at: datetime
     updated_at: datetime
 

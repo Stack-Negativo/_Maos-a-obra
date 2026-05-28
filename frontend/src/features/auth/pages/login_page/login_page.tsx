@@ -9,7 +9,7 @@ export function LoginPage() {
       <LoginForm />
       <div className="auth-layout__footer">
         <p>
-          Ainda nao tem conta? <Link to="/register">Cadastre-se</Link>
+          Ainda não tem conta? <Link to="/register">Cadastre-se</Link>
         </p>
       </div>
     </AuthLayout>

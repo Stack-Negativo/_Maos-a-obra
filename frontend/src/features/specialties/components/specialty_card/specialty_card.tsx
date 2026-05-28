@@ -4,9 +4,10 @@ import "./specialty_card.css";
 
 type SpecialtyCardProps = {
   specialty: Specialty;
+  onToggle?: () => void;
 };
 
-export function SpecialtyCard({ specialty }: SpecialtyCardProps) {
+export function SpecialtyCard({ specialty, onToggle }: SpecialtyCardProps) {
   return (
     <article className="specialty-card">
       <div className="specialty-card__header">
@@ -15,7 +16,12 @@ export function SpecialtyCard({ specialty }: SpecialtyCardProps) {
           {specialty.isActive ? "Ativa" : "Inativa"}
         </span>
       </div>
-      <p>{specialty.description || "Sem descricao cadastrada."}</p>
+      <p>{specialty.description || "Sem descrição cadastrada."}</p>
+      {onToggle && (
+        <button type="button" onClick={onToggle}>
+          {specialty.isActive ? "Inativar" : "Ativar"}
+        </button>
+      )}
     </article>
   );
 }

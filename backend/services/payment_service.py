@@ -50,8 +50,6 @@ class PaymentService:
                 existing_idempotency.status_code
                 and existing_idempotency.status_code < 400
             ):
-                # In a real app, we'd return the cached response.
-                # For this audit, we raise conflict to indicate hit.
                 raise ConflictException(
                     f"Idempotency key {idempotency_key_str} already used."
                 )
@@ -102,7 +100,6 @@ class PaymentService:
             updated_at=audit_metadata.timestamp,
         )
 
-        # Use relationships to ensure correct ID assignment during flush/commit
         transaction = PaymentTransaction(
             payment=payment,
             previous_status=None,
@@ -132,7 +129,6 @@ class PaymentService:
             await self.session.refresh(payment)
             return payment
         except IntegrityError as err:
-            # Race condition: someone else inserted the same idempotency key
             await self.session.rollback()
             raise ConflictException(
                 f"Idempotency key {idempotency_key_str} race condition detected."
@@ -145,7 +141,6 @@ class PaymentService:
         correlation_id: UUID | None = None,
         source: str = "api",
     ) -> Payment:
-        # 1. Get Payment with LOCK to prevent concurrent processing
         payment = await self.payment_repository.get_payment_by_id_for_update(payment_id)
         if not payment:
             raise NotFoundException("Payment not found.")
@@ -162,16 +157,13 @@ class PaymentService:
             correlation_id=correlation_id,
         )
 
-        # 2. SIMULATE EXTERNAL PROCESSING (Always approved in mock)
         is_approved = True
         new_status = PaymentStatus.APPROVED if is_approved else PaymentStatus.DECLINED
 
-        # 3. Transition Status & Ledger
         previous_status = payment.status
         payment.status = new_status
         payment.updated_at = audit_metadata.timestamp
 
-        # Ledger: Record the transition
         transaction = PaymentTransaction(
             payment=payment,
             previous_status=previous_status,
@@ -188,7 +180,6 @@ class PaymentService:
         )
         self.session.add(transaction)
 
-        # 4. Atomic Commit
         await self.session.commit()
         await self.session.refresh(payment)
         return payment
@@ -204,10 +195,8 @@ class PaymentService:
     ) -> Payment:
         """
         Automated flow: Create PENDING payment and immediately process it (mock).
-        Used when a Service Order is finalized.
-        Does not use IdempotencyKey (internal trigger).
+        Does not commit (delegates to caller).
         """
-        # 1. Create PENDING payment
         audit_metadata = AuditMetadata(
             actor_id=actor_id,
             timestamp=datetime.now(UTC),
@@ -239,7 +228,6 @@ class PaymentService:
             created_at=audit_metadata.timestamp,
         )
 
-        # 2. Immediately Approve (Mock)
         payment.status = PaymentStatus.APPROVED
         payment.updated_at = audit_metadata.timestamp
 
@@ -255,11 +243,9 @@ class PaymentService:
             created_at=audit_metadata.timestamp,
         )
 
-        # Save everything
         self.session.add(payment)
         self.session.add(transaction_pending)
         self.session.add(transaction_approved)
-        # We don't commit here: part of ServiceOrder finalization transaction
         return payment
 
     async def refund_payment(
@@ -269,7 +255,6 @@ class PaymentService:
         correlation_id: UUID | None = None,
         source: str = "api",
     ) -> Payment:
-        # 1. Get Payment with LOCK
         payment = await self.payment_repository.get_payment_by_id_for_update(payment_id)
         if not payment:
             raise NotFoundException("Payment not found.")
@@ -284,7 +269,6 @@ class PaymentService:
             correlation_id=correlation_id,
         )
 
-        # 2. Transition Status & Ledger
         previous_status = payment.status
         payment.status = PaymentStatus.REFUNDED
         payment.updated_at = audit_metadata.timestamp
@@ -302,7 +286,6 @@ class PaymentService:
         )
         self.session.add(transaction)
 
-        # 3. Atomic Commit
         await self.session.commit()
         await self.session.refresh(payment)
         return payment

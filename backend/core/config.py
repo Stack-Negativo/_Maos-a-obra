@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ADMIN_EMAIL: str = "admin@maosaobra.com.br"
+    ADMIN_PASSWORD: str = "Admin12345"
+    ADMIN_FULL_NAME: str = "Administrador Maos a Obra"
+    ADMIN_PHONE: str = "11999999999"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

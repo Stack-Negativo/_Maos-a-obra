@@ -1,9 +1,6 @@
 import { Link } from "react-router-dom";
 
-import type {
-  Order,
-  OrderStatus,
-} from "../../types/order_types";
+import type { Order } from "../../types/order_types";
 import {
   ORDER_STATUS_LABELS,
   ORDER_STATUS_COLORS,

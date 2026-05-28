@@ -5,11 +5,20 @@ export enum UserRole {
 }
 
 export type User = {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: UserRole;
+  providerId?: string;
+  bio?: string;
   isProvider?: boolean;
+  isAdmin?: boolean;
+  specialties?: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    isActive?: boolean;
+  }>;
 };
 
 export type AuthContextType = {
@@ -17,8 +26,6 @@ export type AuthContextType = {
   isAuthenticated: boolean;
   login: (user: User) => void;
   logout: () => void;
-  switchToProvider: () => void;
-  switchToClient: () => void;
 };
 
 export type LoginPayload = {
@@ -31,6 +38,9 @@ export type RegisterPayload = {
   email: string;
   senha: string;
   telefone: string;
+  role?: UserRole.CLIENT | UserRole.PROVIDER;
+  bio?: string;
+  specialtyIds?: string[];
 };
 
 export type AuthResponse = {
@@ -39,5 +49,16 @@ export type AuthResponse = {
     id: string;
     name: string;
     email: string;
+    role?: UserRole;
+    providerId?: string;
+    bio?: string;
+    isProvider?: boolean;
+    isAdmin?: boolean;
+    specialties?: Array<{
+      id: string;
+      name: string;
+      description?: string;
+      isActive?: boolean;
+    }>;
   };
 };

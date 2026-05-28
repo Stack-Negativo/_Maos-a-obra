@@ -14,7 +14,7 @@ from services.address_service import AddressService
 
 from .deps import get_current_active_user
 
-router = APIRouter(prefix="/addresses", tags=["addresses"])
+router = APIRouter(tags=["addresses"])
 
 
 async def get_address_service(
@@ -49,22 +49,22 @@ async def get_address(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_address(
-    address_in: AddressCreate,
+    data: AddressCreate,
     current_user: Annotated[User, Depends(get_current_active_user)],
     service: Annotated[AddressService, Depends(get_address_service)],
 ) -> APIResponse[AddressResponse]:
-    address = await service.create_address(current_user.id, address_in)
+    address = await service.create_address(current_user.id, data)
     return APIResponse(data=AddressResponse.model_validate(address))
 
 
 @router.patch("/{address_id}", response_model=APIResponse[AddressResponse])
 async def update_address(
     address_id: UUID,
-    address_in: AddressUpdate,
+    data: AddressUpdate,
     current_user: Annotated[User, Depends(get_current_active_user)],
     service: Annotated[AddressService, Depends(get_address_service)],
 ) -> APIResponse[AddressResponse]:
-    address = await service.update_address(address_id, current_user.id, address_in)
+    address = await service.update_address(address_id, current_user.id, data)
     return APIResponse(data=AddressResponse.model_validate(address))
 
 

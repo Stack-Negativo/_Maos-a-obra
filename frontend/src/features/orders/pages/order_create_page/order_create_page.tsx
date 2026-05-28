@@ -1,81 +1,37 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { AppShell } from "@/shared/components";
+import { listAddresses } from "@/features/addresses/services/addresses_service";
+import { listSpecialties } from "@/features/specialties/services/specialties_service";
+
+import { OrderForm } from "../../components";
+import { useCreateOrder } from "../../hooks/use_create_order";
 import type {
   Address,
   CreateOrderInput,
   Specialty,
 } from "../../types/order_types";
-import { OrderForm } from "../../components";
-import { useCreateOrder } from "../../hooks/use_create_order";
-import { orderService } from "../../services/order_service";
 
 import "./order_create_page.css";
 
-// TODO: Substituir por chamada de API
-const MOCK_SPECIALTIES: Specialty[] = [
-  {
-    id: 1,
-    name: "Encanador",
-    description: "Serviços de encanamento",
-    isActive: true,
-  },
-  {
-    id: 2,
-    name: "Eletricista",
-    description: "Serviços de eletricidade",
-    isActive: true,
-  },
-  {
-    id: 3,
-    name: "Pintor",
-    description: "Serviços de pintura",
-    isActive: true,
-  },
-];
-
-const MOCK_ADDRESSES: Address[] = [
-  {
-    id: 1,
-    street: "Rua das Flores",
-    number: "123",
-    neighborhood: "Centro",
-    city: "São Paulo",
-    state: "SP",
-    zipcode: "01310-100",
-  },
-  {
-    id: 2,
-    street: "Avenida Paulista",
-    number: "1578",
-    neighborhood: "Bela Vista",
-    city: "São Paulo",
-    state: "SP",
-    zipcode: "01311-200",
-  },
-];
-
 export function OrderCreatePage() {
   const navigate = useNavigate();
-  const { createOrder, loading, error } = useCreateOrder();
-  const [specialties, setSpecialties] = useState<Specialty[]>(
-    [],
-  );
+  const { createOrder, loading } = useCreateOrder();
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [pageError, setPageError] = useState<string | null>(
-    null,
-  );
+  const [pageError, setPageError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setPageError(null);
-        // TODO: Substituir por chamadas de API
-        // const [specialtiesData, addressesData] = await Promise.all([
-        //   specialtyService.listSpecialties(),
-        //   addressService.listAddresses(),
-        // ]);
-        setSpecialties(MOCK_SPECIALTIES);
-        setAddresses(MOCK_ADDRESSES);
+        const [specialtiesData, addressesData] = await Promise.all([
+          listSpecialties(),
+          listAddresses(),
+        ]);
+        setSpecialties(specialtiesData);
+        setAddresses(addressesData);
       } catch (err) {
         setPageError(
           err instanceof Error
@@ -88,50 +44,50 @@ export function OrderCreatePage() {
     void loadData();
   }, []);
 
-  const handleSubmit = async (
-    data: CreateOrderInput,
-  ) => {
+  const handleSubmit = async (data: CreateOrderInput) => {
     try {
       setPageError(null);
-      // TODO: Substituir por chamada de API
-      // await orderService.createOrder(data);
-      console.log("Criando ordem:", data);
-      navigate("/orders");
+      await createOrder(data);
     } catch (err) {
       setPageError(
-        err instanceof Error
-          ? err.message
-          : "Erro ao criar ordem",
+        err instanceof Error ? err.message : "Erro ao criar ordem",
       );
     }
   };
 
   return (
-    <div className="order-create-page">
-      <div className="order-create-page__header">
-        <button
-          onClick={() => navigate("/orders")}
-          className="order-create-page__back-btn"
-        >
-          ← Voltar
-        </button>
-      </div>
-
-      {pageError && (
-        <div
-          className="order-create-page__error"
-          role="alert"
-        >
-          {pageError}
+    <AppShell>
+      <div className="order-create-page">
+        <div className="order-create-page__header">
+          <button
+            onClick={() => navigate("/orders/client")}
+            className="order-create-page__back-btn"
+          >
+            Voltar
+          </button>
+          <div>
+            <span className="order-create-page__eyebrow">Cliente</span>
+            <h1>Nova ordem de serviço</h1>
+            <p>
+              Informe o problema, escolha uma especialidade ativa e selecione o
+              endereço onde o atendimento deve acontecer.
+            </p>
+          </div>
         </div>
-      )}
 
-      <OrderForm
-        specialties={specialties}
-        addresses={addresses}
-        onSubmit={handleSubmit}
-        isLoading={loading}
-      />
-    </div>
+        {pageError && (
+          <div className="order-create-page__error" role="alert">
+            {pageError}
+          </div>
+        )}
+
+        <OrderForm
+          specialties={specialties}
+          addresses={addresses}
+          onSubmit={handleSubmit}
+          isLoading={loading}
+        />
+      </div>
+    </AppShell>
   );
 }

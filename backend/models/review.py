@@ -26,8 +26,9 @@ class Review(BaseEntity, Base):
     reviewed_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id"), nullable=False, index=True
     )
+    # Use native_enum=False to avoid migration issues with Postgres types
     direction: Mapped[ReviewDirection] = mapped_column(
-        SQLEnum(ReviewDirection), nullable=False
+        SQLEnum(ReviewDirection, native_enum=False), nullable=False
     )
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)

@@ -83,18 +83,22 @@ class ServiceOrderService:
             OrderStateMachine.validate_transition(OrderStatus.CREATED, next_status)
             order.status = next_status
 
-        # Transactional commit
-        async with self.order_repository.session.begin():
-            await self.order_repository.create(order)
-            # Record history
-            await self._record_history(
-                order_id=order.id,
-                new_status=order.status,
-                old_status=None,  # First record
-                actor_id=client_id,
-                reason="Order creation",
-            )
-            return order
+        await self.order_repository.create(order)
+        # Flush to ensure order.id is populated (default uuid4)
+        await self.order_repository.session.flush()
+
+        # Record history
+        await self._record_history(
+            order_id=order.id,
+            new_status=order.status,
+            old_status=None,  # First record
+            actor_id=client_id,
+            reason="Order creation",
+        )
+
+        await self.order_repository.session.commit()
+        await self.order_repository.session.refresh(order)
+        return order
 
     async def get_order(self, order_id: UUID) -> ServiceOrder:
         order = await self.order_repository.get_by_id(order_id)
@@ -106,108 +110,148 @@ class ServiceOrderService:
         orders = await self.order_repository.list_by_client(client_id)
         return list(orders)
 
+    async def list_provider_orders(
+        self, provider_user_id: UUID,
+    ) -> list[ServiceOrder]:
+        orders = await self.order_repository.list_all()
+        return list(orders)
+
     async def cancel_order(
         self, order_id: UUID, client_id: UUID, reason: str
     ) -> ServiceOrder:
-        async with self.order_repository.session.begin():
-            order = await self.order_repository.get_by_id_for_update(order_id)
-            if not order:
-                raise NotFoundException("Ordem de Serviço não encontrada.")
+        order = await self.order_repository.get_by_id_for_update(order_id)
+        if not order:
+            raise NotFoundException("Ordem de Serviço não encontrada.")
 
-            if order.client_id != client_id:
-                # In a real scenario, an admin could also cancel
-                raise BusinessRuleViolation(
-                    "Apenas o cliente proprietário pode cancelar esta ordem."
-                )
-
-            if not reason:
-                raise ValidationException("O motivo do cancelamento é obrigatório.")
-
-            # Validate transition via StateMachine
-            old_status = order.status
-            OrderStateMachine.validate_transition(old_status, OrderStatus.CANCELLED)
-
-            order.status = OrderStatus.CANCELLED
-            order.cancellation_reason = reason
-
-            await self._record_history(
-                order_id=order.id,
-                new_status=order.status,
-                old_status=old_status,
-                actor_id=client_id,
-                reason=reason,
+        if order.client_id != client_id:
+            raise BusinessRuleViolation(
+                "Apenas o cliente proprietário pode cancelar esta ordem."
             )
 
-            return order
+        if not reason:
+            raise ValidationException("O motivo do cancelamento é obrigatório.")
+
+        # Validate transition via StateMachine
+        old_status = order.status
+        OrderStateMachine.validate_transition(old_status, OrderStatus.CANCELLED)
+
+        order.status = OrderStatus.CANCELLED
+        order.cancellation_reason = reason
+
+        await self._record_history(
+            order_id=order.id,
+            new_status=order.status,
+            old_status=old_status,
+            actor_id=client_id,
+            reason=reason,
+        )
+
+        await self.order_repository.session.commit()
+        await self.order_repository.session.refresh(order)
+        return order
+
+    async def cancel_order_as_admin(
+        self, order_id: UUID, admin_user_id: UUID, reason: str
+    ) -> ServiceOrder:
+        order = await self.order_repository.get_by_id_for_update(order_id)
+        if not order:
+            raise NotFoundException("Ordem de Serviço não encontrada.")
+
+        if not reason:
+            raise ValidationException("O motivo do cancelamento é obrigatório.")
+
+        old_status = order.status
+        OrderStateMachine.validate_transition(old_status, OrderStatus.CANCELLED)
+
+        order.status = OrderStatus.CANCELLED
+        order.cancellation_reason = reason
+
+        await self._record_history(
+            order_id=order.id,
+            new_status=order.status,
+            old_status=old_status,
+            actor_id=admin_user_id,
+            reason=reason,
+        )
+
+        await self.order_repository.session.commit()
+        await self.order_repository.session.refresh(order)
+        return order
+
+    async def list_all_orders(self) -> list[ServiceOrder]:
+        orders = await self.order_repository.list_all()
+        return list(orders)
 
     async def start_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
         """
         Transition OS from SCHEDULED to IN_PROGRESS.
         Only the selected provider can start execution.
         """
-        async with self.order_repository.session.begin():
-            order = await self.order_repository.get_by_id_for_update(order_id)
-            if not order:
-                raise NotFoundException("Ordem de Serviço não encontrada.")
+        order = await self.order_repository.get_by_id_for_update(order_id)
+        if not order:
+            raise NotFoundException("Ordem de Serviço não encontrada.")
 
-            # Validate actor: only the selected provider can start
-            if not order.provider or order.provider.user_id != user_id:
-                raise BusinessRuleViolation(
-                    "Apenas o prestador selecionado pode iniciar a execução.",
-                    error_code="PERMISSION_DENIED",
-                )
-
-            # Validate transition
-            old_status = order.status
-            OrderStateMachine.validate_transition(old_status, OrderStatus.IN_PROGRESS)
-
-            order.status = OrderStatus.IN_PROGRESS
-
-            await self._record_history(
-                order_id=order.id,
-                new_status=order.status,
-                old_status=old_status,
-                actor_id=user_id,
-                reason="Execution started",
+        # Validate actor: only the selected provider can start
+        if not order.provider or order.provider.user_id != user_id:
+            raise BusinessRuleViolation(
+                "Apenas o prestador selecionado pode iniciar a execução.",
+                error_code="PERMISSION_DENIED",
             )
 
-            return order
+        # Validate transition
+        old_status = order.status
+        OrderStateMachine.validate_transition(old_status, OrderStatus.IN_PROGRESS)
+
+        order.status = OrderStatus.IN_PROGRESS
+
+        await self._record_history(
+            order_id=order.id,
+            new_status=order.status,
+            old_status=old_status,
+            actor_id=user_id,
+            reason="Execution started",
+        )
+
+        await self.order_repository.session.commit()
+        await self.order_repository.session.refresh(order)
+        return order
 
     async def complete_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
         """
         Mark execution as completed by the provider.
         Does not change status, but sets provider_finished_at flag.
         """
-        async with self.order_repository.session.begin():
-            order = await self.order_repository.get_by_id_for_update(order_id)
-            if not order:
-                raise NotFoundException("Ordem de Serviço não encontrada.")
+        order = await self.order_repository.get_by_id_for_update(order_id)
+        if not order:
+            raise NotFoundException("Ordem de Serviço não encontrada.")
 
-            # Only the selected provider can mark as completed
-            if not order.provider or order.provider.user_id != user_id:
-                raise BusinessRuleViolation(
-                    "Apenas o prestador selecionado pode marcar como concluída.",
-                    error_code="PERMISSION_DENIED",
-                )
-
-            if order.status != OrderStatus.IN_PROGRESS:
-                raise BusinessRuleViolation(
-                    "A ordem deve estar em execução para ser marcada como concluída.",
-                    error_code="INVALID_ORDER_STATUS",
-                )
-
-            order.provider_finished_at = datetime.now(UTC)
-
-            # Record as an event in history even without status change
-            await self._record_history(
-                order_id=order.id,
-                new_status=order.status,
-                old_status=order.status,
-                actor_id=user_id,
-                reason="Provider marked as finished",
+        # Only the selected provider can mark as completed
+        if not order.provider or order.provider.user_id != user_id:
+            raise BusinessRuleViolation(
+                "Apenas o prestador selecionado pode marcar como concluída.",
+                error_code="PERMISSION_DENIED",
             )
 
-            return order
+        if order.status != OrderStatus.IN_PROGRESS:
+            raise BusinessRuleViolation(
+                "A ordem deve estar em execução para ser marcada como concluída.",
+                error_code="INVALID_ORDER_STATUS",
+            )
+
+        order.provider_finished_at = datetime.now(UTC)
+
+        # Record as an event in history even without status change
+        await self._record_history(
+            order_id=order.id,
+            new_status=order.status,
+            old_status=order.status,
+            actor_id=user_id,
+            reason="Provider marked as finished",
+        )
+
+        await self.order_repository.session.commit()
+        await self.order_repository.session.refresh(order)
+        return order
 
     async def confirm_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
         """
@@ -215,53 +259,53 @@ class ServiceOrderService:
         Transitions OS to FINISHED and requires provider_finished_at to be set.
         Triggers payment processing.
         """
-        async with self.order_repository.session.begin():
-            order = await self.order_repository.get_by_id_for_update(order_id)
-            if not order:
-                raise NotFoundException("Ordem de Serviço não encontrada.")
+        order = await self.order_repository.get_by_id_for_update(order_id)
+        if not order:
+            raise NotFoundException("Ordem de Serviço não encontrada.")
 
-            # Only the client owner can confirm
-            if order.client_id != user_id:
-                raise BusinessRuleViolation(
-                    "Apenas o cliente proprietário pode confirmar a finalização.",
-                    error_code="PERMISSION_DENIED",
-                )
-
-            # Check if provider marked as finished
-            if not order.provider_finished_at:
-                raise BusinessRuleViolation(
-                    "A finalização deve ser sinalizada pelo prestador "
-                    "antes da confirmação.",
-                    error_code="PROVIDER_NOT_FINISHED",
-                )
-
-            # Validate transition via StateMachine with operational_confirmation=True
-            old_status = order.status
-            OrderStateMachine.validate_transition(
-                old_status, OrderStatus.FINISHED, operational_confirmation=True
+        # Only the client owner can confirm
+        if order.client_id != user_id:
+            raise BusinessRuleViolation(
+                "Apenas o cliente proprietário pode confirmar a finalização.",
+                error_code="PERMISSION_DENIED",
             )
 
-            order.status = OrderStatus.FINISHED
+        # Check if provider marked as finished
+        if not order.provider_finished_at:
+            raise BusinessRuleViolation(
+                "A finalização deve ser sinalizada pelo prestador "
+                "antes da confirmação.",
+                error_code="PROVIDER_NOT_FINISHED",
+            )
 
-            # Trigger Payment (Mock)
-            # RI03 — Gatilho de pagamento automático
-            if order.estimated_price:
-                await self.payment_service.auto_create_and_process_payment(
-                    client_id=order.client_id,
-                    service_order_id=order.id,
-                    amount=order.estimated_price,
-                    actor_id=user_id,
-                )
+        # Validate transition via StateMachine with operational_confirmation=True
+        old_status = order.status
+        OrderStateMachine.validate_transition(
+            old_status, OrderStatus.FINISHED, operational_confirmation=True
+        )
 
-            await self._record_history(
-                order_id=order.id,
-                new_status=order.status,
-                old_status=old_status,
+        order.status = OrderStatus.FINISHED
+
+        # Trigger Payment (Mock)
+        if order.estimated_price:
+            await self.payment_service.auto_create_and_process_payment(
+                client_id=order.client_id,
+                service_order_id=order.id,
+                amount=order.estimated_price,
                 actor_id=user_id,
-                reason="Client confirmed finalization and payment triggered",
             )
 
-            return order
+        await self._record_history(
+            order_id=order.id,
+            new_status=order.status,
+            old_status=old_status,
+            actor_id=user_id,
+            reason="Client confirmed finalization and payment triggered",
+        )
+
+        await self.order_repository.session.commit()
+        await self.order_repository.session.refresh(order)
+        return order
 
     async def list_order_history(self, order_id: UUID) -> list[ServiceOrderHistory]:
         """

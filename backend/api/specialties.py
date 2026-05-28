@@ -11,7 +11,7 @@ from schemas.base import APIResponse
 from schemas.specialty import SpecialtyCreate, SpecialtyResponse, SpecialtyUpdate
 from services.specialty_service import SpecialtyService
 
-router = APIRouter(prefix="/specialties", tags=["specialties"])
+router = APIRouter(tags=["specialties"])
 
 
 async def get_specialty_service(

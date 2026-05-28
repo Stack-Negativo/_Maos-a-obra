@@ -1,61 +1,379 @@
-import { useState } from "react";
-import { useOrders } from "../hooks";
-import { OrdersCard } from "../components";
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+
+import { useProviders } from "@/features/providers/hooks/use_providers";
 import { AppShell } from "@/shared/components";
 import { Input } from "@/shared/ui/input";
 
+import { useOrdersMutations } from "../hooks";
+import {
+  ORDER_STATUS_LABELS,
+  PAYMENT_STATUS_LABELS,
+  OrderStatus,
+} from "../types/order_types";
+import type { Order } from "../types/order_types";
+
 import "./orders_page/orders_page.css";
 
+function formatAddress(order: Order) {
+  return `${order.address.street}, ${order.address.number ?? "s/n"} - ${order.address.neighborhood}, ${order.address.city}/${order.address.state}`;
+}
+
+function getPendingLabel(order: Order) {
+  const hasPendingApplication = order.applications?.some(
+    (application) => application.status === "PENDING",
+  );
+
+  if (hasPendingApplication) {
+    return "Cliente precisa analisar candidatura";
+  }
+
+  if (order.status === OrderStatus.PROVIDER_SELECTED) {
+    return "Cliente precisa confirmar agendamento";
+  }
+
+  if (order.status === OrderStatus.AWAITING_CONFIRMATION) {
+    return "Cliente precisa confirmar finalização";
+  }
+
+  return "Sem pendências críticas";
+}
+
 export function OrdersAdminPage() {
-  const { orders, loading, error, refresh } = useOrders();
+  const { orders, loading, cancelOrder, expireOrder } = useOrdersMutations(
+    undefined,
+    "admin",
+  );
+  const {
+    providers,
+    totalProviders,
+    activeProviders,
+    suspendedProviders,
+    loading: providersLoading,
+    updatingProviderId,
+    error: providersError,
+    suspendProvider,
+    unsuspendProvider,
+    refresh: refreshProviders,
+  } = useProviders();
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState<
-    string | null
-  >(null);
+  const [filterStatus, setFilterStatus] = useState<OrderStatus | null>(null);
 
-  const filteredOrders = orders
-    .filter((order) =>
-      order.title.toLowerCase().includes(search.toLowerCase())
-    )
-    .filter((order) =>
-      filterStatus ? order.status === filterStatus : true
-    );
+  const filteredOrders = useMemo(
+    () =>
+      orders
+        .filter((order) =>
+          `${order.title} ${order.description} ${order.specialty.name} ${order.address.city} ${order.selectedProvider?.name ?? ""}`
+            .toLowerCase()
+            .includes(search.toLowerCase()),
+        )
+        .filter((order) =>
+          filterStatus ? order.status === filterStatus : true,
+        ),
+    [orders, search, filterStatus],
+  );
 
-  const statusCounts = {
-    all: orders.length,
-    CREATED: orders.filter((o) => o.status === "CREATED").length,
-    PROVIDER_SELECTED: orders.filter(
-      (o) => o.status === "PROVIDER_SELECTED",
-    ).length,
-    IN_PROGRESS: orders.filter(
-      (o) => o.status === "IN_PROGRESS",
-    ).length,
-    FINISHED: orders.filter((o) => o.status === "FINISHED")
-      .length,
-  };
+  const statuses = Object.values(OrderStatus);
+  const activeOrders = orders.filter(
+    (order) =>
+      ![
+        OrderStatus.FINISHED,
+        OrderStatus.CANCELLED,
+        OrderStatus.EXPIRED,
+      ].includes(order.status),
+  ).length;
+  const pendingDecisions = orders.filter(
+    (order) => order.status === OrderStatus.AWAITING_SELECTION,
+  ).length;
+  const inExecution = orders.filter((order) =>
+    [
+      OrderStatus.SCHEDULED,
+      OrderStatus.IN_PROGRESS,
+      OrderStatus.AWAITING_CONFIRMATION,
+    ].includes(order.status),
+  ).length;
+  const finishedOrders = orders.filter(
+    (order) => order.status === OrderStatus.FINISHED,
+  ).length;
+  const cancelledOrders = orders.filter(
+    (order) => order.status === OrderStatus.CANCELLED,
+  ).length;
+  const awaitingSelectionOrders = orders.filter(
+    (order) => order.status === OrderStatus.AWAITING_SELECTION,
+  );
+  const awaitingScheduleOrders = orders.filter(
+    (order) => order.status === OrderStatus.PROVIDER_SELECTED,
+  );
+  const awaitingConfirmationOrders = orders.filter(
+    (order) => order.status === OrderStatus.AWAITING_CONFIRMATION,
+  );
 
   return (
     <AppShell>
       <section className="orders-page">
         <header className="orders-page__header">
           <div>
-            <h1>Painel Administrativo - Ordens de Serviço</h1>
+            <span className="orders-page__eyebrow">Administração</span>
+            <h1>Central Administrativa</h1>
             <p>
-              Monitore todas as ordens de serviço, prestadores e
-              clientes do sistema. Gerencie conflitos e validações.
+              Acompanhe o funil inteiro de ordens, candidaturas,
+              agendamentos, execução, pagamento e histórico finalizado.
             </p>
             <p className="orders-page__summary">
-              {orders.length} ordem{orders.length === 1 ? "" : "s"}{" "}
-              no sistema
+              {orders.length} ordem{orders.length === 1 ? "" : "s"} e{" "}
+              {totalProviders} prestador{totalProviders === 1 ? "" : "es"} no
+              sistema
             </p>
           </div>
         </header>
 
+        <section className="orders-page__admin-summary">
+          <div>
+            <span>Total</span>
+            <strong>{orders.length}</strong>
+          </div>
+          <div>
+            <span>Ativas</span>
+            <strong>{activeOrders}</strong>
+          </div>
+          <div>
+            <span>Aguardando cliente</span>
+            <strong>{pendingDecisions}</strong>
+          </div>
+          <div>
+            <span>Em atendimento</span>
+            <strong>{inExecution}</strong>
+          </div>
+          <div>
+            <span>Finalizadas</span>
+            <strong>{finishedOrders}</strong>
+          </div>
+          <div>
+            <span>Canceladas</span>
+            <strong>{cancelledOrders}</strong>
+          </div>
+          <div>
+            <span>Prestadores</span>
+            <strong>{providersLoading ? "..." : totalProviders}</strong>
+          </div>
+        </section>
+
+        <section className="orders-page__provider-management">
+          <div className="orders-page__provider-management-head">
+            <div>
+              <span className="orders-page__eyebrow">Gestão de prestadores</span>
+              <h2>Suspender ou reativar acesso</h2>
+              <p>
+                Controle administrativo direto: prestadores suspensos deixam de
+                participar do fluxo operacional até serem reativados.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="orders-page__refresh-btn"
+              onClick={() => {
+                void refreshProviders();
+              }}
+              disabled={providersLoading}
+            >
+              {providersLoading ? "Atualizando..." : "Atualizar"}
+            </button>
+          </div>
+
+          {providersError ? (
+            <p className="orders-page__state">{providersError}</p>
+          ) : providersLoading ? (
+            <p className="orders-page__state">Carregando prestadores...</p>
+          ) : providers.length === 0 ? (
+            <p className="orders-page__state">Nenhum prestador encontrado.</p>
+          ) : (
+            <div className="orders-page__provider-management-list">
+              {providers.map((provider) => (
+                <article
+                  className="orders-page__provider-management-row"
+                  key={provider.id}
+                >
+                  <div>
+                    <strong>{provider.name}</strong>
+                    <span>
+                      {provider.isSuspended ? "Suspenso" : "Ativo"} ·{" "}
+                      {provider.specialties
+                        .map((specialty) => specialty.name)
+                        .join(", ") || "Sem especialidade"}
+                    </span>
+                  </div>
+
+                  {provider.isSuspended ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void unsuspendProvider(provider.id);
+                      }}
+                      disabled={updatingProviderId === provider.id}
+                    >
+                      {updatingProviderId === provider.id
+                        ? "Reativando..."
+                        : "Reativar"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="orders-page__provider-management-danger"
+                      onClick={() => {
+                        void suspendProvider(provider.id);
+                      }}
+                      disabled={updatingProviderId === provider.id}
+                    >
+                      {updatingProviderId === provider.id
+                        ? "Suspendendo..."
+                        : "Suspender"}
+                    </button>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="orders-page__admin-actions">
+          <Link to="/specialties">Gerir catálogo</Link>
+          <Link to="/providers">Ver prestadores</Link>
+          <Link to="/profile">Perfil administrativo</Link>
+        </section>
+
+        <section className="orders-page__admin-workbench">
+          <article>
+            <div>
+              <span>Escolha de prestador</span>
+              <strong>{awaitingSelectionOrders.length}</strong>
+            </div>
+            <p>Ordens com candidaturas aguardando decisão do cliente.</p>
+          </article>
+          <article>
+            <div>
+              <span>Agendamento</span>
+              <strong>{awaitingScheduleOrders.length}</strong>
+            </div>
+            <p>Ordens com prestador aceito aguardando horário oficial.</p>
+          </article>
+          <article>
+            <div>
+              <span>Confirmação final</span>
+              <strong>{awaitingConfirmationOrders.length}</strong>
+            </div>
+            <p>Atendimentos encerrados pelo prestador aguardando o cliente.</p>
+          </article>
+          <article>
+            <div>
+              <span>Rede de prestadores</span>
+              <strong>{activeProviders}</strong>
+            </div>
+            <p>
+              Perfis ativos aparecem aqui após cadastro direto ou ativação pelo
+              botão “Quero me tornar prestador”.
+              {suspendedProviders > 0
+                ? ` ${suspendedProviders} suspenso(s).`
+                : ""}
+            </p>
+          </article>
+        </section>
+
+        <section className="orders-page__provider-control">
+          <div className="orders-page__section-heading">
+            <div>
+              <span className="orders-page__eyebrow">Controle operacional</span>
+              <h2>Prestadores</h2>
+              <p>
+                Suspenda temporariamente prestadores com baixa qualidade,
+                conflito operacional ou necessidade de revisão cadastral.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="orders-page__refresh-btn"
+              onClick={() => {
+                void refreshProviders();
+              }}
+              disabled={providersLoading}
+            >
+              {providersLoading ? "Atualizando..." : "Atualizar prestadores"}
+            </button>
+          </div>
+
+          {providersError ? (
+            <p className="orders-page__state">{providersError}</p>
+          ) : providersLoading ? (
+            <p className="orders-page__state">Carregando prestadores...</p>
+          ) : providers.length === 0 ? (
+            <p className="orders-page__state">Nenhum prestador encontrado.</p>
+          ) : (
+            <div className="orders-page__provider-grid">
+              {providers.map((provider) => (
+                <article className="orders-page__provider-admin-card" key={provider.id}>
+                  <div className="orders-page__provider-admin-main">
+                    <div>
+                      <strong>{provider.name}</strong>
+                      <p>{provider.bio || "Bio profissional não informada."}</p>
+                    </div>
+                    <span
+                      className={
+                        provider.isSuspended
+                          ? "orders-page__provider-admin-status orders-page__provider-admin-status--suspended"
+                          : "orders-page__provider-admin-status"
+                      }
+                    >
+                      {provider.isSuspended ? "Suspenso" : "Ativo"}
+                    </span>
+                  </div>
+
+                  <div className="orders-page__provider-admin-meta">
+                    <span>Nota {provider.ratingAverage.toFixed(1)}</span>
+                    <span>{provider.completedServices} serviço(s)</span>
+                    <span>
+                      {provider.specialties.map((specialty) => specialty.name).join(", ")}
+                    </span>
+                  </div>
+
+                  <div className="orders-page__provider-admin-actions">
+                    <strong>Ação administrativa</strong>
+                    {provider.isSuspended ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          void unsuspendProvider(provider.id);
+                        }}
+                        disabled={updatingProviderId === provider.id}
+                      >
+                        {updatingProviderId === provider.id
+                          ? "Reativando..."
+                          : "Reativar prestador"}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="orders-page__provider-admin-danger"
+                        onClick={() => {
+                          void suspendProvider(provider.id);
+                        }}
+                        disabled={updatingProviderId === provider.id}
+                      >
+                        {updatingProviderId === provider.id
+                          ? "Suspendendo..."
+                          : "Suspender prestador"}
+                      </button>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
         <section className="orders-page__filters">
           <Input
-            placeholder="Buscar ordens..."
+            placeholder="Buscar por título, cidade, especialidade ou prestador"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(event) => setSearch(event.target.value)}
             disabled={loading}
             aria-label="Buscar ordens"
           />
@@ -66,86 +384,111 @@ export function OrdersAdminPage() {
               }`}
               onClick={() => setFilterStatus(null)}
             >
-              Todas ({statusCounts.all})
+              Todas ({orders.length})
             </button>
-            <button
-              className={`orders-page__filter-tab ${
-                filterStatus === "CREATED" ? "active" : ""
-              }`}
-              onClick={() => setFilterStatus("CREATED")}
-            >
-              Criadas ({statusCounts.CREATED})
-            </button>
-            <button
-              className={`orders-page__filter-tab ${
-                filterStatus === "PROVIDER_SELECTED"
-                  ? "active"
-                  : ""
-              }`}
-              onClick={() =>
-                setFilterStatus("PROVIDER_SELECTED")
-              }
-            >
-              Com Prestador ({statusCounts.PROVIDER_SELECTED})
-            </button>
-            <button
-              className={`orders-page__filter-tab ${
-                filterStatus === "IN_PROGRESS"
-                  ? "active"
-                  : ""
-              }`}
-              onClick={() => setFilterStatus("IN_PROGRESS")}
-            >
-              Em Andamento ({statusCounts.IN_PROGRESS})
-            </button>
-            <button
-              className={`orders-page__filter-tab ${
-                filterStatus === "FINISHED" ? "active" : ""
-              }`}
-              onClick={() => setFilterStatus("FINISHED")}
-            >
-              Finalizadas ({statusCounts.FINISHED})
-            </button>
+            {statuses.map((status) => (
+              <button
+                key={status}
+                className={`orders-page__filter-tab ${
+                  filterStatus === status ? "active" : ""
+                }`}
+                onClick={() => setFilterStatus(status)}
+              >
+                {ORDER_STATUS_LABELS[status]} (
+                {orders.filter((order) => order.status === status).length})
+              </button>
+            ))}
           </div>
         </section>
 
-        {error && (
-          <div
-            className="orders-page__error"
-            role="alert"
-          >
-            <p>{error}</p>
-            <button
-              onClick={() => void refresh()}
-              className="orders-page__retry-btn"
-            >
-              Tentar Novamente
-            </button>
-          </div>
-        )}
-
         {loading ? (
-          <p className="orders-page__state">
-            Carregando ordens...
-          </p>
+          <p className="orders-page__state">Carregando ordens...</p>
         ) : filteredOrders.length === 0 ? (
           <div className="orders-page__empty">
-            <p>
-              {search
-                ? "Nenhuma ordem encontrada com esse termo."
-                : filterStatus
-                  ? "Nenhuma ordem com este status."
-                  : "Nenhuma ordem no sistema."}
-            </p>
+            <p>Nenhuma ordem encontrada.</p>
           </div>
         ) : (
           <div className="orders-page__list">
             {filteredOrders.map((order) => (
-              <OrdersCard
+              <article
+                className="orders-flow-card orders-flow-card--admin"
                 key={order.id}
-                order={order}
-                onRefresh={() => void refresh()}
-              />
+              >
+                <div className="orders-flow-card__header">
+                  <div>
+                    <span className="orders-flow-card__eyebrow">
+                      {order.specialty.name}
+                    </span>
+                    <h2>{order.title}</h2>
+                    <p>{order.description}</p>
+                  </div>
+                  <span className="orders-flow-card__status">
+                    {ORDER_STATUS_LABELS[order.status]}
+                  </span>
+                </div>
+
+                <div className="orders-flow-card__meta">
+                  <span>{formatAddress(order)}</span>
+                  <span>Candidatos: {order.applications?.length ?? 0}</span>
+                  <span>
+                    Prestador: {order.selectedProvider?.name ?? "Não vinculado"}
+                  </span>
+                  <span>
+                    Pendência: {getPendingLabel(order)}
+                  </span>
+                  <span>
+                    Pagamento:{" "}
+                    {order.payment
+                      ? PAYMENT_STATUS_LABELS[order.payment.status]
+                      : "não iniciado"}
+                  </span>
+                  <span>
+                    Avaliação:{" "}
+                    {order.review ? `${order.review.rating}/5` : "pendente"}
+                  </span>
+                </div>
+
+                <div className="orders-flow-card__actions">
+                  <Link
+                    to={`/orders/${order.id}`}
+                    className="orders-flow-card__link"
+                  >
+                    Ver detalhes
+                  </Link>
+                  {[
+                    OrderStatus.CREATED,
+                    OrderStatus.AWAITING_CANDIDATES,
+                    OrderStatus.AWAITING_SELECTION,
+                  ].includes(order.status) && (
+                    <button
+                      type="button"
+                      className="orders-flow-card__ghost"
+                      onClick={() => expireOrder(order.id)}
+                    >
+                      Marcar como expirada
+                    </button>
+                  )}
+                  {![
+                    OrderStatus.FINISHED,
+                    OrderStatus.CANCELLED,
+                    OrderStatus.EXPIRED,
+                  ].includes(order.status) && (
+                    <button
+                      type="button"
+                      className="orders-flow-card__ghost"
+                      onClick={() =>
+                        cancelOrder(
+                          order.id,
+                          "Cancelamento administrativo.",
+                          "ADMIN",
+                        )
+                      }
+                    >
+                      Cancelar
+                    </button>
+                  )}
+                </div>
+              </article>
             ))}
           </div>
         )}

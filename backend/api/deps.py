@@ -172,3 +172,18 @@ async def get_current_active_user(
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+
+async def get_current_admin_user(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    provider_repo: Annotated[ProviderRepository, Depends(get_provider_repository)],
+) -> User:
+    admin = await provider_repo.get_admin_by_user_id(current_user.id)
+
+    if not admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+
+    return current_user

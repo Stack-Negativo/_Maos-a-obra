@@ -1,10 +1,5 @@
 import { createContext } from "react";
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-};
+import type { User } from "@/features/auth/types/auth_types";
 
 type SignInPayload = {
   email: string;
@@ -19,6 +14,8 @@ type AuthContextData = {
   signIn: (
     data: SignInPayload,
   ) => Promise<void>;
+
+  updateUser: (user: User) => void;
 
   signOut: () => void;
 };

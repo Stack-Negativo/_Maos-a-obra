@@ -44,7 +44,7 @@
   padding: 0.65rem 0.9rem;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--color-card);
   color: var(--color-text-secondary);
   font-size: 0.84rem;
   font-weight: 800;
@@ -56,7 +56,7 @@
   padding: 1rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--color-card);
 }
 
 .specialties-page__actions .input {
@@ -69,9 +69,145 @@
   border: 1px solid var(--color-brand);
   border-radius: 8px;
   background: var(--color-brand);
-  color: #fff;
+  color: var(--color-on-brand);
   font-weight: 800;
   cursor: pointer;
+}
+
+.specialties-page__panel {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-card);
+  box-shadow: var(--shadow-card);
+}
+
+.specialties-page__panel h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.specialties-page__panel p {
+  margin: 0.35rem 0 0;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.specialties-page__panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.specialties-page__panel-header strong {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  font-size: 0.8rem;
+}
+
+.specialties-page__form {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.7fr) minmax(260px, 1.2fr) auto;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.specialties-page__form textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-card);
+  color: var(--color-text);
+  resize: vertical;
+}
+
+.specialties-page__form button,
+.specialties-page__request-actions button {
+  min-height: 44px;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--color-brand);
+  border-radius: 8px;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.specialties-page__form button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.specialties-page__form-error {
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--color-danger);
+  border-radius: 8px;
+  background: var(--color-danger-bg);
+  color: var(--color-danger) !important;
+}
+
+.specialties-page__requests {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.specialties-page__request {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.specialties-page__request strong {
+  color: var(--color-text);
+}
+
+.specialties-page__request p {
+  margin: 0.25rem 0;
+  color: var(--color-text-secondary);
+}
+
+.specialties-page__request small {
+  color: var(--color-text-muted);
+}
+
+.specialties-page__request-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.specialties-page__request-actions .specialties-page__ghost {
+  border-color: var(--color-border);
+  background: var(--color-card);
+  color: var(--color-text-secondary);
+}
+
+.specialties-page__request-status {
+  flex-shrink: 0;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: var(--color-brand-light);
+  color: var(--color-brand-dark);
+  font-size: 0.76rem;
+  font-weight: 850;
 }
 
 .specialties-page__actions button:disabled {
@@ -83,7 +219,7 @@
   padding: 1rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--color-card);
   color: var(--color-text-secondary);
 }
 
@@ -101,6 +237,12 @@
 
 @media (max-width: 720px) {
   .specialties-page__actions {
+    display: grid;
+  }
+
+  .specialties-page__form,
+  .specialties-page__request {
+    grid-template-columns: 1fr;
     display: grid;
   }
 

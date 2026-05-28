@@ -91,26 +91,26 @@ class ServiceOrderApplicationService:
             status=ApplicationStatus.PENDING,
         )
 
-        # Transactional: update OS status if first application
-        async with self.application_repository.session.begin():
-            created = await self.application_repository.create(application)
+        created = await self.application_repository.create(application)
 
-            # Transition OS from AWAITING_CANDIDATES to AWAITING_SELECTION if needed
-            if order.status == OrderStatus.AWAITING_CANDIDATES:
-                old_status = order.status
-                order.status = OrderStatus.AWAITING_SELECTION
+        # Transition OS from AWAITING_CANDIDATES to AWAITING_SELECTION if needed
+        if order.status == OrderStatus.AWAITING_CANDIDATES:
+            old_status = order.status
+            order.status = OrderStatus.AWAITING_SELECTION
 
-                # Record History
-                history = ServiceOrderHistory(
-                    service_order_id=order_id,
-                    old_status=old_status,
-                    new_status=order.status,
-                    actor_id=provider_user_id,
-                    reason="First application received",
-                )
-                await self.history_repository.create(history)
+            # Record History
+            history = ServiceOrderHistory(
+                service_order_id=order_id,
+                old_status=old_status,
+                new_status=order.status,
+                actor_id=provider_user_id,
+                reason="First application received",
+            )
+            await self.history_repository.create(history)
 
-            return created
+        await self.application_repository.session.commit()
+        await self.application_repository.session.refresh(created)
+        return created
 
     async def accept_application(
         self, client_user_id: UUID, application_id: UUID
@@ -139,30 +139,66 @@ class ServiceOrderApplicationService:
             order.status, OrderStatus.PROVIDER_SELECTED
         )
 
-        # Transactional logic
-        async with self.application_repository.session.begin():
-            # 1. Accept this application
-            application.status = ApplicationStatus.ACCEPTED
+        # 1. Accept this application
+        application.status = ApplicationStatus.ACCEPTED
 
-            # 2. Reject all other pending applications for this order
-            await self.application_repository.reject_others(order.id, application.id)
+        # 2. Reject all other pending applications for this order
+        await self.application_repository.reject_others(order.id, application.id)
 
-            # 3. Update OS provider and status
-            old_status = order.status
-            order.provider_id = application.provider_id
-            order.status = OrderStatus.PROVIDER_SELECTED
+        # 3. Update OS provider and status
+        old_status = order.status
+        order.provider_id = application.provider_id
+        order.status = OrderStatus.PROVIDER_SELECTED
 
-            # Record History
-            history = ServiceOrderHistory(
-                service_order_id=order.id,
-                old_status=old_status,
-                new_status=order.status,
-                actor_id=client_user_id,
-                reason="Provider selected",
+        # Record History
+        history = ServiceOrderHistory(
+            service_order_id=order.id,
+            old_status=old_status,
+            new_status=order.status,
+            actor_id=client_user_id,
+            reason="Provider selected",
+        )
+        await self.history_repository.create(history)
+
+        await self.application_repository.session.commit()
+        await self.application_repository.session.refresh(application)
+        return application
+
+    async def reject_application(
+        self, client_user_id: UUID, application_id: UUID
+    ) -> ServiceOrderApplication:
+        application = await self.application_repository.get_by_id(application_id)
+        if not application:
+            raise NotFoundException("Candidatura não encontrada.")
+
+        if application.status != ApplicationStatus.PENDING:
+            raise BusinessRuleViolation(
+                "Apenas candidaturas pendentes podem ser recusadas."
             )
-            await self.history_repository.create(history)
 
-            return application
+        order = await self.order_repository.get_by_id(application.service_order_id)
+        if not order:
+            raise NotFoundException("Ordem de Serviço vinculada não encontrada.")
+
+        if order.client_id != client_user_id:
+            raise BusinessRuleViolation(
+                "Você não tem permissão para recusar candidaturas nesta ordem."
+            )
+
+        application.status = ApplicationStatus.REJECTED
+
+        history = ServiceOrderHistory(
+            service_order_id=order.id,
+            old_status=order.status,
+            new_status=order.status,
+            actor_id=client_user_id,
+            reason="Application rejected",
+        )
+        await self.history_repository.create(history)
+
+        await self.application_repository.session.commit()
+        await self.application_repository.session.refresh(application)
+        return application
 
     async def list_order_applications(
         self, user_id: UUID, order_id: UUID
@@ -172,9 +208,12 @@ class ServiceOrderApplicationService:
             raise NotFoundException("Ordem de Serviço não encontrada.")
 
         # Rule: Only owner or admin can see all applications
-        # For MVP, we'll allow the owner to see.
-        # Providers can only see their own.
         if order.client_id != user_id:
+            admin = await self.provider_repository.get_admin_by_user_id(user_id)
+            if admin:
+                apps = await self.application_repository.list_by_order(order_id)
+                return list(apps)
+
             # Check if user is a provider who applied
             provider = await self.provider_repository.get_by_user_id(user_id)
             if not provider:

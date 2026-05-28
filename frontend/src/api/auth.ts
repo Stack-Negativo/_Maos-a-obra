@@ -13,7 +13,7 @@ export type ApiResponse<T> = {
 
 export type LoginApiPayload = {
   email: string;
-  senha: string;
+  password: string;
 };
 
 export type LoginApiResponse = {
@@ -30,17 +30,28 @@ export type RegisterApiPayload = {
 
 export type UserApiResponse = {
   id: string;
-  nome: string;
   email: string;
+  full_name: string;
+  nome?: string;
+  role?: string;
+  is_provider?: boolean;
+  is_admin?: boolean;
 };
 
 export const authApi = {
   register: async (
     payload: RegisterApiPayload,
-  ): Promise<ApiResponse<UserApiResponse>> => {
+  ): Promise<ApiResponse<LoginApiResponse>> => {
+    const requestBody = {
+      full_name: payload.nome,
+      email: payload.email,
+      password: payload.senha,
+      phone: payload.telefone,
+    };
+
     const response = await httpClient.post<
-      ApiResponse<UserApiResponse>
-    >("/auth/register", payload);
+      ApiResponse<LoginApiResponse>
+    >("/auth/register", requestBody);
 
     return response.data;
   },
@@ -48,9 +59,17 @@ export const authApi = {
   login: async (
     payload: LoginApiPayload,
   ): Promise<ApiResponse<LoginApiResponse>> => {
+    const formData = new URLSearchParams();
+    formData.append("username", payload.email);
+    formData.append("password", payload.password);
+
     const response = await httpClient.post<
       ApiResponse<LoginApiResponse>
-    >("/auth/login", payload);
+    >("/auth/token", formData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
 
     return response.data;
   },
