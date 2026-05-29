@@ -3,77 +3,9 @@ import axios from "axios";
 import { authApi } from "@/api/auth";
 import { providerApi } from "@/api/providers";
 import { listSpecialties } from "@/features/specialties/services/specialties_service";
-import {
-  notifyProvidersChanged,
-  upsertMockProviderProfile,
-} from "@/features/providers/services/providers_service";
-import type {
-  AuthResponse,
-  LoginPayload,
-  RegisterPayload,
-  User,
-} from "../types";
+import { notifyProvidersChanged } from "@/features/providers/services/providers_service";
+import type { AuthResponse, LoginPayload, RegisterPayload, User } from "../types";
 import { UserRole } from "../types/auth_types";
-
-type MockUser = User;
-
-export const MOCK_PROVIDER_SPECIALTIES = [
-  {
-    id: "mock-specialty-hidraulica",
-    name: "Hidráulica",
-    description: "Serviços de encanamento",
-    isActive: true,
-  },
-  {
-    id: "mock-specialty-eletrica",
-    name: "Elétrica",
-    description: "Instalações e reparos elétricos",
-    isActive: true,
-  },
-  {
-    id: "mock-specialty-pintura",
-    name: "Pintura",
-    description: "Pintura e acabamento residencial",
-    isActive: true,
-  },
-];
-
-const MOCK_USER_STORAGE_KEY = "mock_user";
-
-const MOCK_USERS: Record<string, MockUser> = {
-  "cliente@maosaobra.local": {
-    id: "mock-client",
-    name: "Mariana Cliente",
-    email: "cliente@maosaobra.local",
-    role: UserRole.CLIENT,
-    isProvider: false,
-    isAdmin: false,
-    specialties: [],
-  },
-  "prestador@maosaobra.local": {
-    id: "mock-provider",
-    name: "João Prestador",
-    email: "prestador@maosaobra.local",
-    role: UserRole.PROVIDER,
-    bio: "Especialista em reparos residenciais e manutenção preventiva.",
-    isProvider: true,
-    isAdmin: false,
-    specialties: MOCK_PROVIDER_SPECIALTIES.slice(0, 2),
-  },
-  "admin@maosaobra.local": {
-    id: "mock-admin",
-    name: "Admin Sistema",
-    email: "admin@maosaobra.local",
-    role: UserRole.ADMIN,
-    isProvider: false,
-    isAdmin: true,
-    specialties: [],
-  },
-};
-
-function isNetworkError(error: unknown) {
-  return axios.isAxiosError(error) && !error.response;
-}
 
 function isRealAdminEmail(email: string) {
   return email.trim().toLowerCase() === "admin@maosaobra.com.br";
@@ -96,118 +28,35 @@ function getApiErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : null;
 }
 
-function getSpecialtiesById(ids?: string[]) {
-  const selectedIds = ids?.length
-    ? ids
-    : [MOCK_PROVIDER_SPECIALTIES[0].id];
-
-  return MOCK_PROVIDER_SPECIALTIES.filter((specialty) =>
-    selectedIds.includes(specialty.id),
-  );
+async function resolveSpecialtiesById(ids: string[]) {
+  const specialties = await listSpecialties();
+  return specialties.filter((specialty) => ids.includes(specialty.id));
 }
 
-async function resolveSpecialtiesById(ids?: string[]) {
-  const selectedIds = ids?.length
-    ? ids
-    : [MOCK_PROVIDER_SPECIALTIES[0].id];
-
-  try {
-    const specialties = await listSpecialties();
-    const selectedSpecialties = specialties.filter((specialty) =>
-      selectedIds.includes(specialty.id),
-    );
-
-    if (selectedSpecialties.length > 0) {
-      return selectedSpecialties;
-    }
-  } catch {
-    // Mantem fallback mock quando o catálogo real não está disponível.
-  }
-
-  const mockSpecialties = getSpecialtiesById(selectedIds);
-  return mockSpecialties.length > 0
-    ? mockSpecialties
-    : [MOCK_PROVIDER_SPECIALTIES[0]];
-}
-
-function createMockUser(email: string, name?: string): MockUser {
-  const normalizedEmail = email.trim().toLowerCase();
-
-  if (MOCK_USERS[normalizedEmail]) {
-    return MOCK_USERS[normalizedEmail];
-  }
-
+function mapUser(profile: {
+  id: string;
+  email: string;
+  full_name?: string;
+  nome?: string;
+  role?: string;
+  is_provider?: boolean;
+  is_admin?: boolean;
+}): User {
   return {
-    id: `mock-user-${Date.now()}`,
-    name:
-      name?.trim() ||
-      email
-        .split("@")[0]
-        .replace(/[._-]/g, " ")
-        .replace(/\b\w/g, (letter) => letter.toUpperCase()) ||
-      "Usuário MVP",
-    email: normalizedEmail,
-    role: UserRole.CLIENT,
-    isProvider: false,
-    isAdmin: false,
+    id: profile.id,
+    name: profile.full_name || profile.nome || profile.email.split("@")[0],
+    email: profile.email,
+    role:
+      (profile.role as UserRole | undefined) ??
+      (profile.is_admin
+        ? UserRole.ADMIN
+        : profile.is_provider
+          ? UserRole.PROVIDER
+          : UserRole.CLIENT),
+    isProvider: profile.is_provider ?? false,
+    isAdmin: profile.is_admin ?? false,
     specialties: [],
   };
-}
-
-function saveMockUser(user: MockUser) {
-  localStorage.setItem(MOCK_USER_STORAGE_KEY, JSON.stringify(user));
-}
-
-function getMockUser(email: string) {
-  const normalizedEmail = email.trim().toLowerCase();
-  const knownMockUser = MOCK_USERS[normalizedEmail];
-
-  if (knownMockUser) {
-    return knownMockUser;
-  }
-
-  const storedUser = localStorage.getItem(MOCK_USER_STORAGE_KEY);
-
-  if (!storedUser) {
-    return createMockUser(normalizedEmail);
-  }
-
-  try {
-    const user = JSON.parse(storedUser) as MockUser;
-
-    if (user.email === normalizedEmail) {
-      return user;
-    }
-  } catch {
-    localStorage.removeItem(MOCK_USER_STORAGE_KEY);
-  }
-
-  return createMockUser(normalizedEmail);
-}
-
-function mockLogin(data: LoginPayload): AuthResponse {
-  return {
-    token: "mock-token-mvp",
-    user: getMockUser(data.email.trim()),
-  };
-}
-
-function mockRegister(data: RegisterPayload) {
-  const role = data.role ?? UserRole.CLIENT;
-  const baseUser = createMockUser(data.email.trim(), data.nome);
-  const isProvider = role === UserRole.PROVIDER;
-  const user: MockUser = {
-    ...baseUser,
-    role,
-    bio: isProvider ? data.bio?.trim() || "Prestador em validação MVP." : "",
-    isProvider,
-    isAdmin: false,
-    specialties: isProvider ? getSpecialtiesById(data.specialtyIds) : [],
-  };
-
-  saveMockUser(user);
-
-  return user;
 }
 
 export async function becomeProviderService(
@@ -217,75 +66,37 @@ export async function becomeProviderService(
     specialtyIds: string[];
   },
 ) {
-  if (localStorage.getItem("token") !== "mock-token-mvp") {
-    try {
-      const response = await providerApi.register({
-        bio: data.bio.trim(),
-        specialty_ids: data.specialtyIds,
-      });
+  const response = await providerApi.register({
+    bio: data.bio.trim(),
+    specialty_ids: data.specialtyIds,
+  });
 
-      if (!response.success) {
-        throw new Error(
-          response.error?.message ?? "Falha ao ativar perfil de prestador",
-        );
-      }
-
-      const providerUser: User = {
-        ...user,
-        role: UserRole.PROVIDER,
-        providerId: response.data.id,
-        bio: response.data.bio ?? data.bio.trim(),
-        isProvider: true,
-        isAdmin: false,
-        specialties: response.data.specialties.map((item) => ({
-          id: item.specialty.id,
-          name: item.specialty.name,
-          description: item.specialty.description,
-          isActive: item.specialty.is_active,
-        })),
-      };
-
-      saveMockUser(providerUser);
-      notifyProvidersChanged();
-      return providerUser;
-    } catch (error) {
-      if (!isNetworkError(error)) {
-        throw error;
-      }
-    }
+  if (!response.success) {
+    throw new Error(
+      response.error?.message ?? "Falha ao ativar perfil de prestador",
+    );
   }
 
-  const specialties = await resolveSpecialtiesById(data.specialtyIds);
-  const providerId = user.providerId ?? `mock-provider-${user.id}`;
   const providerUser: User = {
     ...user,
     role: UserRole.PROVIDER,
-    providerId,
-    bio: data.bio.trim(),
+    providerId: response.data.id,
+    bio: response.data.bio ?? data.bio.trim(),
     isProvider: true,
     isAdmin: false,
-    specialties,
+    specialties: response.data.specialties.map((item) => ({
+      id: item.specialty.id,
+      name: item.specialty.name,
+      description: item.specialty.description,
+      isActive: item.specialty.is_active,
+    })),
   };
 
-  upsertMockProviderProfile({
-    id: providerId,
-    userId: user.id,
-    name: user.name,
-    bio: data.bio.trim(),
-    specialties,
-  });
-  saveMockUser(providerUser);
-
+  notifyProvidersChanged();
   return providerUser;
 }
 
-export async function loginService(
-  data: LoginPayload,
-): Promise<AuthResponse> {
-  if (MOCK_USERS[data.email.trim().toLowerCase()]) {
-    return mockLogin(data);
-  }
-
+export async function loginService(data: LoginPayload): Promise<AuthResponse> {
   try {
     const loginResponse = await authApi.login({
       email: data.email,
@@ -303,27 +114,15 @@ export async function loginService(
 
     if (!profileResponse.success) {
       throw new Error(
-        profileResponse.error?.message ??
-          "Falha ao buscar perfil do usuário",
+        profileResponse.error?.message ?? "Falha ao buscar perfil do usuario",
       );
     }
 
-    const user: AuthResponse["user"] = {
-      id: profileResponse.data.id,
-      name:
-        profileResponse.data.full_name ||
-        profileResponse.data.nome ||
-        profileResponse.data.email.split("@")[0],
-      email: profileResponse.data.email,
-      role: profileResponse.data.role as UserRole | undefined,
-      isProvider: profileResponse.data.is_provider ?? false,
-      isAdmin: profileResponse.data.is_admin ?? false,
-      specialties: [] as AuthResponse["user"]["specialties"],
-    };
+    const user = mapUser(profileResponse.data);
 
     if (isRealAdminEmail(data.email) && !user.isAdmin) {
       throw new Error(
-        "Usuário admin autenticado, mas sem permissão administrativa no backend.",
+        "Usuario admin autenticado, mas sem permissao administrativa no backend.",
       );
     }
 
@@ -333,17 +132,15 @@ export async function loginService(
         user.role = user.role ?? UserRole.PROVIDER;
         user.providerId = providerResponse.data.id;
         user.isProvider = true;
-        user.specialties = providerResponse.data.specialties.map(
-          (specialty) => ({
-            id: specialty.specialty.id,
-            name: specialty.specialty.name,
-            description: specialty.specialty.description,
-            isActive: specialty.specialty.is_active,
-          }),
-        );
+        user.specialties = providerResponse.data.specialties.map((specialty) => ({
+          id: specialty.specialty.id,
+          name: specialty.specialty.name,
+          description: specialty.specialty.description,
+          isActive: specialty.specialty.is_active,
+        }));
       }
     } catch {
-      // Perfil de prestador pode não existir para clientes.
+      // Clientes e admins nao precisam ter perfil de prestador.
     }
 
     return {
@@ -356,15 +153,11 @@ export async function loginService(
       throw Object.assign(
         new Error(
           apiMessage
-            ? `Não foi possível autenticar o admin real: ${apiMessage}`
-            : "Não foi possível autenticar o admin real. Verifique se o backend está rodando e se o seed de admin foi executado.",
+            ? `Nao foi possivel autenticar o admin real: ${apiMessage}`
+            : "Nao foi possivel autenticar o admin real. Verifique se o backend esta rodando e se o seed de admin foi executado.",
         ),
         { cause: error },
       );
-    }
-
-    if (isNetworkError(error)) {
-      return mockLogin(data);
     }
 
     throw error;
@@ -374,37 +167,42 @@ export async function loginService(
 export async function registerService(
   data: RegisterPayload,
 ): Promise<{ id: string; name: string; email: string }> {
+  let response;
+
   try {
-    const response = await authApi.register(data);
-
-    if (!response.success) {
-      throw new Error(
-        response.error?.message ?? "Falha ao cadastrar usuário",
-      );
-    }
-
-    const profileResponse = await authApi.me(response.data.access_token);
-
-    if (!profileResponse.success) {
-      throw new Error(
-        profileResponse.error?.message ??
-          "Falha ao recuperar perfil de usuário",
-      );
-    }
-
-    return {
-      id: profileResponse.data.id,
-      name:
-        profileResponse.data.full_name ||
-        profileResponse.data.nome ||
-        profileResponse.data.email.split("@")[0],
-      email: profileResponse.data.email,
-    };
+    response = await authApi.register(data);
   } catch (error) {
-    if (isNetworkError(error)) {
-      return mockRegister(data);
-    }
-
-    throw error;
+    throw Object.assign(
+      new Error(getApiErrorMessage(error) ?? "Falha ao cadastrar usuario"),
+      { cause: error },
+    );
   }
+
+  if (!response.success) {
+    throw new Error(response.error?.message ?? "Falha ao cadastrar usuario");
+  }
+
+  const profileResponse = await authApi.me(response.data.access_token);
+
+  if (!profileResponse.success) {
+    throw new Error(
+      profileResponse.error?.message ?? "Falha ao recuperar perfil de usuario",
+    );
+  }
+
+  if (data.role === UserRole.PROVIDER && data.specialtyIds?.length) {
+    const specialties = await resolveSpecialtiesById(data.specialtyIds);
+    if (specialties.length !== data.specialtyIds.length) {
+      throw new Error("Uma ou mais especialidades selecionadas nao existem.");
+    }
+  }
+
+  return {
+    id: profileResponse.data.id,
+    name:
+      profileResponse.data.full_name ||
+      profileResponse.data.nome ||
+      profileResponse.data.email.split("@")[0],
+    email: profileResponse.data.email,
+  };
 }

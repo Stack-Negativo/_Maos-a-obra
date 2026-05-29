@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuthContext } from "@/app/providers/auth_provider/use_auth_context";
 import {
-  MOCK_PROVIDER_SPECIALTIES,
   becomeProviderService,
   registerService,
 } from "@/features/auth/services/auth_service";
@@ -14,6 +13,8 @@ import { UserRole } from "@/features/auth/types/auth_types";
 import { Input } from "@/shared/ui/input";
 
 import "./register_form.css";
+
+const SPECIALTIES_ERROR = "Nao foi possivel carregar especialidades do backend.";
 
 export function RegisterForm() {
   const navigate = useNavigate();
@@ -27,48 +28,71 @@ export function RegisterForm() {
     UserRole.CLIENT | UserRole.PROVIDER
   >(UserRole.CLIENT);
   const [bio, setBio] = useState("");
-  const [specialtyIds, setSpecialtyIds] = useState<string[]>([
-    MOCK_PROVIDER_SPECIALTIES[0].id,
-  ]);
-  const [specialtyOptions, setSpecialtyOptions] = useState<Specialty[]>(
-    MOCK_PROVIDER_SPECIALTIES,
-  );
+  const [specialtyIds, setSpecialtyIds] = useState<string[]>([]);
+  const [specialtyOptions, setSpecialtyOptions] = useState<Specialty[]>([]);
+  const [specialtiesLoading, setSpecialtiesLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadSpecialties() {
-      try {
-        const specialties = await listSpecialties();
-        const activeSpecialties = specialties.filter(
-          (specialty) => specialty.isActive,
-        );
+  const loadSpecialties = useCallback(async () => {
+    setSpecialtiesLoading(true);
 
-        if (activeSpecialties.length > 0) {
-          setSpecialtyOptions(activeSpecialties);
-          setSpecialtyIds((currentIds) =>
-            currentIds.some((id) =>
-              activeSpecialties.some((specialty) => specialty.id === id),
-            )
-              ? currentIds
-              : [activeSpecialties[0].id],
-          );
+    try {
+      const specialties = await listSpecialties();
+      const activeSpecialties = specialties.filter(
+        (specialty) => specialty.isActive,
+      );
+
+      setSpecialtyOptions(activeSpecialties);
+      setSpecialtyIds((currentIds) => {
+        if (activeSpecialties.length === 0) {
+          return [];
         }
-      } catch {
-        setSpecialtyOptions(MOCK_PROVIDER_SPECIALTIES);
-      }
-    }
 
-    void loadSpecialties();
+        return currentIds.some((id) =>
+          activeSpecialties.some((specialty) => specialty.id === id),
+        )
+          ? currentIds
+          : [activeSpecialties[0].id];
+      });
+      setError((currentError) =>
+        currentError === SPECIALTIES_ERROR ? null : currentError,
+      );
+    } catch (err) {
+      console.error(err);
+      setSpecialtyOptions([]);
+      setSpecialtyIds([]);
+      setError(SPECIALTIES_ERROR);
+    } finally {
+      setSpecialtiesLoading(false);
+    }
   }, []);
 
+  function selectClientAccount() {
+    setAccountType(UserRole.CLIENT);
+    setError(null);
+  }
+
+  async function selectProviderAccount() {
+    setAccountType(UserRole.PROVIDER);
+    setError(null);
+
+    if (specialtyOptions.length === 0) {
+      await loadSpecialties();
+    }
+  }
+
+  async function ensureProviderSpecialtiesLoaded() {
+    if (accountType !== UserRole.PROVIDER || specialtyOptions.length > 0) {
+      return true;
+    }
+
+    await loadSpecialties();
+    return specialtyOptions.length > 0;
+  }
+
   function validateRegister() {
-    if (
-      !name.trim() ||
-      !email.trim() ||
-      !password.trim() ||
-      !phone.trim()
-    ) {
+    if (!name.trim() || !email.trim() || !password.trim() || !phone.trim()) {
       return "Preencha todos os campos.";
     }
 
@@ -77,7 +101,7 @@ export function RegisterForm() {
     }
 
     if (!email.includes("@")) {
-      return "Informe um email válido.";
+      return "Informe um email valido.";
     }
 
     if (password.length < 8) {
@@ -85,16 +109,20 @@ export function RegisterForm() {
     }
 
     if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
-      return "A senha deve ter pelo menos uma letra e um número.";
+      return "A senha deve ter pelo menos uma letra e um numero.";
     }
 
     if (!/^\d{10,11}$/.test(phone.replace(/\D/g, ""))) {
-      return "Informe um telefone com 10 ou 11 dígitos.";
+      return "Informe um telefone com 10 ou 11 digitos.";
     }
 
     if (accountType === UserRole.PROVIDER) {
       if (bio.trim().length < 20) {
-        return "Descreva sua experiência como prestador em pelo menos 20 caracteres.";
+        return "Descreva sua experiencia como prestador em pelo menos 20 caracteres.";
+      }
+
+      if (specialtyOptions.length === 0) {
+        return "Nenhuma especialidade ativa foi carregada. Tente novamente.";
       }
 
       if (specialtyIds.length === 0) {
@@ -106,8 +134,12 @@ export function RegisterForm() {
   }
 
   async function handleRegister() {
-    const validationError =
-      validateRegister();
+    if (!(await ensureProviderSpecialtiesLoaded())) {
+      setError(SPECIALTIES_ERROR);
+      return;
+    }
+
+    const validationError = validateRegister();
 
     if (validationError) {
       setError(validationError);
@@ -117,8 +149,7 @@ export function RegisterForm() {
     setLoading(true);
     setError(null);
 
-    const cleanEmail =
-      email.trim();
+    const cleanEmail = email.trim();
 
     try {
       await registerService({
@@ -138,9 +169,7 @@ export function RegisterForm() {
 
       if (accountType === UserRole.PROVIDER) {
         const storedUser = localStorage.getItem("user");
-        const signedUser = storedUser
-          ? (JSON.parse(storedUser) as User)
-          : null;
+        const signedUser = storedUser ? (JSON.parse(storedUser) as User) : null;
 
         if (signedUser) {
           const providerUser = await becomeProviderService(signedUser, {
@@ -157,11 +186,8 @@ export function RegisterForm() {
           : "/orders/client",
       );
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Erro ao cadastrar usuário.",
-      );
+      console.error(err);
+      setError(err instanceof Error ? err.message : "Erro ao cadastrar usuario.");
     } finally {
       setLoading(false);
     }
@@ -177,7 +203,7 @@ export function RegisterForm() {
     >
       <div className="register-form__header">
         <h1>Cadastre-se</h1>
-        <p>Escolha como quer entrar no MVP e siga para o painel correto.</p>
+        <p>Escolha como quer entrar no sistema e siga para o painel correto.</p>
       </div>
 
       {error ? (
@@ -195,11 +221,11 @@ export function RegisterForm() {
                 ? "register-form__role-card register-form__role-card--active"
                 : "register-form__role-card"
             }
-            onClick={() => setAccountType(UserRole.CLIENT)}
+            onClick={selectClientAccount}
             disabled={loading}
           >
             <strong>Cliente</strong>
-            <span>Criar ordens, escolher prestadores e avaliar serviços.</span>
+            <span>Criar ordens, escolher prestadores e avaliar servicos.</span>
           </button>
           <button
             type="button"
@@ -208,11 +234,13 @@ export function RegisterForm() {
                 ? "register-form__role-card register-form__role-card--active"
                 : "register-form__role-card"
             }
-            onClick={() => setAccountType(UserRole.PROVIDER)}
-            disabled={loading}
+            onClick={() => {
+              void selectProviderAccount();
+            }}
+            disabled={loading || specialtiesLoading}
           >
             <strong>Prestador</strong>
-            <span>Ver ordens disponíveis e se candidatar a serviços.</span>
+            <span>Ver ordens disponiveis e se candidatar a servicos.</span>
           </button>
         </div>
 
@@ -260,30 +288,42 @@ export function RegisterForm() {
                 value={bio}
                 onChange={(event) => setBio(event.target.value)}
                 disabled={loading}
-                placeholder="Conte sua experiência, região de atendimento e tipo de serviço que faz."
+                placeholder="Conte sua experiencia, regiao de atendimento e tipo de servico que faz."
               />
             </label>
-            <fieldset>
-              <legend>Especialidades</legend>
-              <div className="register-form__specialties">
-                {specialtyOptions.map((specialty) => (
-                  <label key={specialty.id}>
-                    <input
-                      type="checkbox"
-                      checked={specialtyIds.includes(specialty.id)}
-                      onChange={(event) => {
-                        setSpecialtyIds((currentIds) =>
-                          event.target.checked
-                            ? [...currentIds, specialty.id]
-                            : currentIds.filter((id) => id !== specialty.id),
-                        );
-                      }}
-                      disabled={loading}
-                    />
-                    <span>{specialty.name}</span>
-                  </label>
-                ))}
-              </div>
+            <fieldset disabled={loading || specialtiesLoading}>
+              <legend>
+                {specialtiesLoading ? "Carregando..." : "Especialidades"}
+              </legend>
+              {specialtyOptions.length === 0 && !specialtiesLoading ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void loadSpecialties();
+                  }}
+                >
+                  Tentar carregar especialidades
+                </button>
+              ) : (
+                <div className="register-form__specialties">
+                  {specialtyOptions.map((specialty) => (
+                    <label key={specialty.id}>
+                      <input
+                        type="checkbox"
+                        checked={specialtyIds.includes(specialty.id)}
+                        onChange={(event) => {
+                          setSpecialtyIds((currentIds) =>
+                            event.target.checked
+                              ? [...currentIds, specialty.id]
+                              : currentIds.filter((id) => id !== specialty.id),
+                          );
+                        }}
+                      />
+                      <span>{specialty.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </fieldset>
           </div>
         )}
@@ -292,14 +332,14 @@ export function RegisterForm() {
       <button
         type="submit"
         className="register-form__submit"
-        disabled={loading}
+        disabled={loading || specialtiesLoading}
       >
         {loading ? "Cadastrando..." : "Criar conta"}
       </button>
 
       <div className="register-form__footer">
         <p>
-          Já tem conta? <Link to="/">Entre</Link>
+          Ja tem conta? <Link to="/">Entre</Link>
         </p>
       </div>
     </form>

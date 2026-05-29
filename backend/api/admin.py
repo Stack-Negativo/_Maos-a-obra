@@ -110,6 +110,20 @@ async def cancel_order_as_admin(
     return APIResponse(data=ServiceOrderResponse.model_validate(order))
 
 
+@router.post(
+    "/orders/{order_id}/expire",
+    response_model=APIResponse[ServiceOrderResponse],
+)
+async def expire_order_as_admin(
+    order_id: UUID,
+    reason: str,
+    admin_user: Annotated[User, Depends(get_current_admin_user)],
+    service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
+) -> APIResponse[ServiceOrderResponse]:
+    order = await service.expire_order_as_admin(order_id, admin_user.id, reason)
+    return APIResponse(data=ServiceOrderResponse.model_validate(order))
+
+
 @router.get("/me", response_model=APIResponse[UserResponse])
 async def get_admin_me(
     admin_user: Annotated[User, Depends(get_current_admin_user)],

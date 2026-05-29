@@ -57,7 +57,7 @@ type ApiApplication = {
   id: string;
   service_order_id: string;
   provider: ApiProvider;
-  status: Application["status"] | "CANCELLED";
+  status: Application["status"];
   created_at: string;
   updated_at?: string;
 };
@@ -95,10 +95,6 @@ type ApiHistoryEvent = {
   created_at: string;
 };
 
-function isMockSession() {
-  return localStorage.getItem("token") === "mock-token-mvp";
-}
-
 function unwrapResponse<T>(response: T | ApiResponse<T>) {
   if (
     response &&
@@ -112,11 +108,7 @@ function unwrapResponse<T>(response: T | ApiResponse<T>) {
   return response as T;
 }
 
-function ensureApiSession() {
-  if (isMockSession()) {
-    throw new Error("API real desativada para usuários mockados.");
-  }
-}
+function ensureApiSession() {}
 
 type OrdersApiResponse = {
   orders: ApiOrder[];
@@ -184,10 +176,7 @@ function mapApplication(apiApplication: ApiApplication): Application {
     id: apiApplication.id,
     orderId: apiApplication.service_order_id,
     provider: mapProvider(apiApplication.provider),
-    status:
-      apiApplication.status === "CANCELLED"
-        ? "REJECTED"
-        : apiApplication.status,
+    status: apiApplication.status,
     appliedAt: apiApplication.created_at,
     respondedAt: apiApplication.updated_at,
   };
@@ -338,24 +327,12 @@ export const orderService = {
     return mapOrder(unwrapResponse(response.data));
   },
 
-  async updateOrder(id: string, updates: Partial<Order>): Promise<Order> {
-    ensureApiSession();
-    const response = await httpClient.put<ApiOrder>(
-      `${ORDERS_BASE_URL}/${id}`,
-      updates,
-    );
-    return mapOrder(unwrapResponse(response.data));
-  },
-
   async cancelOrder(id: string): Promise<Order> {
     ensureApiSession();
     const response = await httpClient.post<ApiOrder>(
       `${ORDERS_BASE_URL}/${id}/cancel`,
-      null,
       {
-        params: {
-          reason: "Cancelado pelo cliente",
-        },
+        reason: "Cancelado pelo cliente",
       },
     );
     return mapOrder(unwrapResponse(response.data));
@@ -366,11 +343,17 @@ export const orderService = {
     const response = await httpClient.post<ApiResponse<ApiOrder>>(
       `${ADMIN_BASE_URL}/orders/${id}/cancel`,
       null,
-      {
-        params: {
-          reason,
-        },
-      },
+      { params: { reason } },
+    );
+    return mapOrder(unwrapResponse(response.data));
+  },
+
+  async expireOrderAsAdmin(id: string, reason: string): Promise<Order> {
+    ensureApiSession();
+    const response = await httpClient.post<ApiResponse<ApiOrder>>(
+      `${ADMIN_BASE_URL}/orders/${id}/expire`,
+      null,
+      { params: { reason } },
     );
     return mapOrder(unwrapResponse(response.data));
   },
@@ -425,6 +408,14 @@ export const orderService = {
     ensureApiSession();
     const response = await httpClient.post<ApiApplication>(
       `${APPLICATIONS_BASE_URL}/${applicationId}/reject`,
+    );
+    return mapApplication(unwrapResponse(response.data));
+  },
+
+  async cancelApplication(applicationId: string): Promise<Application> {
+    ensureApiSession();
+    const response = await httpClient.post<ApiApplication>(
+      `${APPLICATIONS_BASE_URL}/${applicationId}/cancel`,
     );
     return mapApplication(unwrapResponse(response.data));
   },

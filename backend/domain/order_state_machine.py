@@ -23,12 +23,16 @@ class OrderStateMachine:
     # Map of allowed transitions: current_status -> {next_status1, next_status2, ...}
     # Note: Transition to CANCELLED is handled globally for all non-terminal states.
     _TRANSITIONS: dict[OrderStatus, set[OrderStatus]] = {
-        OrderStatus.CREATED: {OrderStatus.AWAITING_CANDIDATES},
+        OrderStatus.CREATED: {OrderStatus.AWAITING_CANDIDATES, OrderStatus.EXPIRED},
         OrderStatus.AWAITING_CANDIDATES: {
             OrderStatus.AWAITING_SELECTION,
             OrderStatus.EXPIRED,
         },
-        OrderStatus.AWAITING_SELECTION: {OrderStatus.PROVIDER_SELECTED},
+        OrderStatus.AWAITING_SELECTION: {
+            OrderStatus.AWAITING_CANDIDATES,
+            OrderStatus.PROVIDER_SELECTED,
+            OrderStatus.EXPIRED,
+        },
         OrderStatus.PROVIDER_SELECTED: {OrderStatus.SCHEDULED},
         OrderStatus.SCHEDULED: {OrderStatus.IN_PROGRESS},
         OrderStatus.IN_PROGRESS: {OrderStatus.FINISHED},

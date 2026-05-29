@@ -1,6 +1,4 @@
-from datetime import UTC, datetime
 from typing import Annotated
-from uuid import uuid4
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +8,8 @@ from repositories.user_repository import UserRepository
 from schemas.base import APIResponse
 from schemas.user import UserResponse
 from services.user_service import UserService
+from .deps import get_current_active_user
+from models.user import User
 
 router = APIRouter()
 
@@ -22,23 +22,12 @@ async def get_user_service(
 
 
 @router.get(
-    "/users/me",
+    "/me",
     response_model=APIResponse[UserResponse],
-    summary="Get current user details (mocked)",
+    summary="Get current user details",
 )
 async def read_users_me(
     _user_service: Annotated[UserService, Depends(get_user_service)],
+    current_user: Annotated[User, Depends(get_current_active_user)],
 ):
-    # For now, return a mocked user as authentication is not implemented
-    # In a real scenario, the authenticated user's ID would be retrieved
-    # and then fetched from the database using user_service.get_user_by_id(user_id)
-    mock_user_data = UserResponse(
-        id=uuid4(),
-        email="mockuser@email.com",
-        full_name="Mock User",
-        phone="79999999999",
-        is_active=True,
-        created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC),
-    )
-    return APIResponse(data=mock_user_data)
+    return APIResponse(data=UserResponse.model_validate(current_user))

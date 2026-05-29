@@ -6,7 +6,7 @@ from core.exceptions import (
     NotFoundException,
     ValidationException,
 )
-from domain.enums import OrderStatus
+from domain.enums import ApplicationStatus, OrderStatus
 from domain.order_state_machine import OrderStateMachine
 from models.service_order import ServiceOrder
 from models.service_order_history import ServiceOrderHistory
@@ -163,6 +163,36 @@ class ServiceOrderService:
 
         order.status = OrderStatus.CANCELLED
         order.cancellation_reason = reason
+
+        await self._record_history(
+            order_id=order.id,
+            new_status=order.status,
+            old_status=old_status,
+            actor_id=admin_user_id,
+            reason=reason,
+        )
+
+        await self.order_repository.session.commit()
+        return await self.get_order(order.id)
+
+    async def expire_order_as_admin(
+        self, order_id: UUID, admin_user_id: UUID, reason: str
+    ) -> ServiceOrder:
+        order = await self.order_repository.get_by_id_for_update(order_id)
+        if not order:
+            raise NotFoundException("Ordem de Serviço não encontrada.")
+
+        if not reason:
+            raise ValidationException("O motivo da expiração é obrigatório.")
+
+        old_status = order.status
+        OrderStateMachine.validate_transition(old_status, OrderStatus.EXPIRED)
+
+        order.status = OrderStatus.EXPIRED
+
+        for application in order.applications:
+            if application.status == ApplicationStatus.PENDING:
+                application.status = ApplicationStatus.CANCELLED
 
         await self._record_history(
             order_id=order.id,

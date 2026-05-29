@@ -45,6 +45,7 @@ const APPLICATION_STATUS_LABELS = {
   PENDING: "Pendente",
   ACCEPTED: "Aceita",
   REJECTED: "Recusada",
+  CANCELLED: "Cancelada",
 } as const;
 
 export function OrderDetailPage() {
@@ -56,9 +57,7 @@ export function OrderDetailPage() {
       ? "client"
       : user?.role === UserRole.PROVIDER
         ? "provider"
-        : user?.role === UserRole.ADMIN
-          ? "admin"
-          : "mock";
+        : "admin";
   const [scheduleValue, setScheduleValue] = useState("");
   const [detailRating, setDetailRating] = useState(5);
   const [detailComment, setDetailComment] = useState("");
@@ -109,7 +108,7 @@ export function OrderDetailPage() {
   const isProvider = user?.role === UserRole.PROVIDER;
   const isAdmin = user?.role === UserRole.ADMIN;
   const selectedProviderId = order.selectedProvider?.id;
-  const currentProviderId = user?.providerId ?? user?.id ?? "mock-provider";
+  const currentProviderId = user?.providerId ?? user?.id ?? "";
   const canClientSchedule =
     isClient && order.status === OrderStatus.PROVIDER_SELECTED;
   const canProviderStart =

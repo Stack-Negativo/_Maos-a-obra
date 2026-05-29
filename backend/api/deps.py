@@ -27,7 +27,7 @@ from services.scheduling_service import SchedulingService
 from services.service_order_application_service import ServiceOrderApplicationService
 from services.service_order_service import ServiceOrderService
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
 
 
 async def get_address_repository(

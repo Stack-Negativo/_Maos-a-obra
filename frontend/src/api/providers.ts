@@ -55,7 +55,7 @@ export const providerApi = {
   list: async (): Promise<ApiResponse<ProviderApiResponse[]>> => {
     const response = await httpClient.get<
       ApiResponse<ProviderApiResponse[]>
-    >("/providers");
+    >("/providers/");
 
     return response.data;
   },
@@ -84,7 +84,7 @@ export const providerApi = {
   ): Promise<ApiResponse<ProviderApiResponse>> => {
     const response = await httpClient.post<
       ApiResponse<ProviderApiResponse>
-    >("/providers", payload);
+    >("/providers/", payload);
 
     return response.data;
   },

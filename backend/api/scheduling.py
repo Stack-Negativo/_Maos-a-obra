@@ -6,7 +6,11 @@ from fastapi import APIRouter, Depends, status
 from core.exceptions import NotFoundException
 from models.user import User
 from repositories.provider_repository import ProviderRepository
-from schemas.scheduling import BusySlotResponse, ScheduleOrderInput
+from schemas.scheduling import (
+    BusySlotResponse,
+    ProviderScheduleResponse,
+    ScheduleOrderInput,
+)
 from services.scheduling_service import SchedulingService
 
 from .deps import get_current_user, get_provider_repository, get_scheduling_service
@@ -33,7 +37,7 @@ async def schedule_order(
     )
 
 
-@router.get("/providers/{provider_id}", response_model=BusySlotResponse)
+@router.get("/providers/{provider_id}", response_model=ProviderScheduleResponse)
 async def get_provider_schedule(
     provider_id: UUID,
     service: Annotated[SchedulingService, Depends(get_scheduling_service)],
@@ -42,7 +46,7 @@ async def get_provider_schedule(
     return {"provider_id": provider_id, "busy_slots": slots}
 
 
-@router.get("/me", response_model=BusySlotResponse)
+@router.get("/me", response_model=ProviderScheduleResponse)
 async def get_my_schedule(
     current_user: Annotated[User, Depends(get_current_user)],
     service: Annotated[SchedulingService, Depends(get_scheduling_service)],

@@ -74,6 +74,16 @@ class ServiceOrderApplicationRepository:
             .values(status=ApplicationStatus.REJECTED)
         )
 
+    async def cancel_pending_by_order(self, order_id: UUID) -> None:
+        await self.session.execute(
+            update(ServiceOrderApplication)
+            .where(
+                ServiceOrderApplication.service_order_id == order_id,
+                ServiceOrderApplication.status == ApplicationStatus.PENDING,
+            )
+            .values(status=ApplicationStatus.CANCELLED)
+        )
+
     async def count_active_by_order(self, order_id: UUID) -> int:
         """Counts pending or accepted applications for an order."""
         result = await self.session.execute(

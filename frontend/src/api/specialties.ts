@@ -13,7 +13,7 @@ export const specialtiesApi = {
   getAll: async () => {
     const response = await httpClient.get<
       BaseApiResponse<SpecialtyApiResponse[]>
-    >("/specialties");
+    >("/specialties/");
 
     return response.data;
   },

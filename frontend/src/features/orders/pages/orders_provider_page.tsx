@@ -15,8 +15,6 @@ import type { Provider } from "../types/order_types";
 
 import "./orders_page/orders_page.css";
 
-const FALLBACK_PROVIDER_SPECIALTIES = ["hidraulica", "eletrica"];
-
 function normalizeText(value: string) {
   return value
     .normalize("NFD")
@@ -41,8 +39,8 @@ function buildProviderFromUser(user: ReturnType<typeof useAuthContext>["user"]) 
     id: user.providerId ?? user.id,
     name: user.name,
     bio: user.bio,
-    ratingAverage: 4.7,
-    completedServices: user.id === "mock-provider" ? 52 : 0,
+    ratingAverage: 0,
+    completedServices: 0,
     isSuspended: false,
     specialties,
   } satisfies Provider;
@@ -51,7 +49,7 @@ function buildProviderFromUser(user: ReturnType<typeof useAuthContext>["user"]) 
 export function OrdersProviderPage() {
   const navigate = useNavigate();
   const { user } = useAuthContext();
-  const currentProvider = buildProviderFromUser(user);
+  const currentProvider = useMemo(() => buildProviderFromUser(user), [user]);
   const {
     orders,
     loading,
@@ -61,17 +59,35 @@ export function OrdersProviderPage() {
     finishOrder,
   } = useOrdersMutations(currentProvider, "provider");
   const [search, setSearch] = useState("");
+  const [actionError, setActionError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<
     "available" | "applications" | "accepted" | "history"
   >("available");
 
-  const providerId = currentProvider?.id ?? "mock-provider";
-  const providerSpecialtyNames =
-    currentProvider?.specialties.length
-      ? currentProvider.specialties.map((specialty) =>
+  async function runAction(action: () => Promise<void>) {
+    setActionError(null);
+
+    try {
+      await action();
+    } catch (err) {
+      setActionError(
+        err instanceof Error
+          ? err.message
+          : "Nao foi possivel executar a acao solicitada.",
+      );
+    }
+  }
+
+  const providerId = currentProvider?.id ?? "";
+  const providerSpecialtyNames = useMemo(
+    () =>
+      currentProvider?.specialties.length
+        ? currentProvider.specialties.map((specialty) =>
           normalizeText(specialty.name),
         )
-      : FALLBACK_PROVIDER_SPECIALTIES;
+        : [],
+    [currentProvider],
+  );
 
   const visibleOrders = useMemo(
     () =>
@@ -83,7 +99,9 @@ export function OrdersProviderPage() {
           const myApplication = order.applications?.find(
             (application) => application.provider.id === providerId,
           );
-          const wasRejected = myApplication?.status === "REJECTED";
+          const wasRejected = ["REJECTED", "CANCELLED"].includes(
+            myApplication?.status ?? "",
+          );
           const isAvailable =
             [
               OrderStatus.CREATED,
@@ -119,7 +137,11 @@ export function OrdersProviderPage() {
           }
 
           if (viewMode === "applications") {
-            return Boolean(myApplication) && !order.selectedProvider;
+            return (
+              Boolean(myApplication) &&
+              myApplication?.status !== "CANCELLED" &&
+              !order.selectedProvider
+            );
           }
 
           if (viewMode === "accepted") {
@@ -149,13 +171,15 @@ export function OrdersProviderPage() {
         !order.applications?.some(
           (application) =>
             application.provider.id === providerId &&
-            application.status === "REJECTED",
+            ["REJECTED", "CANCELLED"].includes(application.status),
         ),
     ).length,
     applications: orders.filter(
       (order) =>
         order.applications?.some(
-          (application) => application.provider.id === providerId,
+          (application) =>
+            application.provider.id === providerId &&
+            application.status !== "CANCELLED",
         ) && !order.selectedProvider,
     ).length,
     accepted: orders.filter(
@@ -274,6 +298,12 @@ export function OrdersProviderPage() {
           </div>
         </section>
 
+        {actionError && (
+          <p className="orders-page__error" role="alert">
+            {actionError}
+          </p>
+        )}
+
         {loading ? (
           <p className="orders-page__state">
             Carregando ordens disponíveis...
@@ -365,7 +395,9 @@ export function OrdersProviderPage() {
                     {canApply && (
                       <button
                         type="button"
-                        onClick={() => applyForOrder(order.id)}
+                        onClick={() => {
+                          void runAction(() => applyForOrder(order.id));
+                        }}
                       >
                         Candidatar-se
                       </button>
@@ -374,9 +406,11 @@ export function OrdersProviderPage() {
                       <button
                         type="button"
                         className="orders-flow-card__ghost"
-                        onClick={() =>
-                          cancelApplication(order.id, myApplication.id)
-                        }
+                        onClick={() => {
+                          void runAction(() =>
+                            cancelApplication(order.id, myApplication.id),
+                          );
+                        }}
                       >
                         Cancelar candidatura
                       </button>
@@ -384,7 +418,9 @@ export function OrdersProviderPage() {
                     {canStart && (
                       <button
                         type="button"
-                        onClick={() => startOrder(order.id)}
+                        onClick={() => {
+                          void runAction(() => startOrder(order.id));
+                        }}
                       >
                         Iniciar serviço
                       </button>
@@ -392,7 +428,9 @@ export function OrdersProviderPage() {
                     {canFinish && (
                       <button
                         type="button"
-                        onClick={() => finishOrder(order.id)}
+                        onClick={() => {
+                          void runAction(() => finishOrder(order.id));
+                        }}
                       >
                         Encerrar atendimento
                       </button>

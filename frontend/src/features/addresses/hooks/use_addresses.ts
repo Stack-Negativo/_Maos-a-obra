@@ -1,18 +1,12 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   createAddress,
   deleteAddress,
   listAddresses,
+  updateAddress,
 } from "../services/addresses_service";
-import type {
-  Address,
-  AddressPayload,
-} from "../types/address_types";
+import type { Address, AddressPayload } from "../types/address_types";
 
 const INITIAL_FORM: AddressPayload = {
   label: "",
@@ -28,6 +22,7 @@ const INITIAL_FORM: AddressPayload = {
 export function useAddresses() {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [form, setForm] = useState<AddressPayload>(INITIAL_FORM);
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -38,12 +33,9 @@ export function useAddresses() {
     setError(null);
 
     try {
-      const data =
-        await listAddresses();
-
-      setAddresses(data);
+      setAddresses(await listAddresses());
     } catch {
-      setError("Não foi possível carregar os endereços mockados.");
+      setError("Nao foi possivel carregar os enderecos do backend.");
     } finally {
       setLoading(false);
     }
@@ -59,10 +51,7 @@ export function useAddresses() {
     };
   }, []);
 
-  function updateField(
-    field: keyof AddressPayload,
-    value: string,
-  ) {
+  function updateField(field: keyof AddressPayload, value: string) {
     setForm((currentForm) => ({
       ...currentForm,
       [field]: value,
@@ -71,7 +60,7 @@ export function useAddresses() {
 
   function validateForm() {
     if (!form.label.trim()) {
-      return "Informe um nome para o endereço.";
+      return "Informe um nome para o endereco.";
     }
 
     if (!/^\d{8}$/.test(form.zipCode.replace(/\D/g, ""))) {
@@ -102,8 +91,7 @@ export function useAddresses() {
   }
 
   async function submitAddress() {
-    const validationError =
-      validateForm();
+    const validationError = validateForm();
 
     if (validationError) {
       setError(validationError);
@@ -113,27 +101,34 @@ export function useAddresses() {
     setSubmitting(true);
     setError(null);
 
-    try {
-      const address =
-        await createAddress({
-          ...form,
-          label: form.label.trim(),
-          zipCode: form.zipCode.replace(/\D/g, ""),
-          street: form.street.trim(),
-          number: form.number.trim(),
-          complement: form.complement.trim(),
-          neighborhood: form.neighborhood.trim(),
-          city: form.city.trim(),
-          state: form.state.trim().toUpperCase(),
-        });
+    const payload = {
+      ...form,
+      label: form.label.trim(),
+      zipCode: form.zipCode.replace(/\D/g, ""),
+      street: form.street.trim(),
+      number: form.number.trim(),
+      complement: form.complement.trim(),
+      neighborhood: form.neighborhood.trim(),
+      city: form.city.trim(),
+      state: form.state.trim().toUpperCase(),
+    };
 
-      setAddresses((currentAddresses) => [
-        address,
-        ...currentAddresses,
-      ]);
+    try {
+      const address = editingAddressId
+        ? await updateAddress(editingAddressId, payload)
+        : await createAddress(payload);
+
+      setAddresses((currentAddresses) =>
+        editingAddressId
+          ? currentAddresses.map((currentAddress) =>
+              currentAddress.id === editingAddressId ? address : currentAddress,
+            )
+          : [address, ...currentAddresses],
+      );
       setForm(INITIAL_FORM);
+      setEditingAddressId(null);
     } catch {
-      setError("Não foi possível salvar o endereço mockado.");
+      setError("Nao foi possivel salvar o endereco no backend.");
     } finally {
       setSubmitting(false);
     }
@@ -144,20 +139,41 @@ export function useAddresses() {
 
     try {
       await deleteAddress(addressId);
-
       setAddresses((currentAddresses) =>
-        currentAddresses.filter(
-          (address) => address.id !== addressId,
-        ),
+        currentAddresses.filter((address) => address.id !== addressId),
       );
+      if (editingAddressId === addressId) {
+        setEditingAddressId(null);
+        setForm(INITIAL_FORM);
+      }
     } catch {
-      setError("Não foi possível remover o endereço mockado.");
+      setError("Nao foi possivel remover o endereco no backend.");
     }
   }
 
+  function startEditingAddress(address: Address) {
+    setEditingAddressId(address.id);
+    setForm({
+      label: address.label,
+      zipCode: address.zipCode,
+      street: address.street,
+      number: address.number,
+      complement: address.complement,
+      neighborhood: address.neighborhood,
+      city: address.city,
+      state: address.state,
+    });
+    setError(null);
+  }
+
+  function cancelEditingAddress() {
+    setEditingAddressId(null);
+    setForm(INITIAL_FORM);
+    setError(null);
+  }
+
   const filteredAddresses = useMemo(() => {
-    const query =
-      search.trim().toLowerCase();
+    const query = search.trim().toLowerCase();
 
     if (!query) {
       return addresses;
@@ -184,11 +200,14 @@ export function useAddresses() {
     search,
     loading,
     submitting,
+    editingAddressId,
     error,
     setSearch,
     updateField,
     submitAddress,
     removeAddress,
+    startEditingAddress,
+    cancelEditingAddress,
     refresh,
   };
 }

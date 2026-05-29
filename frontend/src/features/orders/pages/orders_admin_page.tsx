@@ -58,6 +58,21 @@ export function OrdersAdminPage() {
   } = useProviders();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<OrderStatus | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  async function runAction(action: () => Promise<void>) {
+    setActionError(null);
+
+    try {
+      await action();
+    } catch (err) {
+      setActionError(
+        err instanceof Error
+          ? err.message
+          : "Nao foi possivel executar a acao administrativa.",
+      );
+    }
+  }
 
   const filteredOrders = useMemo(
     () =>
@@ -401,6 +416,12 @@ export function OrdersAdminPage() {
           </div>
         </section>
 
+        {actionError && (
+          <p className="orders-page__error" role="alert">
+            {actionError}
+          </p>
+        )}
+
         {loading ? (
           <p className="orders-page__state">Carregando ordens...</p>
         ) : filteredOrders.length === 0 ? (
@@ -463,7 +484,9 @@ export function OrdersAdminPage() {
                     <button
                       type="button"
                       className="orders-flow-card__ghost"
-                      onClick={() => expireOrder(order.id)}
+                      onClick={() => {
+                        void runAction(() => expireOrder(order.id));
+                      }}
                     >
                       Marcar como expirada
                     </button>
@@ -476,13 +499,15 @@ export function OrdersAdminPage() {
                     <button
                       type="button"
                       className="orders-flow-card__ghost"
-                      onClick={() =>
-                        cancelOrder(
-                          order.id,
-                          "Cancelamento administrativo.",
-                          "ADMIN",
-                        )
-                      }
+                      onClick={() => {
+                        void runAction(() =>
+                          cancelOrder(
+                            order.id,
+                            "Cancelamento administrativo.",
+                            "ADMIN",
+                          ),
+                        );
+                      }}
                     >
                       Cancelar
                     </button>

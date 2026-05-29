@@ -14,7 +14,7 @@ export function AuthLayout({
       <section className="auth-layout__content">
         <div className="auth-layout__brand">
           <strong>Mãos à Obra</strong>
-          <p>Teste os perfis de cliente, prestador e admin no MVP.</p>
+          <p>Acesse com usuarios cadastrados no backend.</p>
         </div>
 
         {children}

@@ -6,10 +6,6 @@ import { listSpecialties } from "@/features/specialties/services/specialties_ser
 
 import { orderService } from "../services/order_service";
 import type { CreateOrderInput } from "../types/order_types";
-import {
-  createMockOrder,
-  upsertStoredOrders,
-} from "./use_orders_mutations";
 
 export function useCreateOrder() {
   const navigate = useNavigate();
@@ -34,12 +30,7 @@ export function useCreateOrder() {
         throw new Error("Especialidade ou endereço inválido.");
       }
 
-      try {
-        const createdOrder = await orderService.createOrder(data);
-        upsertStoredOrders(createdOrder);
-      } catch {
-        createMockOrder(data, specialty, address);
-      }
+      await orderService.createOrder(data);
 
       navigate("/orders/client");
       return true;

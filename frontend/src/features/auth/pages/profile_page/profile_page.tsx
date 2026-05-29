@@ -1,11 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuthContext } from "@/app/providers/auth_provider";
-import {
-  MOCK_PROVIDER_SPECIALTIES,
-  becomeProviderService,
-} from "@/features/auth/services/auth_service";
+import { becomeProviderService } from "@/features/auth/services/auth_service";
 import { listSpecialties } from "@/features/specialties/services/specialties_service";
 import type { Specialty } from "@/features/specialties/types/specialty_types";
 import { UserRole } from "@/features/auth/types/auth_types";
@@ -19,14 +16,11 @@ export function ProfilePage() {
   const [showProviderForm, setShowProviderForm] = useState(false);
   const [bio, setBio] = useState(user?.bio ?? "");
   const [specialtyIds, setSpecialtyIds] = useState<string[]>(
-    user?.specialties?.map((specialty) => specialty.id) ?? [
-      MOCK_PROVIDER_SPECIALTIES[0].id,
-    ],
+    user?.specialties?.map((specialty) => specialty.id) ?? [],
   );
-  const [specialtyOptions, setSpecialtyOptions] = useState<Specialty[]>(
-    MOCK_PROVIDER_SPECIALTIES,
-  );
+  const [specialtyOptions, setSpecialtyOptions] = useState<Specialty[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loadingSpecialties, setLoadingSpecialties] = useState(false);
 
   const roleLabel = useMemo(() => {
     if (user?.role === UserRole.ADMIN) {
@@ -40,31 +34,39 @@ export function ProfilePage() {
     return "Cliente";
   }, [user?.role]);
 
-  useEffect(() => {
-    async function loadSpecialties() {
-      try {
-        const specialties = await listSpecialties();
-        const activeSpecialties = specialties.filter(
-          (specialty) => specialty.isActive,
-        );
-
-        if (activeSpecialties.length > 0) {
-          setSpecialtyOptions(activeSpecialties);
-          setSpecialtyIds((currentIds) =>
-            currentIds.some((id) =>
-              activeSpecialties.some((specialty) => specialty.id === id),
-            )
-              ? currentIds
-              : [activeSpecialties[0].id],
-          );
-        }
-      } catch {
-        setSpecialtyOptions(MOCK_PROVIDER_SPECIALTIES);
-      }
+  async function loadSpecialties() {
+    if (specialtyOptions.length > 0 || loadingSpecialties) {
+      return specialtyOptions;
     }
 
-    void loadSpecialties();
-  }, []);
+    setLoadingSpecialties(true);
+    setError(null);
+
+    try {
+      const specialties = await listSpecialties();
+      const activeSpecialties = specialties.filter(
+        (specialty) => specialty.isActive,
+      );
+
+      setSpecialtyOptions(activeSpecialties);
+      setSpecialtyIds((currentIds) =>
+        currentIds.some((id) =>
+          activeSpecialties.some((specialty) => specialty.id === id),
+        )
+          ? currentIds
+          : activeSpecialties[0]
+            ? [activeSpecialties[0].id]
+            : currentIds,
+      );
+
+      return activeSpecialties;
+    } catch {
+      setError("Nao foi possivel carregar especialidades do backend.");
+      return [];
+    } finally {
+      setLoadingSpecialties(false);
+    }
+  }
 
   if (!user) {
     return null;
@@ -80,7 +82,15 @@ export function ProfilePage() {
       return;
     }
 
-    if (specialtyIds.length === 0) {
+    const specialties = await loadSpecialties();
+    const selectedIds =
+      specialtyIds.length > 0
+        ? specialtyIds
+        : specialties[0]
+          ? [specialties[0].id]
+          : [];
+
+    if (selectedIds.length === 0) {
       setError("Selecione pelo menos uma especialidade.");
       return;
     }
@@ -88,7 +98,7 @@ export function ProfilePage() {
     try {
       const providerUser = await becomeProviderService(user, {
         bio,
-        specialtyIds,
+        specialtyIds: selectedIds,
       });
 
       updateUser(providerUser);
@@ -164,7 +174,10 @@ export function ProfilePage() {
                   <button
                     type="button"
                     className="profile-page__primary"
-                    onClick={() => setShowProviderForm(true)}
+                    onClick={() => {
+                      setShowProviderForm(true);
+                      void loadSpecialties();
+                    }}
                   >
                     Quero me tornar prestador
                   </button>
@@ -192,7 +205,12 @@ export function ProfilePage() {
                     <fieldset>
                       <legend>Especialidades</legend>
                       <div className="profile-page__chips profile-page__chips--selectable">
-                        {specialtyOptions.map((specialty) => (
+                        {loadingSpecialties ? (
+                          <p className="profile-page__muted">
+                            Carregando especialidades...
+                          </p>
+                        ) : (
+                          specialtyOptions.map((specialty) => (
                           <label key={specialty.id}>
                             <input
                               type="checkbox"
@@ -209,7 +227,8 @@ export function ProfilePage() {
                             />
                             <span>{specialty.name}</span>
                           </label>
-                        ))}
+                          ))
+                        )}
                       </div>
                     </fieldset>
                     <div className="profile-page__actions">
