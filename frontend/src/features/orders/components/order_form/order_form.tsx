@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { Input } from "@/shared/ui/input";
 
@@ -135,30 +136,30 @@ export function OrderForm({
   return (
     <form className="order-form" onSubmit={handleSubmit}>
       <aside className="order-form__guide" aria-label="Etapas da solicitação">
-        <span className="order-form__guide-eyebrow">Fluxo do cliente</span>
-        <h2>Como a ordem avança</h2>
+        <span className="order-form__guide-eyebrow">Solicitação</span>
+        <h2>Do pedido ao atendimento</h2>
         <ol>
           <li>
             <strong>1</strong>
-            <span>Você publica a necessidade.</span>
+            <span>Conte o que precisa com os detalhes principais.</span>
           </li>
           <li>
             <strong>2</strong>
-            <span>Prestadores compatíveis se candidatam.</span>
+            <span>Prestadores compatíveis enviam candidatura.</span>
           </li>
           <li>
             <strong>3</strong>
-            <span>Você escolhe, agenda e confirma a finalização.</span>
+            <span>Escolha, acompanhe e avalie ao finalizar.</span>
           </li>
         </ol>
       </aside>
 
       <div className="order-form__content">
         <div className="order-form__header">
-          <h2>Detalhes da solicitação</h2>
+          <h2>Detalhes do serviço</h2>
           <p>
-            Descreva a necessidade com clareza. O agendamento oficial será
-            confirmado depois que um prestador for selecionado.
+            Quanto melhor a descrição, mais fácil para o prestador avaliar o
+            atendimento antes de se candidatar.
           </p>
         </div>
 
@@ -170,14 +171,15 @@ export function OrderForm({
 
         {addresses.length === 0 && (
           <div className="order-form__notice">
-            Cadastre um endereço antes de criar uma ordem de serviço.
+            Cadastre um endereço antes de criar uma ordem de serviço.{" "}
+            <Link to="/addresses">Cadastrar endereço</Link>
           </div>
         )}
 
         {activeSpecialties.length === 0 && (
           <div className="order-form__notice">
-            Nenhuma especialidade ativa encontrada. Atualize a página ou peça
-            para o administrador cadastrar/ativar especialidades no catálogo.
+            Nenhuma especialidade disponível no momento. Atualize a página ou
+            peça para o administrador revisar o catálogo.
           </div>
         )}
 

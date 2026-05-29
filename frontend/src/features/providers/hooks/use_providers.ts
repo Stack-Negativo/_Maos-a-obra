@@ -5,6 +5,7 @@ import type { Specialty } from "@/features/specialties/types/specialty_types";
 
 import {
   createProviderProfile,
+  deleteProvider,
   listProviders,
   PROVIDERS_CHANGED_EVENT,
   suspendProvider,
@@ -51,7 +52,7 @@ export function useProviders() {
       setSpecialties(specialtyData.filter((specialty) => specialty.isActive));
     } catch {
       setError(
-        "Nao foi possivel carregar os prestadores. Verifique o backend e tente novamente.",
+        "Não foi possível carregar os prestadores. Tente novamente em instantes.",
       );
     } finally {
       setLoading(false);
@@ -142,7 +143,7 @@ export function useProviders() {
       setForm(INITIAL_FORM);
     } catch {
       setError(
-        "Nao foi possivel salvar o prestador. Verifique o backend e tente novamente.",
+        "Não foi possível salvar o prestador. Revise os dados e tente novamente.",
       );
     } finally {
       setSubmitting(false);
@@ -166,7 +167,7 @@ export function useProviders() {
         ),
       );
     } catch {
-      setError("Nao foi possivel suspender o prestador no backend.");
+      setError("Não foi possível suspender o prestador.");
     } finally {
       setUpdatingProviderId(null);
     }
@@ -189,7 +190,27 @@ export function useProviders() {
         ),
       );
     } catch {
-      setError("Nao foi possivel reativar o prestador no backend.");
+      setError("Não foi possível reativar o prestador.");
+    } finally {
+      setUpdatingProviderId(null);
+    }
+  }
+
+  async function remove(providerId: string) {
+    setUpdatingProviderId(providerId);
+    setError(null);
+
+    try {
+      await deleteProvider(providerId);
+      setProviders((currentProviders) =>
+        currentProviders.filter((provider) => provider.id !== providerId),
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Não foi possível excluir o prestador.",
+      );
     } finally {
       setUpdatingProviderId(null);
     }
@@ -240,6 +261,7 @@ export function useProviders() {
     submitProvider,
     suspendProvider: suspend,
     unsuspendProvider: unsuspend,
+    deleteProvider: remove,
     refresh,
   };
 }

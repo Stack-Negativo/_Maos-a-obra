@@ -51,7 +51,7 @@ export async function createSpecialty(input: {
   );
 
   if (alreadyExists) {
-    throw new Error("Ja existe uma especialidade com esse nome.");
+    throw new Error("Já existe uma especialidade com esse nome.");
   }
 
   const response = await specialtiesApi.create({
@@ -76,7 +76,7 @@ export async function toggleSpecialtyStatus(specialtyId: string) {
   );
 
   if (!currentSpecialty) {
-    throw new Error("Especialidade nao encontrada.");
+    throw new Error("Especialidade não encontrada.");
   }
 
   const response = await specialtiesApi.update(specialtyId, {
@@ -95,16 +95,16 @@ export async function toggleSpecialtyStatus(specialtyId: string) {
 export async function requestSpecialty(..._args: unknown[]) {
   void _args;
   throw new Error(
-    "Solicitacao de especialidade ainda nao possui endpoint no backend. Peça ao admin para criar a especialidade no catalogo.",
+    "Solicitação de especialidade indisponível no momento. Peça ao admin para criar a categoria.",
   );
 }
 
 export async function approveSpecialtyRequest(..._args: unknown[]) {
   void _args;
-  throw new Error("Nao ha solicitacoes de especialidade persistidas no backend.");
+  throw new Error("Não há solicitações de especialidade pendentes.");
 }
 
 export async function rejectSpecialtyRequest(..._args: unknown[]) {
   void _args;
-  throw new Error("Nao ha solicitacoes de especialidade persistidas no backend.");
+  throw new Error("Não há solicitações de especialidade pendentes.");
 }

@@ -10,9 +10,10 @@ import type {
   OrderHistoryEvent,
   OrderReview,
 } from "../types/order_types";
-import { OrderStatus } from "../types/order_types";
+import { ORDER_STATUS_LABELS, OrderStatus } from "../types/order_types";
 
 const ORDERS_BASE_URL = "/orders";
+const PROVIDERS_BASE_URL = "/providers";
 const APPLICATIONS_BASE_URL = "/applications";
 const SCHEDULING_BASE_URL = "/scheduling";
 const ADMIN_BASE_URL = "/admin";
@@ -190,17 +191,41 @@ function mapReview(apiReview: ApiReview): OrderReview {
   };
 }
 
+function formatHistoryStatus(status: string) {
+  return ORDER_STATUS_LABELS[status as OrderStatus] ?? status;
+}
+
+function formatHistoryReason(reason?: string | null) {
+  const translatedReasons: Record<string, string> = {
+    "Application cancelled by provider":
+      "Candidatura cancelada pelo prestador.",
+    "Application rejected": "Candidatura recusada.",
+    "Client confirmed finalization and payment triggered":
+      "Cliente confirmou a conclusão do atendimento.",
+    "Execution started": "Atendimento iniciado.",
+    "First application received": "Primeira candidatura recebida.",
+    "No active applications remain": "A ordem voltou a aguardar candidaturas.",
+    "Order creation": "Ordem criada pelo cliente.",
+    "Provider marked as finished": "Prestador sinalizou a conclusão.",
+    "Provider selected": "Prestador selecionado pelo cliente.",
+  };
+
+  return reason ? translatedReasons[reason] ?? reason : undefined;
+}
+
 function mapHistoryEvent(apiEvent: ApiHistoryEvent): OrderHistoryEvent {
   const title =
     apiEvent.old_status && apiEvent.old_status !== apiEvent.new_status
-      ? `${apiEvent.old_status} -> ${apiEvent.new_status}`
-      : apiEvent.new_status;
+      ? `${formatHistoryStatus(apiEvent.old_status)} para ${formatHistoryStatus(
+          apiEvent.new_status,
+        )}`
+      : formatHistoryStatus(apiEvent.new_status);
 
   return {
     id: apiEvent.id,
     actor: "SYSTEM",
     title,
-    description: apiEvent.reason ?? undefined,
+    description: formatHistoryReason(apiEvent.reason),
     createdAt: apiEvent.created_at,
   };
 }
@@ -362,6 +387,14 @@ export const orderService = {
     ensureApiSession();
     const response = await httpClient.get<OrdersApiResponse>(
       `${ORDERS_BASE_URL}/providers/me`,
+    );
+    return unwrapResponse(response.data).orders.map(mapOrder);
+  },
+
+  async listProviderFeed(): Promise<Order[]> {
+    ensureApiSession();
+    const response = await httpClient.get<ApiResponse<OrdersApiResponse>>(
+      `${PROVIDERS_BASE_URL}/feed`,
     );
     return unwrapResponse(response.data).orders.map(mapOrder);
   },

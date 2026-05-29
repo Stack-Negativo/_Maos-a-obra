@@ -1,16 +1,18 @@
 .auth-layout {
   width: 100%;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   padding: 2rem;
-  background: var(--color-surface);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-brand) 13%, transparent), transparent 34%),
+    radial-gradient(circle at 90% 15%, color-mix(in srgb, var(--color-info) 14%, transparent), transparent 26%),
+    var(--color-surface);
 }
 
 .auth-layout__content {
   width: 100%;
-  max-width: 560px;
+  max-width: 460px;
 }
 
 .auth-layout__brand {
@@ -23,20 +25,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
-  height: 54px;
+  width: 58px;
+  height: 58px;
   margin-bottom: 1rem;
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--color-brand);
-  color: #ffffff;
+  color: var(--color-on-brand);
   font-weight: 850;
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--color-brand) 28%, transparent);
 }
 
 .auth-layout__brand strong {
   display: block;
   color: var(--color-text);
-  font-size: 1.7rem;
-  font-weight: 850;
+  font-size: 1.85rem;
+  font-weight: 900;
   letter-spacing: 0;
 }
 

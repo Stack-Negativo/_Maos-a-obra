@@ -35,7 +35,7 @@ export function useAddresses() {
     try {
       setAddresses(await listAddresses());
     } catch {
-      setError("Nao foi possivel carregar os enderecos do backend.");
+      setError("Não foi possível carregar os endereços.");
     } finally {
       setLoading(false);
     }
@@ -60,11 +60,11 @@ export function useAddresses() {
 
   function validateForm() {
     if (!form.label.trim()) {
-      return "Informe um nome para o endereco.";
+      return "Informe um nome para o endereço.";
     }
 
     if (!/^\d{8}$/.test(form.zipCode.replace(/\D/g, ""))) {
-      return "Informe um CEP com 8 digitos.";
+      return "Informe um CEP com 8 dígitos.";
     }
 
     if (!form.street.trim()) {
@@ -72,7 +72,7 @@ export function useAddresses() {
     }
 
     if (!form.number.trim()) {
-      return "Informe o numero.";
+      return "Informe o número.";
     }
 
     if (!form.neighborhood.trim()) {
@@ -128,7 +128,7 @@ export function useAddresses() {
       setForm(INITIAL_FORM);
       setEditingAddressId(null);
     } catch {
-      setError("Nao foi possivel salvar o endereco no backend.");
+      setError("Não foi possível salvar o endereço.");
     } finally {
       setSubmitting(false);
     }
@@ -147,7 +147,7 @@ export function useAddresses() {
         setForm(INITIAL_FORM);
       }
     } catch {
-      setError("Nao foi possivel remover o endereco no backend.");
+      setError("Não foi possível remover o endereço.");
     }
   }
 

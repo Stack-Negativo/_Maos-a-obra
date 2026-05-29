@@ -1,6 +1,7 @@
 import type { Specialty } from "@/features/specialties/types/specialty_types";
 import { providerApi } from "@/api/providers";
 import type { ProviderApiResponse } from "@/api/providers";
+import axios from "axios";
 
 import type { ProviderPayload, ProviderProfile } from "../types/provider_types";
 
@@ -109,4 +110,34 @@ export async function unsuspendProvider(providerId: string) {
 
   notifyProvidersChanged();
   return mapApiProvider(response.data);
+}
+
+export async function deleteProvider(providerId: string) {
+  try {
+    await providerApi.delete(providerId);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const data = error.response?.data as
+        | {
+            detail?: string;
+            error?: {
+              message?: string;
+            };
+          }
+        | undefined;
+
+      throw Object.assign(
+        new Error(
+          data?.error?.message ??
+            data?.detail ??
+            "Falha ao excluir prestador",
+        ),
+        { cause: error },
+      );
+    }
+
+    throw error;
+  }
+
+  notifyProvidersChanged();
 }

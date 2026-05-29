@@ -19,13 +19,13 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: 4px;
-  background: #0f766e;
+  background: var(--color-provider);
 }
 
 .provider-card:hover {
   transform: translateY(-1px);
-  border-color: var(--color-brand);
-  box-shadow: var(--shadow-card);
+  border-color: var(--color-provider);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .provider-card__top {
@@ -49,8 +49,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: color-mix(in srgb, #0f766e 16%, var(--color-card));
-  color: #0f766e;
+  background: var(--color-provider-soft);
+  color: var(--color-provider);
   font-size: 0.82rem;
   font-weight: 900;
 }
@@ -89,9 +89,10 @@
 
 .provider-card__specialties span {
   padding: 0.25rem 0.6rem;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: var(--color-brand-light);
-  color: var(--color-brand-dark);
+  background: var(--color-surface-elevated);
+  color: var(--color-text-secondary);
   font-size: 0.76rem;
   font-weight: 800;
 }
@@ -126,6 +127,14 @@
   font-size: 0.82rem;
   font-weight: 850;
   cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    background 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.provider-card__actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .provider-card__actions button:disabled {

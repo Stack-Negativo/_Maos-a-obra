@@ -59,10 +59,9 @@ export function DashboardPage() {
         <div className="dashboard-page__header">
           <div>
             <span className="dashboard-page__eyebrow">Administração</span>
-            <h1>Central de Operação</h1>
+            <h1>Central de operação</h1>
             <p>
-              Controle geral do MVP: filas operacionais, catálogo,
-              prestadores, auditoria de ordens e solicitações pendentes.
+              Acompanhe filas, catálogo, prestadores e evolução das ordens em um só lugar.
             </p>
           </div>
           <Link className="dashboard-page__primary-link" to="/orders/admin">
@@ -125,7 +124,7 @@ export function DashboardPage() {
             <div className="dashboard-panel__header">
               <div>
                 <h2>Saúde operacional</h2>
-                <p>Resumo do ciclo de servico com dados do backend.</p>
+                <p>Resumo do ciclo de serviço e dos resultados da plataforma.</p>
               </div>
             </div>
             <div className="dashboard-health">
@@ -163,7 +162,7 @@ export function DashboardPage() {
             <div className="dashboard-page__cards">
               <article className="dashboard-card dashboard-card--highlight">
                 <div>
-                  <strong>Ordens de Serviço</strong>
+                  <strong>Ordens de serviço</strong>
                   <p>
                     Monitore candidaturas, seleção, agendamento, execução,
                     confirmação do cliente, pagamentos e histórico.

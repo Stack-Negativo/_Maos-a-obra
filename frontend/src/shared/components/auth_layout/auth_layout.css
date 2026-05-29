@@ -9,11 +9,8 @@
   padding: 24px;
 
   background:
-    linear-gradient(
-      135deg,
-      #eff6ff 0%,
-      #dbeafe 100%
-    );
+    linear-gradient(135deg, color-mix(in srgb, var(--color-info) 14%, transparent), transparent 34%),
+    linear-gradient(180deg, var(--color-surface-elevated), var(--color-surface));
 }
 
 .auth_layout_content {
