@@ -43,6 +43,8 @@ def review_service():
     session_mock = MagicMock()
     session_mock.begin.return_value = AsyncContextManagerMock()
     session_mock.flush = AsyncMock()
+    session_mock.commit = AsyncMock()
+    session_mock.refresh = AsyncMock()
     review_repo.session = session_mock
 
     return (

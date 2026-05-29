@@ -16,7 +16,12 @@ from services.provider_service import ProviderService
 
 @pytest.fixture
 def provider_repo() -> Any:
-    return MagicMock()
+    repo = MagicMock()
+    repo.session = MagicMock()
+    repo.session.commit = AsyncMock()
+    repo.session.refresh = AsyncMock()
+    repo.session.flush = AsyncMock()
+    return repo
 
 
 @pytest.fixture
@@ -46,6 +51,7 @@ async def test_register_provider_success(
     specialty_repo.get_by_id = AsyncMock(return_value=mock_specialty)
 
     provider_repo.create = AsyncMock(return_value=MagicMock(spec=Provider))
+    provider_repo.get_by_id = AsyncMock(return_value=MagicMock(spec=Provider))
 
     await service.register_provider(user_id, data)
 

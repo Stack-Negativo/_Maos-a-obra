@@ -6,12 +6,12 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from core.exceptions import ValidationException
-from schemas.address import AddressResponse
-from schemas.service_order_application import ApplicationResponse
-from schemas.specialty import SpecialtyResponse
-from schemas.provider import ProviderResponse
 from domain.enums import OrderStatus
 from domain.value_objects.date_range import DateRange
+from schemas.address import AddressResponse
+from schemas.provider import ProviderResponse
+from schemas.service_order_application import ApplicationResponse
+from schemas.specialty import SpecialtyResponse
 
 
 class ServiceOrderBase(BaseModel):

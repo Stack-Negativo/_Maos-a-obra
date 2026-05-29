@@ -30,6 +30,9 @@ def scheduling_service():
 
     # Mocking the session and transaction context
     session = MagicMock()
+    session.commit = AsyncMock()
+    session.refresh = AsyncMock()
+    session.flush = AsyncMock()
 
     # Simple sync mock for context manager (SQLAlchemy session.begin()
     # returns a sync object)

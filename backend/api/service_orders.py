@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Body, Depends, status
 
 from models.user import User
 from repositories.provider_repository import ProviderRepository
@@ -58,24 +58,22 @@ async def list_provider_orders(
     current_user: Annotated[User, Depends(get_current_user)],
     service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
 ):
-    orders = await service.list_provider_orders(current_user.id)
+    orders = await service.list_provider_orders()
     return {"orders": orders}
 
 
 @router.get("/{id}", response_model=ServiceOrderResponse)
 async def get_order(
     id: UUID,
-    current_user: Annotated[User, Depends(get_current_user)],
     service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
 ):
-    order = await service.get_order(id)
-    return order
+    return await service.get_order(id)
 
 
 @router.post("/{id}/cancel", response_model=ServiceOrderResponse)
 async def cancel_order(
     id: UUID,
-    reason: str,
+    reason: Annotated[str, Body(embed=True)],
     current_user: Annotated[User, Depends(get_current_user)],
     service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
 ):

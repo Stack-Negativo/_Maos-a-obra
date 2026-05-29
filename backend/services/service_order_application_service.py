@@ -91,7 +91,7 @@ class ServiceOrderApplicationService:
             status=ApplicationStatus.PENDING,
         )
 
-        created = await self.application_repository.create(application)
+        await self.application_repository.create(application)
 
         # Transition OS from AWAITING_CANDIDATES to AWAITING_SELECTION if needed
         if order.status == OrderStatus.AWAITING_CANDIDATES:
@@ -109,8 +109,10 @@ class ServiceOrderApplicationService:
             await self.history_repository.create(history)
 
         await self.application_repository.session.commit()
-        await self.application_repository.session.refresh(created)
-        return created
+        app_loaded = await self.application_repository.get_by_id(application.id)
+        if not app_loaded:
+            return application
+        return app_loaded
 
     async def accept_application(
         self, client_user_id: UUID, application_id: UUID
@@ -161,8 +163,10 @@ class ServiceOrderApplicationService:
         await self.history_repository.create(history)
 
         await self.application_repository.session.commit()
-        await self.application_repository.session.refresh(application)
-        return application
+        app_loaded = await self.application_repository.get_by_id(application.id)
+        if not app_loaded:
+            return application
+        return app_loaded
 
     async def reject_application(
         self, client_user_id: UUID, application_id: UUID
@@ -197,8 +201,10 @@ class ServiceOrderApplicationService:
         await self.history_repository.create(history)
 
         await self.application_repository.session.commit()
-        await self.application_repository.session.refresh(application)
-        return application
+        app_loaded = await self.application_repository.get_by_id(application.id)
+        if not app_loaded:
+            return application
+        return app_loaded
 
     async def list_order_applications(
         self, user_id: UUID, order_id: UUID

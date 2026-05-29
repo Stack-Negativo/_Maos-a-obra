@@ -42,7 +42,11 @@ async def list_all_orders(
     service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
 ) -> APIResponse[ServiceOrderListResponse]:
     orders = await service.list_all_orders()
-    return APIResponse(data=ServiceOrderListResponse(orders=orders))
+    return APIResponse(
+        data=ServiceOrderListResponse(
+            orders=[ServiceOrderResponse.model_validate(o) for o in orders]
+        )
+    )
 
 
 @router.get("/providers", response_model=APIResponse[list[ProviderResponse]])

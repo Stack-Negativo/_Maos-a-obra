@@ -3,8 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
-from schemas.provider import ProviderResponse
 from domain.enums import ApplicationStatus
+from schemas.provider import ProviderResponse
 
 
 class ApplicationBase(BaseModel):

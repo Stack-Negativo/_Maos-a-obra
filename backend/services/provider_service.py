@@ -3,6 +3,7 @@ from uuid import UUID
 
 from core.exceptions import (
     BusinessRuleViolation,
+    ConflictException,
     InfrastructureException,
     NotFoundException,
 )
@@ -25,7 +26,7 @@ class ProviderService:
         # Check if already a provider
         existing = await self.provider_repository.get_by_user_id(user_id)
         if existing:
-            raise BusinessRuleViolation("User is already a provider")
+            raise ConflictException("User is already a provider")
 
         # Check if user is admin (cannot be both in MVP)
         admin = await self.provider_repository.get_admin_by_user_id(user_id)
@@ -35,8 +36,10 @@ class ProviderService:
         # Validate specialties
         for s_id in data.specialty_ids:
             spec = await self.specialty_repository.get_by_id(s_id)
-            if not spec or not spec.is_active:
-                raise NotFoundException(f"Specialty {s_id} not found or inactive")
+            if not spec:
+                raise NotFoundException(f"Specialty {s_id} not found")
+            if not spec.is_active:
+                raise BusinessRuleViolation(f"Specialty {s_id} is inactive")
 
         provider = Provider(
             user_id=user_id,

@@ -2,8 +2,8 @@ from collections.abc import Sequence
 from uuid import UUID
 
 from sqlalchemy import select, update
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from domain.enums import ApplicationStatus
 from models.provider import Provider, ProviderSpecialty

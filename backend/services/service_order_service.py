@@ -97,8 +97,7 @@ class ServiceOrderService:
         )
 
         await self.order_repository.session.commit()
-        await self.order_repository.session.refresh(order)
-        return order
+        return await self.get_order(order.id)
 
     async def get_order(self, order_id: UUID) -> ServiceOrder:
         order = await self.order_repository.get_by_id(order_id)
@@ -111,7 +110,7 @@ class ServiceOrderService:
         return list(orders)
 
     async def list_provider_orders(
-        self, provider_user_id: UUID,
+        self,
     ) -> list[ServiceOrder]:
         orders = await self.order_repository.list_all()
         return list(orders)
@@ -147,8 +146,7 @@ class ServiceOrderService:
         )
 
         await self.order_repository.session.commit()
-        await self.order_repository.session.refresh(order)
-        return order
+        return await self.get_order(order.id)
 
     async def cancel_order_as_admin(
         self, order_id: UUID, admin_user_id: UUID, reason: str
@@ -175,8 +173,7 @@ class ServiceOrderService:
         )
 
         await self.order_repository.session.commit()
-        await self.order_repository.session.refresh(order)
-        return order
+        return await self.get_order(order.id)
 
     async def list_all_orders(self) -> list[ServiceOrder]:
         orders = await self.order_repository.list_all()
@@ -213,8 +210,7 @@ class ServiceOrderService:
         )
 
         await self.order_repository.session.commit()
-        await self.order_repository.session.refresh(order)
-        return order
+        return await self.get_order(order.id)
 
     async def complete_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
         """
@@ -250,8 +246,7 @@ class ServiceOrderService:
         )
 
         await self.order_repository.session.commit()
-        await self.order_repository.session.refresh(order)
-        return order
+        return await self.get_order(order.id)
 
     async def confirm_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
         """
@@ -304,8 +299,7 @@ class ServiceOrderService:
         )
 
         await self.order_repository.session.commit()
-        await self.order_repository.session.refresh(order)
-        return order
+        return await self.get_order(order.id)
 
     async def list_order_history(self, order_id: UUID) -> list[ServiceOrderHistory]:
         """

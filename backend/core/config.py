@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     ADMIN_FULL_NAME: str = "Administrador Maos a Obra"
     ADMIN_PHONE: str = "11999999999"
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(extra="ignore")
 
 
 @lru_cache

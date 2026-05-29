@@ -30,8 +30,12 @@ class AsyncContextManagerMock:
 @pytest.fixture
 def service_order_service():
     order_repo = MagicMock()
+    order_repo.get_by_id = AsyncMock()
+    order_repo.get_by_id_for_update = AsyncMock()
     address_repo = MagicMock()
+    address_repo.get_by_id = AsyncMock()
     specialty_repo = MagicMock()
+    specialty_repo.get_by_id = AsyncMock()
     history_repo = MagicMock()
     history_repo.create = AsyncMock()
     payment_service = MagicMock()
@@ -40,6 +44,9 @@ def service_order_service():
     # Mock session for begin() context manager
     session_mock = MagicMock()
     session_mock.begin.return_value = AsyncContextManagerMock()
+    session_mock.commit = AsyncMock()
+    session_mock.refresh = AsyncMock()
+    session_mock.flush = AsyncMock()
     order_repo.session = session_mock
 
     return (
@@ -73,6 +80,7 @@ async def test_create_order_success(service_order_service):
 
     async def mock_create(order: ServiceOrder) -> ServiceOrder:
         order.id = uuid4()
+        order_repo.get_by_id.return_value = order
         return order
 
     order_repo.create = AsyncMock(side_effect=mock_create)
@@ -130,6 +138,7 @@ async def test_cancel_order_success(service_order_service):
     )
 
     order_repo.get_by_id_for_update = AsyncMock(return_value=order)
+    order_repo.get_by_id.return_value = order
 
     cancelled_order = await service.cancel_order(
         order_id, client_id, "Mudança de planos"
@@ -155,6 +164,7 @@ async def test_start_execution_success(service_order_service):
     )
 
     order_repo.get_by_id_for_update = AsyncMock(return_value=order)
+    order_repo.get_by_id.return_value = order
 
     started_order = await service.start_execution(order_id, provider_user_id)
 
@@ -178,6 +188,7 @@ async def test_complete_execution_success(service_order_service):
     )
 
     order_repo.get_by_id_for_update = AsyncMock(return_value=order)
+    order_repo.get_by_id.return_value = order
 
     completed_order = await service.complete_execution(order_id, provider_user_id)
 
@@ -201,6 +212,7 @@ async def test_confirm_execution_success(service_order_service):
     )
 
     order_repo.get_by_id_for_update = AsyncMock(return_value=order)
+    order_repo.get_by_id.return_value = order
 
     confirmed_order = await service.confirm_execution(order_id, client_id)
 

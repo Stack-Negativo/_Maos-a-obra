@@ -23,13 +23,19 @@ from services.service_order_application_service import ServiceOrderApplicationSe
 @pytest.fixture
 def application_service():
     app_repo = MagicMock()
+    app_repo.get_by_id = AsyncMock()
     order_repo = MagicMock()
+    order_repo.get_by_id = AsyncMock()
     provider_repo = MagicMock()
+    provider_repo.get_by_id = AsyncMock()
     history_repo = MagicMock()
     history_repo.create = AsyncMock()
 
     # Mock session for transactional block
     app_repo.session = MagicMock()
+    app_repo.session.commit = AsyncMock()
+    app_repo.session.refresh = AsyncMock()
+    app_repo.session.flush = AsyncMock()
     app_repo.session.begin = MagicMock()
     app_repo.session.begin.return_value.__aenter__ = AsyncMock()
     app_repo.session.begin.return_value.__aexit__ = AsyncMock()
@@ -71,6 +77,7 @@ async def test_apply_for_order_success(application_service):
     app_repo.get_by_order_and_provider = AsyncMock(return_value=None)
 
     async def mock_create(obj):
+        app_repo.get_by_id.return_value = obj
         return obj
 
     app_repo.create = AsyncMock(side_effect=mock_create)

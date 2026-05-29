@@ -12,7 +12,12 @@ from services.address_service import AddressService
 
 @pytest.fixture
 def mock_repo() -> Any:
-    return MagicMock()
+    repo = MagicMock()
+    repo.session = MagicMock()
+    repo.session.commit = AsyncMock()
+    repo.session.refresh = AsyncMock()
+    repo.session.flush = AsyncMock()
+    return repo
 
 
 @pytest.fixture
@@ -72,6 +77,7 @@ async def test_update_set_default_unsets_previous(
 
     mock_address = MagicMock(spec=Address)
     mock_address.user_id = user_id
+    mock_address.is_default = False
     mock_repo.get_by_id = AsyncMock(return_value=mock_address)
     mock_repo.unset_default_for_user = AsyncMock()
     mock_repo.update = AsyncMock()
