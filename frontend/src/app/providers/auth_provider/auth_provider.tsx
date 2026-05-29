@@ -15,6 +15,21 @@ type SignInPayload = {
   password: string;
 };
 
+const LEGACY_MOCK_STORAGE_KEYS = [
+  "mock_addresses",
+  "mock_user",
+  "mock_providers",
+  "maos_a_obra_mock_orders_v6",
+  "maos_a_obra_mock_specialties_v2",
+  "maos_a_obra_mock_specialty_requests_v1",
+];
+
+function clearLegacyMockStorage() {
+  LEGACY_MOCK_STORAGE_KEYS.forEach((key) => {
+    localStorage.removeItem(key);
+  });
+}
+
 export function AuthProvider({
   children,
 }: AuthProviderProps) {
@@ -22,6 +37,8 @@ export function AuthProvider({
     useState<User | null>(() => {
       const storedUser =
         localStorage.getItem("user");
+
+      clearLegacyMockStorage();
 
       if (!storedUser) {
         return null;
@@ -31,10 +48,21 @@ export function AuthProvider({
         const parsedUser =
           JSON.parse(storedUser) as Partial<User>;
 
+        if (
+          !parsedUser.id ||
+          !parsedUser.email ||
+          parsedUser.id.startsWith("mock-") ||
+          parsedUser.email.endsWith(".local")
+        ) {
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+          return null;
+        }
+
         return {
-          id: parsedUser.id ?? "mock-client",
-          name: parsedUser.name ?? "Mariana Cliente",
-          email: parsedUser.email ?? "cliente@maosaobra.local",
+          id: parsedUser.id,
+          name: parsedUser.name ?? parsedUser.email.split("@")[0],
+          email: parsedUser.email,
           role: parsedUser.role ?? UserRole.CLIENT,
           providerId: parsedUser.providerId,
           bio: parsedUser.bio,
@@ -50,9 +78,17 @@ export function AuthProvider({
     });
 
   const [token, setToken] =
-    useState<string | null>(() =>
-      localStorage.getItem("token"),
-    );
+    useState<string | null>(() => {
+      const storedToken = localStorage.getItem("token");
+
+      if (storedToken === "mock-token-mvp") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        return null;
+      }
+
+      return storedToken;
+    });
 
   async function signIn({
     email,

@@ -31,7 +31,7 @@ const roleLabels = {
 
 function getInitials(name?: string) {
   if (!name) {
-    return "MO";
+    return "US";
   }
 
   return name
@@ -119,9 +119,9 @@ export function AppShell({ children }: AppShellProps) {
         <div className="app-shell__user">
           <span className="app-shell__avatar">{getInitials(user?.name)}</span>
           <div className="app-shell__user-copy">
-            <strong>{user?.name ?? "Usuário MVP"}</strong>
+            <strong>{user?.name ?? "Usuario"}</strong>
             <span>
-              {user?.role ?? "CLIENT"} - {user?.email ?? "mock@local"}
+              {user?.role ?? "CLIENT"} - {user?.email ?? "sem email"}
             </span>
           </div>
           <div className="app-shell__role-badge" aria-label="Perfil do usuário">

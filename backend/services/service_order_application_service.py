@@ -206,6 +206,74 @@ class ServiceOrderApplicationService:
             return application
         return app_loaded
 
+    async def cancel_application(
+        self, provider_user_id: UUID, application_id: UUID
+    ) -> ServiceOrderApplication:
+        provider = await self.provider_repository.get_by_user_id(provider_user_id)
+        if not provider:
+            raise NotFoundException("Perfil de prestador não encontrado.")
+
+        application = await self.application_repository.get_by_id(application_id)
+        if not application:
+            raise NotFoundException("Candidatura não encontrada.")
+
+        if application.provider_id != provider.id:
+            raise BusinessRuleViolation(
+                "Você não tem permissão para cancelar esta candidatura."
+            )
+
+        if application.status != ApplicationStatus.PENDING:
+            raise BusinessRuleViolation(
+                "Apenas candidaturas pendentes podem ser canceladas."
+            )
+
+        order = await self.order_repository.get_by_id_for_update(
+            application.service_order_id
+        )
+        if not order:
+            raise NotFoundException("Ordem de Serviço vinculada não encontrada.")
+
+        if order.provider_id is not None:
+            raise BusinessRuleViolation(
+                "Não é possível cancelar candidatura após seleção de prestador."
+            )
+
+        application.status = ApplicationStatus.CANCELLED
+
+        history = ServiceOrderHistory(
+            service_order_id=order.id,
+            old_status=order.status,
+            new_status=order.status,
+            actor_id=provider_user_id,
+            reason="Application cancelled by provider",
+        )
+        await self.history_repository.create(history)
+
+        active_applications = await self.application_repository.count_active_by_order(
+            order.id
+        )
+        if active_applications == 0 and order.status == OrderStatus.AWAITING_SELECTION:
+            old_status = order.status
+            OrderStateMachine.validate_transition(
+                old_status, OrderStatus.AWAITING_CANDIDATES
+            )
+            order.status = OrderStatus.AWAITING_CANDIDATES
+            await self.history_repository.create(
+                ServiceOrderHistory(
+                    service_order_id=order.id,
+                    old_status=old_status,
+                    new_status=order.status,
+                    actor_id=provider_user_id,
+                    reason="No active applications remain",
+                )
+            )
+
+        await self.application_repository.session.commit()
+        app_loaded = await self.application_repository.get_by_id(application.id)
+        if not app_loaded:
+            return application
+        return app_loaded
+
     async def list_order_applications(
         self, user_id: UUID, order_id: UUID
     ) -> list[ServiceOrderApplication]:

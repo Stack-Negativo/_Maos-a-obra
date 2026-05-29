@@ -71,9 +71,11 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
         "http://0.0.0.0:5173",
     ],
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1|0\.0\.0\.0|host\.docker\.internal|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+):(5173|4173)",
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1|0\.0\.0\.0|host\.docker\.internal|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+):[0-9]+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

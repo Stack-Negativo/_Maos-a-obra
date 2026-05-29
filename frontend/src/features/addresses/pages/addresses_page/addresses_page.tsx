@@ -15,181 +15,199 @@ export function AddressesPage() {
     search,
     loading,
     submitting,
+    editingAddressId,
     error,
     setSearch,
     updateField,
     submitAddress,
     removeAddress,
+    startEditingAddress,
+    cancelEditingAddress,
     refresh,
   } = useAddresses();
 
   return (
     <AppShell>
       <section className="addresses-page">
-      <header className="addresses-page__header">
-        <div>
-          <h1>Endereços</h1>
-          <p>
-            Cadastre endereços mockados para validar a etapa que antecede a
-            criação de ordens de serviço.
-          </p>
-          <p className="addresses-page__summary">
-            {totalAddresses} endereço{totalAddresses === 1 ? "" : "s"} no
-            ambiente de teste.
-          </p>
-        </div>
-
-        <div className="addresses-page__header-actions">
-          <Link to="/dashboard" className="addresses-page__back-link">
-            Voltar ao dashboard
-          </Link>
-        </div>
-      </header>
-
-      <section className="addresses-page__content">
-        <form
-          className="address-form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void submitAddress();
-          }}
-        >
+        <header className="addresses-page__header">
           <div>
-            <h2>Novo endereço</h2>
-            <p>Dados salvos apenas no navegador para testes do MVP.</p>
-          </div>
-
-          {error ? (
-            <p className="address-form__error" role="alert">
-              {error}
+            <h1>Enderecos</h1>
+            <p>Cadastre e atualize os enderecos usados nas ordens de servico.</p>
+            <p className="addresses-page__summary">
+              {totalAddresses} endereco{totalAddresses === 1 ? "" : "s"} no
+              sistema.
             </p>
-          ) : null}
-
-          <div className="address-form__grid">
-            <Input
-              placeholder="Apelido"
-              value={form.label}
-              onChange={(event) => updateField("label", event.target.value)}
-              disabled={submitting}
-            />
-            <Input
-              placeholder="CEP"
-              value={form.zipCode}
-              onChange={(event) => updateField("zipCode", event.target.value)}
-              disabled={submitting}
-              inputMode="numeric"
-            />
-            <Input
-              placeholder="Rua"
-              value={form.street}
-              onChange={(event) => updateField("street", event.target.value)}
-              disabled={submitting}
-            />
-            <Input
-              placeholder="Número"
-              value={form.number}
-              onChange={(event) => updateField("number", event.target.value)}
-              disabled={submitting}
-            />
-            <Input
-              placeholder="Complemento"
-              value={form.complement}
-              onChange={(event) =>
-                updateField("complement", event.target.value)
-              }
-              disabled={submitting}
-            />
-            <Input
-              placeholder="Bairro"
-              value={form.neighborhood}
-              onChange={(event) =>
-                updateField("neighborhood", event.target.value)
-              }
-              disabled={submitting}
-            />
-            <Input
-              placeholder="Cidade"
-              value={form.city}
-              onChange={(event) => updateField("city", event.target.value)}
-              disabled={submitting}
-            />
-            <Input
-              placeholder="UF"
-              value={form.state}
-              onChange={(event) => updateField("state", event.target.value)}
-              disabled={submitting}
-              maxLength={2}
-            />
           </div>
 
-          <button
-            type="submit"
-            className="address-form__submit"
-            disabled={submitting}
+          <div className="addresses-page__header-actions">
+            <Link to="/dashboard" className="addresses-page__back-link">
+              Voltar ao dashboard
+            </Link>
+          </div>
+        </header>
+
+        <section className="addresses-page__content">
+          <form
+            className="address-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void submitAddress();
+            }}
           >
-            {submitting ? "Salvando..." : "Adicionar endereço"}
-          </button>
-        </form>
-
-        <section className="addresses-list">
-          <div className="addresses-list__toolbar">
-            <Input
-              placeholder="Buscar endereço"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              disabled={loading}
-              aria-label="Buscar endereço"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                void refresh();
-              }}
-              disabled={loading}
-            >
-              {loading ? "Atualizando..." : "Atualizar"}
-            </button>
-          </div>
-
-          {loading ? (
-            <p className="addresses-list__state">Carregando endereços...</p>
-          ) : addresses.length === 0 ? (
-            <p className="addresses-list__state">
-              Nenhum endereço encontrado.
-            </p>
-          ) : (
-            <div className="addresses-list__items">
-              {addresses.map((address) => (
-                <article
-                  className="address-card"
-                  key={address.id}
-                >
-                  <div>
-                    <strong>{address.label}</strong>
-                    <p>
-                      {address.street}, {address.number}
-                      {address.complement ? ` - ${address.complement}` : ""}
-                    </p>
-                    <span>
-                      {address.neighborhood}, {address.city} - {address.state}
-                    </span>
-                    <small>CEP {address.zipCode}</small>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      void removeAddress(address.id);
-                    }}
-                  >
-                    Remover
-                  </button>
-                </article>
-              ))}
+            <div>
+              <h2>{editingAddressId ? "Editar endereco" : "Novo endereco"}</h2>
+              <p>Dados salvos no backend e usados na criacao de ordens.</p>
             </div>
-          )}
+
+            {error ? (
+              <p className="address-form__error" role="alert">
+                {error}
+              </p>
+            ) : null}
+
+            <div className="address-form__grid">
+              <Input
+                placeholder="Apelido"
+                value={form.label}
+                onChange={(event) => updateField("label", event.target.value)}
+                disabled={submitting}
+              />
+              <Input
+                placeholder="CEP"
+                value={form.zipCode}
+                onChange={(event) => updateField("zipCode", event.target.value)}
+                disabled={submitting}
+                inputMode="numeric"
+              />
+              <Input
+                placeholder="Rua"
+                value={form.street}
+                onChange={(event) => updateField("street", event.target.value)}
+                disabled={submitting}
+              />
+              <Input
+                placeholder="Numero"
+                value={form.number}
+                onChange={(event) => updateField("number", event.target.value)}
+                disabled={submitting}
+              />
+              <Input
+                placeholder="Complemento"
+                value={form.complement}
+                onChange={(event) =>
+                  updateField("complement", event.target.value)
+                }
+                disabled={submitting}
+              />
+              <Input
+                placeholder="Bairro"
+                value={form.neighborhood}
+                onChange={(event) =>
+                  updateField("neighborhood", event.target.value)
+                }
+                disabled={submitting}
+              />
+              <Input
+                placeholder="Cidade"
+                value={form.city}
+                onChange={(event) => updateField("city", event.target.value)}
+                disabled={submitting}
+              />
+              <Input
+                placeholder="UF"
+                value={form.state}
+                onChange={(event) => updateField("state", event.target.value)}
+                disabled={submitting}
+                maxLength={2}
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="address-form__submit"
+              disabled={submitting}
+            >
+              {submitting
+                ? "Salvando..."
+                : editingAddressId
+                  ? "Salvar alteracoes"
+                  : "Adicionar endereco"}
+            </button>
+            {editingAddressId ? (
+              <button
+                type="button"
+                className="address-form__submit"
+                onClick={cancelEditingAddress}
+                disabled={submitting}
+              >
+                Cancelar edicao
+              </button>
+            ) : null}
+          </form>
+
+          <section className="addresses-list">
+            <div className="addresses-list__toolbar">
+              <Input
+                placeholder="Buscar endereco"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                disabled={loading}
+                aria-label="Buscar endereco"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  void refresh();
+                }}
+                disabled={loading}
+              >
+                {loading ? "Atualizando..." : "Atualizar"}
+              </button>
+            </div>
+
+            {loading ? (
+              <p className="addresses-list__state">Carregando enderecos...</p>
+            ) : addresses.length === 0 ? (
+              <p className="addresses-list__state">
+                Nenhum endereco encontrado.
+              </p>
+            ) : (
+              <div className="addresses-list__items">
+                {addresses.map((address) => (
+                  <article className="address-card" key={address.id}>
+                    <div>
+                      <strong>{address.label}</strong>
+                      <p>
+                        {address.street}, {address.number}
+                        {address.complement ? ` - ${address.complement}` : ""}
+                      </p>
+                      <span>
+                        {address.neighborhood}, {address.city} -{" "}
+                        {address.state}
+                      </span>
+                      <small>CEP {address.zipCode}</small>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => startEditingAddress(address)}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void removeAddress(address.id);
+                      }}
+                    >
+                      Remover
+                    </button>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
         </section>
-      </section>
       </section>
     </AppShell>
   );

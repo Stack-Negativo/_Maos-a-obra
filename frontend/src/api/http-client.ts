@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosHeaders } from "axios";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ??
-  "http://localhost:8000/api/v1";
+  "/api/v1";
 
 const httpClient = axios.create({
   baseURL: API_BASE_URL,
@@ -12,7 +12,10 @@ const httpClient = axios.create({
 httpClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
-  if (token) {
+  if (token === "mock-token-mvp") {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  } else if (token) {
     const headers = AxiosHeaders.from(
       config.headers ?? {},
     );

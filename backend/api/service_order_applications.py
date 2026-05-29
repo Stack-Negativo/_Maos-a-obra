@@ -71,3 +71,17 @@ async def reject_application(
     ],
 ):
     return await service.reject_application(current_user.id, application_id)
+
+
+@router.post(
+    "/{application_id}/cancel",
+    response_model=ApplicationResponse,
+)
+async def cancel_application(
+    application_id: UUID,
+    current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[
+        ServiceOrderApplicationService, Depends(get_application_service)
+    ],
+):
+    return await service.cancel_application(current_user.id, application_id)

@@ -23,7 +23,6 @@ export function SpecialtiesPage() {
     refresh,
     createCatalogSpecialty,
     toggleCatalogSpecialty,
-    submitSpecialtyRequest,
     approveRequest,
     rejectRequest,
   } = useSpecialties();
@@ -35,10 +34,6 @@ export function SpecialtiesPage() {
   const isProvider = user?.role === UserRole.PROVIDER;
   const pendingRequests = useMemo(
     () => requests.filter((request) => request.status === "PENDING"),
-    [requests],
-  );
-  const approvedRequests = useMemo(
-    () => requests.filter((request) => request.status !== "PENDING"),
     [requests],
   );
   const activeCount = allSpecialties.filter(
@@ -54,7 +49,7 @@ export function SpecialtiesPage() {
     }
 
     if (formDescription.trim().length < 10) {
-      setFormError("Informe uma descrição com pelo menos 10 caracteres.");
+      setFormError("Informe uma descricao com pelo menos 10 caracteres.");
       return;
     }
 
@@ -62,20 +57,11 @@ export function SpecialtiesPage() {
     setFormError(null);
 
     try {
-      if (isAdmin) {
-        await createCatalogSpecialty({
-          name: formName,
-          description: formDescription,
-          isActive: true,
-        });
-      } else if (user) {
-        await submitSpecialtyRequest({
-          name: formName,
-          description: formDescription,
-          requestedBy: user.id,
-          requestedByName: user.name,
-        });
-      }
+      await createCatalogSpecialty({
+        name: formName,
+        description: formDescription,
+        isActive: true,
+      });
 
       setFormName("");
       setFormDescription("");
@@ -83,7 +69,7 @@ export function SpecialtiesPage() {
       setFormError(
         err instanceof Error
           ? err.message
-          : "Não foi possível salvar a especialidade.",
+          : "Nao foi possivel salvar a especialidade.",
       );
     } finally {
       setSubmitting(false);
@@ -98,8 +84,8 @@ export function SpecialtiesPage() {
             <h1>Especialidades</h1>
             <p>
               {isAdmin
-                ? "Gerencie o catálogo operacional usado para casar ordens com prestadores elegíveis."
-                : "Revise suas áreas de atuação e solicite novas especialidades ao administrador."}
+                ? "Gerencie o catalogo operacional usado para casar ordens com prestadores elegiveis."
+                : "Revise as especialidades cadastradas no catalogo."}
             </p>
             <p className="specialties-page__summary">
               {activeCount} ativa{activeCount === 1 ? "" : "s"} de{" "}
@@ -135,19 +121,11 @@ export function SpecialtiesPage() {
           </button>
         </section>
 
-        {(isAdmin || isProvider) && (
+        {isAdmin && (
           <section className="specialties-page__panel">
             <div>
-              <h2>
-                {isAdmin
-                  ? "Cadastrar especialidade"
-                  : "Solicitar nova especialidade"}
-              </h2>
-              <p>
-                {isAdmin
-                  ? "A especialidade criada entra ativa no catálogo do MVP."
-                  : "O admin avalia a solicitação antes de liberar no catálogo."}
-              </p>
+              <h2>Cadastrar especialidade</h2>
+              <p>A especialidade criada entra ativa no catalogo.</p>
             </div>
             {formError && (
               <p className="specialties-page__form-error" role="alert">
@@ -167,77 +145,64 @@ export function SpecialtiesPage() {
                 disabled={submitting}
               />
               <textarea
-                placeholder="Descrição operacional"
+                placeholder="Descricao operacional"
                 value={formDescription}
                 onChange={(event) => setFormDescription(event.target.value)}
                 disabled={submitting}
               />
               <button type="submit" disabled={submitting}>
-                {submitting
-                  ? "Salvando..."
-                  : isAdmin
-                    ? "Criar especialidade"
-                    : "Enviar solicitação"}
+                {submitting ? "Salvando..." : "Criar especialidade"}
               </button>
             </form>
           </section>
         )}
 
-        {isAdmin && (
+        {isAdmin && pendingRequests.length > 0 && (
           <section className="specialties-page__panel">
             <div className="specialties-page__panel-header">
               <div>
-                <h2>Solicitações de prestadores</h2>
+                <h2>Solicitacoes de prestadores</h2>
                 <p>
-                  Aprove novas áreas de atuação ou recuse solicitações fora do
-                  escopo do catálogo.
+                  Esta lista so aparece quando houver solicitacoes persistidas
+                  no backend.
                 </p>
               </div>
               <strong>{pendingRequests.length} pendente(s)</strong>
             </div>
 
-            {pendingRequests.length === 0 ? (
-              <p className="specialties-page__state">
-                Nenhuma solicitação pendente.
-              </p>
-            ) : (
-              <div className="specialties-page__requests">
-                {pendingRequests.map((request) => (
-                  <article
-                    className="specialties-page__request"
-                    key={request.id}
-                  >
-                    <div>
-                      <strong>{request.name}</strong>
-                      <p>{request.description}</p>
-                      <small>
-                        Solicitada por {request.requestedByName} em{" "}
-                        {new Date(request.createdAt).toLocaleString("pt-BR")}
-                      </small>
-                    </div>
-                    <div className="specialties-page__request-actions">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          void approveRequest(request.id);
-                        }}
-                      >
-                        Aprovar
-                      </button>
-                      <button
-                        type="button"
-                        className="specialties-page__ghost"
-                        onClick={() => {
-                          void rejectRequest(request.id);
-                        }}
-                      >
-                        Recusar
-                      </button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
+            <div className="specialties-page__requests">
+              {pendingRequests.map((request) => (
+                <article className="specialties-page__request" key={request.id}>
+                  <div>
+                    <strong>{request.name}</strong>
+                    <p>{request.description}</p>
+                    <small>
+                      Solicitada por {request.requestedByName} em{" "}
+                      {new Date(request.createdAt).toLocaleString("pt-BR")}
+                    </small>
+                  </div>
+                  <div className="specialties-page__request-actions">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void approveRequest(request.id);
+                      }}
+                    >
+                      Aprovar
+                    </button>
+                    <button
+                      type="button"
+                      className="specialties-page__ghost"
+                      onClick={() => {
+                        void rejectRequest(request.id);
+                      }}
+                    >
+                      Recusar
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
           </section>
         )}
 
@@ -271,27 +236,13 @@ export function SpecialtiesPage() {
           </div>
         )}
 
-        {isProvider && approvedRequests.length > 0 && (
+        {isProvider && (
           <section className="specialties-page__panel">
-            <h2>Histórico das minhas solicitações</h2>
-            <div className="specialties-page__requests">
-              {approvedRequests
-                .filter((request) => request.requestedBy === user?.id)
-                .map((request) => (
-                  <article
-                    className="specialties-page__request"
-                    key={request.id}
-                  >
-                    <div>
-                      <strong>{request.name}</strong>
-                      <p>{request.description}</p>
-                    </div>
-                    <span className="specialties-page__request-status">
-                      {request.status === "APPROVED" ? "Aprovada" : "Recusada"}
-                    </span>
-                  </article>
-                ))}
-            </div>
+            <h2>Catalogo disponivel</h2>
+            <p>
+              Novas especialidades devem ser criadas pelo admin enquanto nao
+              houver endpoint de solicitacao no backend.
+            </p>
           </section>
         )}
       </section>

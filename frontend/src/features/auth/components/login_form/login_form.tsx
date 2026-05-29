@@ -17,24 +17,6 @@ export function LoginForm() {
     handleLogin,
   } = useAuth();
 
-  const mockUsers = [
-    {
-      label: "Entrar como Cliente",
-      email: "cliente@maosaobra.local",
-      password: "12345678",
-    },
-    {
-      label: "Entrar como Prestador",
-      email: "prestador@maosaobra.local",
-      password: "12345678",
-    },
-    {
-      label: "Entrar como Admin",
-      email: "admin@maosaobra.com.br",
-      password: "Admin12345",
-    },
-  ];
-
   return (
     <form
       className="login-form"
@@ -45,7 +27,7 @@ export function LoginForm() {
     >
       <div className="login-form__header">
         <h1>Bem-vindo de volta</h1>
-        <p>Entre com um perfil de teste e valide o fluxo do MVP.</p>
+        <p>Entre com uma conta cadastrada no backend.</p>
       </div>
 
       {error ? (
@@ -83,24 +65,6 @@ export function LoginForm() {
       >
         {loading ? "Entrando..." : "Entrar"}
       </button>
-
-      <div className="login-form__mock-actions">
-        {mockUsers.map((mockUser) => (
-          <button
-            key={mockUser.email}
-            type="button"
-            disabled={loading}
-            onClick={() =>
-              void handleLogin({
-                email: mockUser.email,
-                password: mockUser.password ?? "12345678",
-              })
-            }
-          >
-            {mockUser.label}
-          </button>
-        ))}
-      </div>
     </form>
   );
 }

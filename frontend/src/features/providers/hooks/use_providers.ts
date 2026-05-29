@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { listSpecialties } from "@/features/specialties/services/specialties_service";
 import type { Specialty } from "@/features/specialties/types/specialty_types";
@@ -46,21 +42,16 @@ export function useProviders() {
     setError(null);
 
     try {
-      const [
-        providerData,
-        specialtyData,
-      ] = await Promise.all([
+      const [providerData, specialtyData] = await Promise.all([
         listProviders(),
         listSpecialties(),
       ]);
 
       setProviders(providerData);
-      setSpecialties(
-        specialtyData.filter((specialty) => specialty.isActive),
-      );
+      setSpecialties(specialtyData.filter((specialty) => specialty.isActive));
     } catch {
       setError(
-        "Não foi possível carregar os prestadores. Verifique sua conexão e tente novamente.",
+        "Nao foi possivel carregar os prestadores. Verifique o backend e tente novamente.",
       );
     } finally {
       setLoading(false);
@@ -74,14 +65,8 @@ export function useProviders() {
     const handleProvidersChanged = () => {
       void refresh();
     };
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === "mock_providers") {
-        void refresh();
-      }
-    };
 
     window.addEventListener(PROVIDERS_CHANGED_EVENT, handleProvidersChanged);
-    window.addEventListener("storage", handleStorage);
 
     return () => {
       window.clearTimeout(timeoutId);
@@ -89,7 +74,6 @@ export function useProviders() {
         PROVIDERS_CHANGED_EVENT,
         handleProvidersChanged,
       );
-      window.removeEventListener("storage", handleStorage);
     };
   }, []);
 
@@ -105,8 +89,7 @@ export function useProviders() {
 
   function toggleSpecialty(specialtyId: string) {
     setForm((currentForm) => {
-      const isSelected =
-        currentForm.specialtyIds.includes(specialtyId);
+      const isSelected = currentForm.specialtyIds.includes(specialtyId);
 
       return {
         ...currentForm,
@@ -134,8 +117,7 @@ export function useProviders() {
   }
 
   async function submitProvider() {
-    const validationError =
-      validateForm();
+    const validationError = validateForm();
 
     if (validationError) {
       setError(validationError);
@@ -146,26 +128,21 @@ export function useProviders() {
     setError(null);
 
     try {
-      const selectedSpecialties =
-        specialties.filter((specialty) =>
-          form.specialtyIds.includes(specialty.id),
-        );
+      const selectedSpecialties = specialties.filter((specialty) =>
+        form.specialtyIds.includes(specialty.id),
+      );
 
-      const provider =
-        await createProviderProfile({
-          name: form.name.trim(),
-          bio: form.bio.trim(),
-          specialties: selectedSpecialties,
-        });
+      const provider = await createProviderProfile({
+        name: form.name.trim(),
+        bio: form.bio.trim(),
+        specialties: selectedSpecialties,
+      });
 
-      setProviders((currentProviders) => [
-        provider,
-        ...currentProviders,
-      ]);
+      setProviders((currentProviders) => [provider, ...currentProviders]);
       setForm(INITIAL_FORM);
     } catch {
       setError(
-        "Não foi possível salvar o prestador. Verifique sua conexão e tente novamente.",
+        "Nao foi possivel salvar o prestador. Verifique o backend e tente novamente.",
       );
     } finally {
       setSubmitting(false);
@@ -175,16 +152,6 @@ export function useProviders() {
   async function suspend(providerId: string) {
     setUpdatingProviderId(providerId);
     setError(null);
-    setProviders((currentProviders) =>
-      currentProviders.map((currentProvider) =>
-        currentProvider.id === providerId
-          ? {
-              ...currentProvider,
-              isSuspended: true,
-            }
-          : currentProvider,
-      ),
-    );
 
     try {
       const provider = await suspendProvider(providerId);
@@ -199,9 +166,7 @@ export function useProviders() {
         ),
       );
     } catch {
-      setError(
-        "Prestador suspenso visualmente. Não foi possível confirmar no backend agora.",
-      );
+      setError("Nao foi possivel suspender o prestador no backend.");
     } finally {
       setUpdatingProviderId(null);
     }
@@ -210,16 +175,6 @@ export function useProviders() {
   async function unsuspend(providerId: string) {
     setUpdatingProviderId(providerId);
     setError(null);
-    setProviders((currentProviders) =>
-      currentProviders.map((currentProvider) =>
-        currentProvider.id === providerId
-          ? {
-              ...currentProvider,
-              isSuspended: false,
-            }
-          : currentProvider,
-      ),
-    );
 
     try {
       const provider = await unsuspendProvider(providerId);
@@ -234,26 +189,19 @@ export function useProviders() {
         ),
       );
     } catch {
-      setError(
-        "Prestador reativado visualmente. Não foi possível confirmar no backend agora.",
-      );
+      setError("Nao foi possivel reativar o prestador no backend.");
     } finally {
       setUpdatingProviderId(null);
     }
   }
 
   const filteredProviders = useMemo(() => {
-    const query =
-      search.trim().toLowerCase();
+    const query = search.trim().toLowerCase();
 
     return providers.filter((provider) => {
       const matchesSearch =
         !query ||
-        [
-          provider.name,
-          provider.bio,
-          ...provider.specialties.map((specialty) => specialty.name),
-        ]
+        [provider.name, provider.bio, ...provider.specialties.map((s) => s.name)]
           .join(" ")
           .toLowerCase()
           .includes(query);

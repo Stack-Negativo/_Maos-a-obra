@@ -125,7 +125,7 @@ export function DashboardPage() {
             <div className="dashboard-panel__header">
               <div>
                 <h2>Saúde operacional</h2>
-                <p>Resumo do ciclo de serviço no ambiente mockado.</p>
+                <p>Resumo do ciclo de servico com dados do backend.</p>
               </div>
             </div>
             <div className="dashboard-health">
@@ -166,7 +166,7 @@ export function DashboardPage() {
                   <strong>Ordens de Serviço</strong>
                   <p>
                     Monitore candidaturas, seleção, agendamento, execução,
-                    confirmação do cliente, pagamentos mockados e histórico.
+                    confirmação do cliente, pagamentos e histórico.
                   </p>
                 </div>
                 <Link to="/orders/admin">Auditar ordens</Link>

@@ -63,7 +63,7 @@ export interface Application {
   id: string;
   orderId: string;
   provider: Provider;
-  status: "PENDING" | "ACCEPTED" | "REJECTED";
+  status: "PENDING" | "ACCEPTED" | "REJECTED" | "CANCELLED";
   appliedAt: string;
   respondedAt?: string;
 }
