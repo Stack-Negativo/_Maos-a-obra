@@ -6,9 +6,28 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from models.provider import Provider, ProviderSpecialty
 from models.service_order import ServiceOrder
 from models.service_order_application import ServiceOrderApplication
-from models.provider import Provider, ProviderSpecialty
+
+
+def service_order_load_options():
+    return (
+        selectinload(ServiceOrder.provider),
+        selectinload(ServiceOrder.provider).selectinload(Provider.user),
+        selectinload(ServiceOrder.provider)
+        .selectinload(Provider.specialties)
+        .selectinload(ProviderSpecialty.specialty),
+        selectinload(ServiceOrder.address),
+        selectinload(ServiceOrder.specialty),
+        selectinload(ServiceOrder.applications)
+        .selectinload(ServiceOrderApplication.provider)
+        .selectinload(Provider.user),
+        selectinload(ServiceOrder.applications)
+        .selectinload(ServiceOrderApplication.provider)
+        .selectinload(Provider.specialties)
+        .selectinload(ProviderSpecialty.specialty),
+    )
 
 
 class ServiceOrderRepository:
@@ -23,23 +42,7 @@ class ServiceOrderRepository:
         result = await self.session.execute(
             select(ServiceOrder)
             .where(ServiceOrder.id == order_id)
-            .options(
-                selectinload(ServiceOrder.provider),
-                selectinload(ServiceOrder.provider).selectinload(Provider.user),
-                selectinload(ServiceOrder.provider).selectinload(
-                    Provider.specialties,
-                ).selectinload(ProviderSpecialty.specialty),
-                selectinload(ServiceOrder.address),
-                selectinload(ServiceOrder.specialty),
-                selectinload(ServiceOrder.applications).selectinload(
-                    ServiceOrderApplication.provider,
-                ).selectinload(Provider.user),
-                selectinload(ServiceOrder.applications).selectinload(
-                    ServiceOrderApplication.provider,
-                ).selectinload(Provider.specialties).selectinload(
-                    ProviderSpecialty.specialty,
-                ),
-            )
+            .options(*service_order_load_options())
         )
         return result.scalars().first()
 
@@ -47,23 +50,7 @@ class ServiceOrderRepository:
         result = await self.session.execute(
             select(ServiceOrder)
             .where(ServiceOrder.id == order_id)
-            .options(
-                selectinload(ServiceOrder.provider),
-                selectinload(ServiceOrder.provider).selectinload(Provider.user),
-                selectinload(ServiceOrder.provider).selectinload(
-                    Provider.specialties,
-                ).selectinload(ProviderSpecialty.specialty),
-                selectinload(ServiceOrder.address),
-                selectinload(ServiceOrder.specialty),
-                selectinload(ServiceOrder.applications).selectinload(
-                    ServiceOrderApplication.provider,
-                ).selectinload(Provider.user),
-                selectinload(ServiceOrder.applications).selectinload(
-                    ServiceOrderApplication.provider,
-                ).selectinload(Provider.specialties).selectinload(
-                    ProviderSpecialty.specialty,
-                ),
-            )
+            .options(*service_order_load_options())
             .with_for_update()
         )
         return result.scalars().first()
@@ -73,23 +60,7 @@ class ServiceOrderRepository:
             select(ServiceOrder)
             .where(ServiceOrder.client_id == client_id)
             .order_by(ServiceOrder.created_at.desc())
-            .options(
-                selectinload(ServiceOrder.provider),
-                selectinload(ServiceOrder.provider).selectinload(Provider.user),
-                selectinload(ServiceOrder.provider).selectinload(
-                    Provider.specialties,
-                ).selectinload(ProviderSpecialty.specialty),
-                selectinload(ServiceOrder.address),
-                selectinload(ServiceOrder.specialty),
-                selectinload(ServiceOrder.applications).selectinload(
-                    ServiceOrderApplication.provider,
-                ).selectinload(Provider.user),
-                selectinload(ServiceOrder.applications).selectinload(
-                    ServiceOrderApplication.provider,
-                ).selectinload(Provider.specialties).selectinload(
-                    ProviderSpecialty.specialty,
-                ),
-            )
+            .options(*service_order_load_options())
         )
         return result.scalars().all()
 
@@ -97,23 +68,7 @@ class ServiceOrderRepository:
         result = await self.session.execute(
             select(ServiceOrder)
             .order_by(ServiceOrder.created_at.desc())
-            .options(
-                selectinload(ServiceOrder.provider),
-                selectinload(ServiceOrder.provider).selectinload(Provider.user),
-                selectinload(ServiceOrder.provider).selectinload(
-                    Provider.specialties,
-                ).selectinload(ProviderSpecialty.specialty),
-                selectinload(ServiceOrder.address),
-                selectinload(ServiceOrder.specialty),
-                selectinload(ServiceOrder.applications).selectinload(
-                    ServiceOrderApplication.provider,
-                ).selectinload(Provider.user),
-                selectinload(ServiceOrder.applications).selectinload(
-                    ServiceOrderApplication.provider,
-                ).selectinload(Provider.specialties).selectinload(
-                    ProviderSpecialty.specialty,
-                ),
-            )
+            .options(*service_order_load_options())
         )
         return result.scalars().all()
 
