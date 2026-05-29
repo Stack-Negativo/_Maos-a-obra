@@ -34,8 +34,21 @@ export function ProvidersPage() {
     submitProvider,
     suspendProvider,
     unsuspendProvider,
+    deleteProvider,
     refresh,
   } = useProviders();
+
+  async function confirmDeleteProvider(providerId: string, providerName: string) {
+    const confirmed = window.confirm(
+      `Excluir o perfil de prestador de ${providerName}? Esta ação não remove o usuário e só será permitida se ele não estiver vinculado a ordens.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteProvider(providerId);
+  }
 
   return (
     <AppShell>
@@ -92,8 +105,7 @@ export function ProvidersPage() {
               <div>
                 <h2>Novo prestador</h2>
                 <p>
-                  Cadastre seu perfil de prestador no backend. Se a conexão
-                  falhar, o cadastro será salvo localmente para testes.
+                  Cadastre seu perfil profissional para receber solicitações compatíveis.
                 </p>
               </div>
 
@@ -272,6 +284,23 @@ export function ProvidersPage() {
                           {updatingProviderId === provider.id
                             ? "Suspendendo..."
                             : "Suspender prestador"}
+                        </button>
+                      )}
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          className="providers-admin-card__danger"
+                          onClick={() => {
+                            void confirmDeleteProvider(
+                              provider.id,
+                              provider.name,
+                            );
+                          }}
+                          disabled={updatingProviderId === provider.id}
+                        >
+                          {updatingProviderId === provider.id
+                            ? "Processando..."
+                            : "Excluir prestador"}
                         </button>
                       )}
                     </div>

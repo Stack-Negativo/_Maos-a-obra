@@ -36,7 +36,7 @@ export function OrderCreatePage() {
         setPageError(
           err instanceof Error
             ? err.message
-            : "Erro ao carregar formulário",
+            : "Não foi possível carregar os dados da ordem.",
         );
       }
     };
@@ -50,7 +50,7 @@ export function OrderCreatePage() {
       await createOrder(data);
     } catch (err) {
       setPageError(
-        err instanceof Error ? err.message : "Erro ao criar ordem",
+        err instanceof Error ? err.message : "Não foi possível criar a ordem.",
       );
     }
   };
@@ -69,8 +69,8 @@ export function OrderCreatePage() {
             <span className="order-create-page__eyebrow">Cliente</span>
             <h1>Nova ordem de serviço</h1>
             <p>
-              Informe o problema, escolha uma especialidade ativa e selecione o
-              endereço onde o atendimento deve acontecer.
+              Descreva a necessidade, escolha a especialidade e informe onde o
+              atendimento deve acontecer.
             </p>
           </div>
         </div>

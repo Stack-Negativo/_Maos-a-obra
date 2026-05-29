@@ -9,6 +9,11 @@
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-card);
+  box-shadow: var(--shadow-card);
 }
 
 .addresses-page__header h1 {
@@ -26,6 +31,14 @@
 }
 
 .addresses-page__summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  margin-top: 0.55rem;
+  padding: 0 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--color-brand) 28%, var(--color-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-light) 72%, var(--color-card));
   color: var(--color-brand-dark) !important;
   font-weight: 700;
 }
@@ -62,6 +75,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
+  box-shadow: var(--shadow-card);
 }
 
 .address-form h2 {
@@ -78,7 +92,7 @@
 
 .address-form__error {
   padding: 0.85rem 1rem;
-  border: 1px solid #fecaca;
+  border: 1px solid var(--color-danger);
   border-radius: 8px;
   background: var(--color-danger-bg);
   color: var(--color-danger);
@@ -131,7 +145,7 @@
   padding: 1rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
   color: var(--color-text-secondary);
 }
 
@@ -154,7 +168,7 @@
 
 .address-card:hover {
   border-color: var(--color-brand);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .address-card strong {
@@ -172,9 +186,13 @@
 }
 
 .address-card button {
-  border: 1px solid #fecaca;
+  border: 1px solid var(--color-danger);
   background: var(--color-card);
   color: var(--color-danger);
+}
+
+.address-card button:hover {
+  background: var(--color-danger-bg);
 }
 
 @media (max-width: 860px) {

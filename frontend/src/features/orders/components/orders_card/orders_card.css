@@ -1,5 +1,5 @@
 .orders-card {
-  background: var(--color-surface);
+  background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 20px;
@@ -7,7 +7,8 @@
 }
 
 .orders-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: color-mix(in srgb, var(--color-brand) 32%, var(--color-border));
+  box-shadow: var(--shadow-card-hover);
   transform: translateY(-2px);
 }
 
@@ -28,8 +29,8 @@
 
 .orders-card__title {
   font-size: 18px;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-weight: 800;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -50,23 +51,23 @@
 }
 
 .orders-card__badge--success {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
 }
 
 .orders-card__badge--warning {
-  background-color: #fff3e0;
-  color: #f57c00;
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .orders-card__badge--info {
-  background-color: #e3f2fd;
-  color: #1565c0;
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .orders-card__badge--danger {
-  background-color: #ffebee;
-  color: #c62828;
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
 }
 
 .orders-card__description {
@@ -110,14 +111,14 @@
 .orders-card__rating {
   margin-left: 4px;
   font-size: 12px;
-  color: #f57c00;
+  color: var(--color-warning);
 }
 
 .orders-card__error {
-  background-color: #fee;
-  color: #c33;
-  border: 1px solid #fcc;
-  border-radius: 4px;
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 12px;
   font-size: 13px;
@@ -132,7 +133,7 @@
   flex: 1;
   padding: 10px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -140,21 +141,21 @@
 }
 
 .orders-card__btn--primary {
-  background-color: var(--color-primary);
-  color: white;
+  background-color: var(--color-brand);
+  color: var(--color-on-brand);
 }
 
 .orders-card__btn--primary:hover:not(:disabled) {
-  background-color: var(--color-primary-hover);
+  background-color: var(--color-brand-hover);
 }
 
 .orders-card__btn--danger {
-  background-color: #c62828;
-  color: white;
+  background-color: var(--color-danger);
+  color: var(--color-on-brand);
 }
 
 .orders-card__btn--danger:hover:not(:disabled) {
-  background-color: #b71c1c;
+  filter: brightness(0.95);
 }
 
 .orders-card__btn:disabled {

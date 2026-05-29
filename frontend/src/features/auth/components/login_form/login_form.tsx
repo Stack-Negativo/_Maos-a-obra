@@ -27,7 +27,7 @@ export function LoginForm() {
     >
       <div className="login-form__header">
         <h1>Bem-vindo de volta</h1>
-        <p>Entre com uma conta cadastrada no backend.</p>
+        <p>Acesse sua conta para acompanhar solicitações, atendimentos e prestadores.</p>
       </div>
 
       {error ? (

@@ -19,6 +19,7 @@
   display: grid;
   gap: 1rem;
   padding: 1rem;
+  border-left: 4px solid var(--color-brand);
 }
 
 .order-form__guide-eyebrow {
@@ -139,6 +140,13 @@
   border: 1px solid var(--color-warning);
   background: var(--color-warning-bg);
   color: var(--color-warning);
+}
+
+.order-form__notice a {
+  color: inherit;
+  font-weight: 850;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .order-form__label {

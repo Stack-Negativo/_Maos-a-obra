@@ -31,10 +31,10 @@ export function AddressesPage() {
       <section className="addresses-page">
         <header className="addresses-page__header">
           <div>
-            <h1>Enderecos</h1>
-            <p>Cadastre e atualize os enderecos usados nas ordens de servico.</p>
+            <h1>Endereços</h1>
+            <p>Cadastre seus locais de atendimento para agilizar novas solicitações.</p>
             <p className="addresses-page__summary">
-              {totalAddresses} endereco{totalAddresses === 1 ? "" : "s"} no
+              {totalAddresses} endereço{totalAddresses === 1 ? "" : "s"} no
               sistema.
             </p>
           </div>
@@ -55,8 +55,8 @@ export function AddressesPage() {
             }}
           >
             <div>
-              <h2>{editingAddressId ? "Editar endereco" : "Novo endereco"}</h2>
-              <p>Dados salvos no backend e usados na criacao de ordens.</p>
+              <h2>{editingAddressId ? "Editar endereço" : "Novo endereço"}</h2>
+              <p>Use apelidos simples para encontrar o local rapidamente ao criar uma ordem.</p>
             </div>
 
             {error ? (
@@ -86,7 +86,7 @@ export function AddressesPage() {
                 disabled={submitting}
               />
               <Input
-                placeholder="Numero"
+                placeholder="Número"
                 value={form.number}
                 onChange={(event) => updateField("number", event.target.value)}
                 disabled={submitting}
@@ -130,8 +130,8 @@ export function AddressesPage() {
               {submitting
                 ? "Salvando..."
                 : editingAddressId
-                  ? "Salvar alteracoes"
-                  : "Adicionar endereco"}
+                  ? "Salvar alterações"
+                  : "Adicionar endereço"}
             </button>
             {editingAddressId ? (
               <button
@@ -140,7 +140,7 @@ export function AddressesPage() {
                 onClick={cancelEditingAddress}
                 disabled={submitting}
               >
-                Cancelar edicao
+                Cancelar edição
               </button>
             ) : null}
           </form>
@@ -148,11 +148,11 @@ export function AddressesPage() {
           <section className="addresses-list">
             <div className="addresses-list__toolbar">
               <Input
-                placeholder="Buscar endereco"
+                placeholder="Buscar endereço"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 disabled={loading}
-                aria-label="Buscar endereco"
+                aria-label="Buscar endereço"
               />
               <button
                 type="button"
@@ -166,10 +166,10 @@ export function AddressesPage() {
             </div>
 
             {loading ? (
-              <p className="addresses-list__state">Carregando enderecos...</p>
+              <p className="addresses-list__state">Carregando endereços...</p>
             ) : addresses.length === 0 ? (
               <p className="addresses-list__state">
-                Nenhum endereco encontrado.
+                Nenhum endereço encontrado.
               </p>
             ) : (
               <div className="addresses-list__items">

@@ -11,11 +11,15 @@ const httpClient = axios.create({
 
 httpClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
+  const requestUrl = config.url ?? "";
+  const isAuthRequest =
+    requestUrl.includes("/auth/token") ||
+    requestUrl.includes("/auth/register");
 
   if (token === "mock-token-mvp") {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-  } else if (token) {
+  } else if (token && !isAuthRequest) {
     const headers = AxiosHeaders.from(
       config.headers ?? {},
     );
@@ -30,10 +34,16 @@ httpClient.interceptors.request.use((config) => {
 httpClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 401) {
+    const token = localStorage.getItem("token");
+    const requestUrl = error.config?.url ?? "";
+    const isAuthRequest =
+      requestUrl.includes("/auth/token") ||
+      requestUrl.includes("/auth/register");
+
+    if (error.response?.status === 401 && token && !isAuthRequest) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/";
+      window.dispatchEvent(new Event("maos-a-obra:auth-expired"));
     }
 
     return Promise.reject(error);

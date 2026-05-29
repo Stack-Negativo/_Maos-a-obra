@@ -15,13 +15,6 @@ import type { Provider } from "../types/order_types";
 
 import "./orders_page/orders_page.css";
 
-function normalizeText(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-}
-
 function buildProviderFromUser(user: ReturnType<typeof useAuthContext>["user"]) {
   if (!user) {
     return undefined;
@@ -73,29 +66,28 @@ export function OrdersProviderPage() {
       setActionError(
         err instanceof Error
           ? err.message
-          : "Nao foi possivel executar a acao solicitada.",
+          : "Não foi possível concluir a ação. Tente novamente.",
       );
     }
   }
 
   const providerId = currentProvider?.id ?? "";
-  const providerSpecialtyNames = useMemo(
+  const providerSpecialtyIds = useMemo(
     () =>
       currentProvider?.specialties.length
-        ? currentProvider.specialties.map((specialty) =>
-          normalizeText(specialty.name),
-        )
+        ? currentProvider.specialties.map((specialty) => specialty.id)
         : [],
     [currentProvider],
   );
+  const hasProviderSpecialtiesLoaded = providerSpecialtyIds.length > 0;
 
   const visibleOrders = useMemo(
     () =>
       orders
         .filter((order) => {
-          const specialtyCompatible = providerSpecialtyNames.includes(
-            normalizeText(order.specialty.name),
-          );
+          const specialtyCompatible =
+            !hasProviderSpecialtiesLoaded ||
+            providerSpecialtyIds.includes(order.specialty.id);
           const myApplication = order.applications?.find(
             (application) => application.provider.id === providerId,
           );
@@ -155,7 +147,14 @@ export function OrdersProviderPage() {
             .toLowerCase()
             .includes(search.toLowerCase()),
         ),
-    [orders, providerId, providerSpecialtyNames, search, viewMode],
+    [
+      hasProviderSpecialtiesLoaded,
+      orders,
+      providerId,
+      providerSpecialtyIds,
+      search,
+      viewMode,
+    ],
   );
 
   const counts = {
@@ -167,7 +166,8 @@ export function OrdersProviderPage() {
           OrderStatus.AWAITING_SELECTION,
         ].includes(order.status) &&
         !order.selectedProvider &&
-        providerSpecialtyNames.includes(normalizeText(order.specialty.name)) &&
+        (!hasProviderSpecialtiesLoaded ||
+          providerSpecialtyIds.includes(order.specialty.id)) &&
         !order.applications?.some(
           (application) =>
             application.provider.id === providerId &&
@@ -205,6 +205,17 @@ export function OrdersProviderPage() {
         ].includes(order.status),
     ).length,
   };
+  const openOrdersCount = orders.filter(
+    (order) =>
+      [
+        OrderStatus.CREATED,
+        OrderStatus.AWAITING_CANDIDATES,
+        OrderStatus.AWAITING_SELECTION,
+      ].includes(order.status) && !order.selectedProvider,
+  ).length;
+  const providerSpecialtiesSummary = hasProviderSpecialtiesLoaded
+    ? currentProvider?.specialties.map((specialty) => specialty.name).join(", ")
+    : "Complete seu perfil com especialidades para refinar o feed.";
 
   const workflowItems = [
     {
@@ -230,17 +241,29 @@ export function OrdersProviderPage() {
         <header className="orders-page__header">
           <div>
             <span className="orders-page__eyebrow">Prestador</span>
-            <h1>Feed do Prestador</h1>
+            <h1>Ordens disponíveis</h1>
             <p>
               Veja ordens compatíveis com suas especialidades, envie
-              candidaturas e acompanhe atendimentos aceitos até a finalização.
+              candidaturas e acompanhe atendimentos aceitos até a conclusão.
             </p>
             <p className="orders-page__summary">
               {visibleOrders.length} ordem
               {visibleOrders.length === 1 ? "" : "s"} no seu painel
             </p>
+            <p className="orders-page__summary">
+              {openOrdersCount} ordem{openOrdersCount === 1 ? "" : "s"} aberta
+              {openOrdersCount === 1 ? "" : "s"} para candidatura
+            </p>
           </div>
         </header>
+
+        <section className="orders-page__provider-context">
+          <div>
+            <span>Seu perfil</span>
+            <strong>{currentProvider?.name ?? "Prestador"}</strong>
+          </div>
+          <p>{providerSpecialtiesSummary}</p>
+        </section>
 
         <section className="orders-page__admin-workbench orders-page__admin-workbench--provider">
           {workflowItems.map((item) => (
@@ -310,7 +333,11 @@ export function OrdersProviderPage() {
           </p>
         ) : visibleOrders.length === 0 ? (
           <div className="orders-page__empty">
-            <p>Nenhuma ordem disponível no momento.</p>
+            <p>
+              {openOrdersCount === 0
+                ? "Nenhuma ordem aberta para candidatura no momento."
+                : "Nenhuma ordem passou pelos filtros atuais."}
+            </p>
           </div>
         ) : (
           <div className="orders-page__list">
@@ -328,9 +355,11 @@ export function OrdersProviderPage() {
                 ].includes(order.status) &&
                 !order.selectedProvider &&
                 !myApplication &&
-                providerSpecialtyNames.includes(
-                  normalizeText(order.specialty.name),
-                );
+                (!hasProviderSpecialtiesLoaded ||
+                  providerSpecialtyIds.includes(order.specialty.id));
+              const isSpecialtyCompatible =
+                !hasProviderSpecialtiesLoaded ||
+                providerSpecialtyIds.includes(order.specialty.id);
               const canStart =
                 order.selectedProvider?.id === providerId &&
                 order.status === OrderStatus.SCHEDULED;
@@ -384,10 +413,13 @@ export function OrdersProviderPage() {
                       </span>
                     )}
                     {latestHistoryEvent && (
-                      <span>Último evento: {latestHistoryEvent.title}</span>
+                      <span>Última atualização: {latestHistoryEvent.title}</span>
                     )}
                     {!myApplication && canApply && (
                       <span>Disponível para candidatura</span>
+                    )}
+                    {!isSpecialtyCompatible && (
+                      <span>Especialidade fora do seu perfil</span>
                     )}
                   </div>
 
@@ -422,7 +454,7 @@ export function OrdersProviderPage() {
                           void runAction(() => startOrder(order.id));
                         }}
                       >
-                        Iniciar serviço
+                        Iniciar atendimento
                       </button>
                     )}
                     {canFinish && (

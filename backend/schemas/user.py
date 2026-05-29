@@ -20,6 +20,10 @@ class UserUpdate(UserBase):
     is_active: bool | None = None
 
 
+class UserProfileUpdate(UserBase):
+    pass
+
+
 class UserResponse(UserBase):
     id: UUID
     email: EmailStr

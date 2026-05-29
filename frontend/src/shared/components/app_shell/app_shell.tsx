@@ -4,6 +4,7 @@ import { Link, NavLink } from "react-router-dom";
 
 import { useAuthContext } from "@/app/providers/auth_provider/use_auth_context";
 import { UserRole } from "@/features/auth/types/auth_types";
+import { initializeTheme, toggleTheme } from "@/shared/utils/theme";
 
 import "./app_shell.css";
 
@@ -47,15 +48,7 @@ export function AppShell({ children }: AppShellProps) {
   const { user, signOut } = useAuthContext();
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem("theme");
-
-    if (storedTheme === "dark" || storedTheme === "light") {
-      document.documentElement.dataset.theme = storedTheme;
-      return;
-    }
-
-    document.documentElement.dataset.theme = "dark";
-    localStorage.setItem("theme", "dark");
+    initializeTheme();
   }, []);
 
   const effectiveRole = user?.isAdmin
@@ -119,9 +112,9 @@ export function AppShell({ children }: AppShellProps) {
         <div className="app-shell__user">
           <span className="app-shell__avatar">{getInitials(user?.name)}</span>
           <div className="app-shell__user-copy">
-            <strong>{user?.name ?? "Usuario"}</strong>
+            <strong>{user?.name ?? "Conta"}</strong>
             <span>
-              {user?.role ?? "CLIENT"} - {user?.email ?? "sem email"}
+              {effectiveRole ? roleLabels[effectiveRole] : "Cliente"} - {user?.email ?? ""}
             </span>
           </div>
           <div className="app-shell__role-badge" aria-label="Perfil do usuário">
@@ -130,13 +123,7 @@ export function AppShell({ children }: AppShellProps) {
           <button
             type="button"
             className="app-shell__theme-toggle"
-            onClick={() => {
-              const currentTheme = document.documentElement.dataset.theme;
-              const nextTheme = currentTheme === "dark" ? "light" : "dark";
-
-              document.documentElement.dataset.theme = nextTheme;
-              localStorage.setItem("theme", nextTheme);
-            }}
+            onClick={toggleTheme}
           >
             Tema
           </button>

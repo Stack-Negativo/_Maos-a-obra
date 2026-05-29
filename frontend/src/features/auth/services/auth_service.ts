@@ -37,6 +37,7 @@ function mapUser(profile: {
   id: string;
   email: string;
   full_name?: string;
+  phone?: string;
   nome?: string;
   role?: string;
   is_provider?: boolean;
@@ -46,6 +47,7 @@ function mapUser(profile: {
     id: profile.id,
     name: profile.full_name || profile.nome || profile.email.split("@")[0],
     email: profile.email,
+    phone: profile.phone,
     role:
       (profile.role as UserRole | undefined) ??
       (profile.is_admin
@@ -56,6 +58,25 @@ function mapUser(profile: {
     isProvider: profile.is_provider ?? false,
     isAdmin: profile.is_admin ?? false,
     specialties: [],
+  };
+}
+
+export async function updateProfileService(data: {
+  name: string;
+  phone: string;
+}): Promise<Pick<User, "name" | "phone">> {
+  const response = await authApi.updateMe({
+    full_name: data.name.trim(),
+    phone: data.phone.replace(/\D/g, ""),
+  });
+
+  if (!response.success) {
+    throw new Error(response.error?.message ?? "Falha ao atualizar perfil");
+  }
+
+  return {
+    name: response.data.full_name || response.data.nome || data.name.trim(),
+    phone: response.data.phone ?? data.phone.replace(/\D/g, ""),
   };
 }
 
@@ -114,7 +135,7 @@ export async function loginService(data: LoginPayload): Promise<AuthResponse> {
 
     if (!profileResponse.success) {
       throw new Error(
-        profileResponse.error?.message ?? "Falha ao buscar perfil do usuario",
+        profileResponse.error?.message ?? "Falha ao buscar perfil do usuário",
       );
     }
 
@@ -122,7 +143,7 @@ export async function loginService(data: LoginPayload): Promise<AuthResponse> {
 
     if (isRealAdminEmail(data.email) && !user.isAdmin) {
       throw new Error(
-        "Usuario admin autenticado, mas sem permissao administrativa no backend.",
+        "Conta administrativa sem permissão ativa.",
       );
     }
 
@@ -140,7 +161,7 @@ export async function loginService(data: LoginPayload): Promise<AuthResponse> {
         }));
       }
     } catch {
-      // Clientes e admins nao precisam ter perfil de prestador.
+      // Clientes e admins não precisam ter perfil de prestador.
     }
 
     return {
@@ -153,8 +174,8 @@ export async function loginService(data: LoginPayload): Promise<AuthResponse> {
       throw Object.assign(
         new Error(
           apiMessage
-            ? `Nao foi possivel autenticar o admin real: ${apiMessage}`
-            : "Nao foi possivel autenticar o admin real. Verifique se o backend esta rodando e se o seed de admin foi executado.",
+            ? `Não foi possível autenticar a conta administrativa: ${apiMessage}`
+            : "Não foi possível autenticar a conta administrativa.",
         ),
         { cause: error },
       );
@@ -173,27 +194,27 @@ export async function registerService(
     response = await authApi.register(data);
   } catch (error) {
     throw Object.assign(
-      new Error(getApiErrorMessage(error) ?? "Falha ao cadastrar usuario"),
+      new Error(getApiErrorMessage(error) ?? "Falha ao cadastrar usuário"),
       { cause: error },
     );
   }
 
   if (!response.success) {
-    throw new Error(response.error?.message ?? "Falha ao cadastrar usuario");
+    throw new Error(response.error?.message ?? "Falha ao cadastrar usuário");
   }
 
   const profileResponse = await authApi.me(response.data.access_token);
 
   if (!profileResponse.success) {
     throw new Error(
-      profileResponse.error?.message ?? "Falha ao recuperar perfil de usuario",
+      profileResponse.error?.message ?? "Falha ao recuperar perfil de usuário",
     );
   }
 
   if (data.role === UserRole.PROVIDER && data.specialtyIds?.length) {
     const specialties = await resolveSpecialtiesById(data.specialtyIds);
     if (specialties.length !== data.specialtyIds.length) {
-      throw new Error("Uma ou mais especialidades selecionadas nao existem.");
+      throw new Error("Uma ou mais especialidades selecionadas não existem.");
     }
   }
 

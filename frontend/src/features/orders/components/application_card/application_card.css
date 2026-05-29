@@ -5,12 +5,13 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
+  box-shadow: var(--shadow-card);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .application-card:hover {
   border-color: var(--color-brand);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .application-card__header {
@@ -74,9 +75,10 @@
 
 .application-card__specialty-tag {
   padding: 0.25rem 0.6rem;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: var(--color-brand-light);
-  color: var(--color-brand-dark);
+  background: var(--color-surface-elevated);
+  color: var(--color-text-secondary);
   font-size: 0.74rem;
   font-weight: 800;
 }
@@ -97,7 +99,13 @@
   font-size: 0.86rem;
   font-weight: 800;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.16s ease;
+}
+
+.application-card__btn:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .application-card__btn:disabled {

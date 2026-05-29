@@ -3,8 +3,9 @@
   gap: 1rem;
   padding: 1.25rem;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--color-card);
+  box-shadow: var(--shadow-card);
 }
 
 .register-form__header {
@@ -41,10 +42,19 @@
   padding: 0.85rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
   color: var(--color-text-secondary);
   text-align: left;
   cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.register-form__role-card:hover:not(:disabled) {
+  border-color: var(--color-brand);
+  transform: translateY(-1px);
 }
 
 .register-form__role-card strong {
@@ -69,7 +79,7 @@
   padding: 0.85rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
 }
 
 .register-form__provider-fields label,
@@ -110,11 +120,12 @@
   border-radius: 999px;
   background: var(--color-card);
   color: var(--color-text);
+  cursor: pointer;
 }
 
 .register-form__error {
   padding: 0.85rem 1rem;
-  border: 1px solid #fecaca;
+  border: 1px solid var(--color-danger);
   border-radius: 8px;
   background: var(--color-danger-bg);
   color: var(--color-danger);
