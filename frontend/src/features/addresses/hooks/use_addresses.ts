@@ -43,7 +43,7 @@ export function useAddresses() {
 
       setAddresses(data);
     } catch {
-      setError("Nao foi possivel carregar os enderecos mockados.");
+      setError("Não foi possível carregar os endereços mockados.");
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ export function useAddresses() {
 
   function validateForm() {
     if (!form.label.trim()) {
-      return "Informe um nome para o endereco.";
+      return "Informe um nome para o endereço.";
     }
 
     if (!/^\d{8}$/.test(form.zipCode.replace(/\D/g, ""))) {
@@ -133,7 +133,7 @@ export function useAddresses() {
       ]);
       setForm(INITIAL_FORM);
     } catch {
-      setError("Nao foi possivel salvar o endereco mockado.");
+      setError("Não foi possível salvar o endereço mockado.");
     } finally {
       setSubmitting(false);
     }
@@ -151,7 +151,7 @@ export function useAddresses() {
         ),
       );
     } catch {
-      setError("Nao foi possivel remover o endereco mockado.");
+      setError("Não foi possível remover o endereço mockado.");
     }
   }
 

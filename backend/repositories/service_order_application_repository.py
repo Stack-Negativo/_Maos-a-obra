@@ -2,10 +2,21 @@ from collections.abc import Sequence
 from uuid import UUID
 
 from sqlalchemy import select, update
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from domain.enums import ApplicationStatus
+from models.provider import Provider, ProviderSpecialty
 from models.service_order_application import ServiceOrderApplication
+
+
+def load_application_provider():
+    return (
+        selectinload(ServiceOrderApplication.provider).selectinload(Provider.user),
+        selectinload(ServiceOrderApplication.provider)
+        .selectinload(Provider.specialties)
+        .selectinload(ProviderSpecialty.specialty),
+    )
 
 
 class ServiceOrderApplicationRepository:
@@ -20,9 +31,9 @@ class ServiceOrderApplicationRepository:
 
     async def get_by_id(self, application_id: UUID) -> ServiceOrderApplication | None:
         result = await self.session.execute(
-            select(ServiceOrderApplication).where(
-                ServiceOrderApplication.id == application_id
-            )
+            select(ServiceOrderApplication)
+            .options(*load_application_provider())
+            .where(ServiceOrderApplication.id == application_id)
         )
         return result.scalars().first()
 
@@ -30,9 +41,11 @@ class ServiceOrderApplicationRepository:
         self, order_id: UUID, provider_id: UUID
     ) -> ServiceOrderApplication | None:
         result = await self.session.execute(
-            select(ServiceOrderApplication).where(
-                ServiceOrderApplication.service_order_id == order_id,
-                ServiceOrderApplication.provider_id == provider_id,
+            select(ServiceOrderApplication)
+            .options(*load_application_provider())
+            .where(
+                    ServiceOrderApplication.service_order_id == order_id,
+                    ServiceOrderApplication.provider_id == provider_id,
             )
         )
         return result.scalars().first()
@@ -40,6 +53,7 @@ class ServiceOrderApplicationRepository:
     async def list_by_order(self, order_id: UUID) -> Sequence[ServiceOrderApplication]:
         result = await self.session.execute(
             select(ServiceOrderApplication)
+            .options(*load_application_provider())
             .where(ServiceOrderApplication.service_order_id == order_id)
             .order_by(ServiceOrderApplication.created_at.desc())
         )

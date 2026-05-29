@@ -28,13 +28,13 @@ export function AddressesPage() {
       <section className="addresses-page">
       <header className="addresses-page__header">
         <div>
-          <h1>Enderecos</h1>
+          <h1>Endereços</h1>
           <p>
-            Cadastre enderecos mockados para validar a etapa que antecede a
-            criacao de ordens de servico.
+            Cadastre endereços mockados para validar a etapa que antecede a
+            criação de ordens de serviço.
           </p>
           <p className="addresses-page__summary">
-            {totalAddresses} endereco{totalAddresses === 1 ? "" : "s"} no
+            {totalAddresses} endereço{totalAddresses === 1 ? "" : "s"} no
             ambiente de teste.
           </p>
         </div>
@@ -55,7 +55,7 @@ export function AddressesPage() {
           }}
         >
           <div>
-            <h2>Novo endereco</h2>
+            <h2>Novo endereço</h2>
             <p>Dados salvos apenas no navegador para testes do MVP.</p>
           </div>
 
@@ -86,7 +86,7 @@ export function AddressesPage() {
               disabled={submitting}
             />
             <Input
-              placeholder="Numero"
+              placeholder="Número"
               value={form.number}
               onChange={(event) => updateField("number", event.target.value)}
               disabled={submitting}
@@ -127,18 +127,18 @@ export function AddressesPage() {
             className="address-form__submit"
             disabled={submitting}
           >
-            {submitting ? "Salvando..." : "Adicionar endereco"}
+            {submitting ? "Salvando..." : "Adicionar endereço"}
           </button>
         </form>
 
         <section className="addresses-list">
           <div className="addresses-list__toolbar">
             <Input
-              placeholder="Buscar endereco"
+              placeholder="Buscar endereço"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               disabled={loading}
-              aria-label="Buscar endereco"
+              aria-label="Buscar endereço"
             />
             <button
               type="button"
@@ -152,10 +152,10 @@ export function AddressesPage() {
           </div>
 
           {loading ? (
-            <p className="addresses-list__state">Carregando enderecos...</p>
+            <p className="addresses-list__state">Carregando endereços...</p>
           ) : addresses.length === 0 ? (
             <p className="addresses-list__state">
-              Nenhum endereco encontrado.
+              Nenhum endereço encontrado.
             </p>
           ) : (
             <div className="addresses-list__items">

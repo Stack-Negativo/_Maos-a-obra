@@ -13,8 +13,8 @@ export function AuthLayout({
     <main className="auth-layout">
       <section className="auth-layout__content">
         <div className="auth-layout__brand">
-          <strong>Maos a Obra</strong>
-          <p>Teste login, cadastro e especialidades no painel do MVP.</p>
+          <strong>Mãos à Obra</strong>
+          <p>Teste os perfis de cliente, prestador e admin no MVP.</p>
         </div>
 
         {children}

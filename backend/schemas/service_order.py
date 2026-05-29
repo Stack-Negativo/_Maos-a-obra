@@ -6,6 +6,10 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from core.exceptions import ValidationException
+from schemas.address import AddressResponse
+from schemas.service_order_application import ApplicationResponse
+from schemas.specialty import SpecialtyResponse
+from schemas.provider import ProviderResponse
 from domain.enums import OrderStatus
 from domain.value_objects.date_range import DateRange
 
@@ -62,6 +66,10 @@ class ServiceOrderResponse(ServiceOrderBase):
     estimated_price: Decimal | None = None
     final_price: Decimal | None = None
     cancellation_reason: str | None = None
+    address: AddressResponse
+    specialty: SpecialtyResponse
+    provider: ProviderResponse | None = None
+    applications: list[ApplicationResponse] | None = None
     created_at: datetime
     updated_at: datetime
 

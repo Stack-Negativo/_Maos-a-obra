@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from uuid import UUID
 
 from core.exceptions import (
@@ -90,3 +91,39 @@ class ProviderService:
 
     async def list_active_providers(self):
         return await self.provider_repository.get_all_active()
+
+    async def list_all_providers(self):
+        return await self.provider_repository.get_all()
+
+    async def list_suspended_providers(self):
+        return await self.provider_repository.get_all_suspended()
+
+    async def suspend_provider(self, provider_id: UUID) -> Provider:
+        provider = await self.provider_repository.get_by_id(provider_id)
+        if not provider:
+            raise NotFoundException("Provider profile not found")
+
+        provider.is_suspended = True
+        provider.suspended_at = datetime.now(UTC)
+
+        await self.provider_repository.session.commit()
+
+        updated_provider = await self.provider_repository.get_by_id(provider.id)
+        if not updated_provider:
+            raise NotFoundException("Provider disappeared after suspension")
+        return updated_provider
+
+    async def unsuspend_provider(self, provider_id: UUID) -> Provider:
+        provider = await self.provider_repository.get_by_id(provider_id)
+        if not provider:
+            raise NotFoundException("Provider profile not found")
+
+        provider.is_suspended = False
+        provider.suspended_at = None
+
+        await self.provider_repository.session.commit()
+
+        updated_provider = await self.provider_repository.get_by_id(provider.id)
+        if not updated_provider:
+            raise NotFoundException("Provider disappeared after reactivation")
+        return updated_provider

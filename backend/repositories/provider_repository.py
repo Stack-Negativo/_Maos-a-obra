@@ -18,6 +18,7 @@ class ProviderRepository:
             select(Provider)
             .where(Provider.id == provider_id)
             .options(
+                selectinload(Provider.user),
                 selectinload(Provider.specialties).selectinload(
                     ProviderSpecialty.specialty
                 )
@@ -30,6 +31,7 @@ class ProviderRepository:
             select(Provider)
             .where(Provider.user_id == user_id)
             .options(
+                selectinload(Provider.user),
                 selectinload(Provider.specialties).selectinload(
                     ProviderSpecialty.specialty
                 )
@@ -64,9 +66,34 @@ class ProviderRepository:
             select(Provider)
             .where(Provider.is_suspended.is_(False))
             .options(
+                selectinload(Provider.user),
                 selectinload(Provider.specialties).selectinload(
                     ProviderSpecialty.specialty
                 )
+            )
+        )
+        return result.scalars().all()
+
+    async def get_all(self) -> Sequence[Provider]:
+        result = await self.session.execute(
+            select(Provider).options(
+                selectinload(Provider.user),
+                selectinload(Provider.specialties).selectinload(
+                    ProviderSpecialty.specialty
+                ),
+            )
+        )
+        return result.scalars().all()
+
+    async def get_all_suspended(self) -> Sequence[Provider]:
+        result = await self.session.execute(
+            select(Provider)
+            .where(Provider.is_suspended.is_(True))
+            .options(
+                selectinload(Provider.user),
+                selectinload(Provider.specialties).selectinload(
+                    ProviderSpecialty.specialty
+                ),
             )
         )
         return result.scalars().all()

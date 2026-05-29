@@ -57,3 +57,17 @@ async def accept_application(
     ],
 ):
     return await service.accept_application(current_user.id, application_id)
+
+
+@router.post(
+    "/{application_id}/reject",
+    response_model=ApplicationResponse,
+)
+async def reject_application(
+    application_id: UUID,
+    current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[
+        ServiceOrderApplicationService, Depends(get_application_service)
+    ],
+):
+    return await service.reject_application(current_user.id, application_id)

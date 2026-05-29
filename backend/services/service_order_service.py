@@ -110,6 +110,12 @@ class ServiceOrderService:
         orders = await self.order_repository.list_by_client(client_id)
         return list(orders)
 
+    async def list_provider_orders(
+        self, provider_user_id: UUID,
+    ) -> list[ServiceOrder]:
+        orders = await self.order_repository.list_all()
+        return list(orders)
+
     async def cancel_order(
         self, order_id: UUID, client_id: UUID, reason: str
     ) -> ServiceOrder:
@@ -143,6 +149,38 @@ class ServiceOrderService:
         await self.order_repository.session.commit()
         await self.order_repository.session.refresh(order)
         return order
+
+    async def cancel_order_as_admin(
+        self, order_id: UUID, admin_user_id: UUID, reason: str
+    ) -> ServiceOrder:
+        order = await self.order_repository.get_by_id_for_update(order_id)
+        if not order:
+            raise NotFoundException("Ordem de Serviço não encontrada.")
+
+        if not reason:
+            raise ValidationException("O motivo do cancelamento é obrigatório.")
+
+        old_status = order.status
+        OrderStateMachine.validate_transition(old_status, OrderStatus.CANCELLED)
+
+        order.status = OrderStatus.CANCELLED
+        order.cancellation_reason = reason
+
+        await self._record_history(
+            order_id=order.id,
+            new_status=order.status,
+            old_status=old_status,
+            actor_id=admin_user_id,
+            reason=reason,
+        )
+
+        await self.order_repository.session.commit()
+        await self.order_repository.session.refresh(order)
+        return order
+
+    async def list_all_orders(self) -> list[ServiceOrder]:
+        orders = await self.order_repository.list_all()
+        return list(orders)
 
     async def start_execution(self, order_id: UUID, user_id: UUID) -> ServiceOrder:
         """

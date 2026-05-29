@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuthContext } from "@/app/providers/auth_provider";
+import { UserRole } from "../types/auth_types";
 
 export function useAuth() {
   const navigate = useNavigate();
@@ -22,24 +23,19 @@ export function useAuth() {
   const [error, setError] =
     useState<string | null>(null);
 
-  function validateLogin() {
-    if (
-      !email.trim() ||
-      !password.trim()
-    ) {
-      return "Preencha email e senha.";
-    }
+  async function handleLogin(
+    credentials?: {
+      email: string;
+      password: string;
+    },
+  ) {
+    const nextEmail =
+      credentials?.email ?? email;
+    const nextPassword =
+      credentials?.password ?? password;
 
-    if (!email.includes("@")) {
-      return "Informe um email valido.";
-    }
-
-    return null;
-  }
-
-  async function handleLogin() {
     const validationError =
-      validateLogin();
+      validateLoginCredentials(nextEmail, nextPassword);
 
     if (validationError) {
       setError(validationError);
@@ -51,11 +47,26 @@ export function useAuth() {
       setError(null);
 
       await signIn({
-        email: email.trim(),
-        password,
+        email: nextEmail.trim(),
+        password: nextPassword,
       });
 
-      navigate("/dashboard");
+      const storedUser = localStorage.getItem("user");
+      const parsedUser = storedUser
+        ? (JSON.parse(storedUser) as { role?: UserRole })
+        : null;
+
+      if (parsedUser?.role === UserRole.ADMIN) {
+        navigate("/orders/admin");
+        return;
+      }
+
+      if (parsedUser?.role === UserRole.PROVIDER) {
+        navigate("/orders/provider");
+        return;
+      }
+
+      navigate("/orders/client");
     } catch (err) {
       setError(
         err instanceof Error
@@ -65,6 +76,24 @@ export function useAuth() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function validateLoginCredentials(
+    loginEmail: string,
+    loginPassword: string,
+  ) {
+    if (
+      !loginEmail.trim() ||
+      !loginPassword.trim()
+    ) {
+      return "Preencha email e senha.";
+    }
+
+    if (!loginEmail.includes("@")) {
+      return "Informe um email válido.";
+    }
+
+    return null;
   }
 
   return {

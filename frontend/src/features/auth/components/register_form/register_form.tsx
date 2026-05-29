@@ -1,22 +1,66 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuthContext } from "@/app/providers/auth_provider/use_auth_context";
-import { registerService } from "@/features/auth/services/auth_service";
+import {
+  MOCK_PROVIDER_SPECIALTIES,
+  becomeProviderService,
+  registerService,
+} from "@/features/auth/services/auth_service";
+import { listSpecialties } from "@/features/specialties/services/specialties_service";
+import type { Specialty } from "@/features/specialties/types/specialty_types";
+import type { User } from "@/features/auth/types/auth_types";
+import { UserRole } from "@/features/auth/types/auth_types";
 import { Input } from "@/shared/ui/input";
 
 import "./register_form.css";
 
 export function RegisterForm() {
   const navigate = useNavigate();
-  const { signIn } = useAuthContext();
+  const { signIn, updateUser } = useAuthContext();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [accountType, setAccountType] = useState<
+    UserRole.CLIENT | UserRole.PROVIDER
+  >(UserRole.CLIENT);
+  const [bio, setBio] = useState("");
+  const [specialtyIds, setSpecialtyIds] = useState<string[]>([
+    MOCK_PROVIDER_SPECIALTIES[0].id,
+  ]);
+  const [specialtyOptions, setSpecialtyOptions] = useState<Specialty[]>(
+    MOCK_PROVIDER_SPECIALTIES,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadSpecialties() {
+      try {
+        const specialties = await listSpecialties();
+        const activeSpecialties = specialties.filter(
+          (specialty) => specialty.isActive,
+        );
+
+        if (activeSpecialties.length > 0) {
+          setSpecialtyOptions(activeSpecialties);
+          setSpecialtyIds((currentIds) =>
+            currentIds.some((id) =>
+              activeSpecialties.some((specialty) => specialty.id === id),
+            )
+              ? currentIds
+              : [activeSpecialties[0].id],
+          );
+        }
+      } catch {
+        setSpecialtyOptions(MOCK_PROVIDER_SPECIALTIES);
+      }
+    }
+
+    void loadSpecialties();
+  }, []);
 
   function validateRegister() {
     if (
@@ -33,7 +77,7 @@ export function RegisterForm() {
     }
 
     if (!email.includes("@")) {
-      return "Informe um email valido.";
+      return "Informe um email válido.";
     }
 
     if (password.length < 8) {
@@ -41,11 +85,21 @@ export function RegisterForm() {
     }
 
     if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
-      return "A senha deve ter pelo menos uma letra e um numero.";
+      return "A senha deve ter pelo menos uma letra e um número.";
     }
 
     if (!/^\d{10,11}$/.test(phone.replace(/\D/g, ""))) {
-      return "Informe um telefone com 10 ou 11 digitos.";
+      return "Informe um telefone com 10 ou 11 dígitos.";
+    }
+
+    if (accountType === UserRole.PROVIDER) {
+      if (bio.trim().length < 20) {
+        return "Descreva sua experiência como prestador em pelo menos 20 caracteres.";
+      }
+
+      if (specialtyIds.length === 0) {
+        return "Selecione pelo menos uma especialidade.";
+      }
     }
 
     return null;
@@ -72,6 +126,9 @@ export function RegisterForm() {
         email: cleanEmail,
         senha: password,
         telefone: phone.replace(/\D/g, ""),
+        role: accountType,
+        bio,
+        specialtyIds,
       });
 
       await signIn({
@@ -79,12 +136,31 @@ export function RegisterForm() {
         password,
       });
 
-      navigate("/dashboard");
+      if (accountType === UserRole.PROVIDER) {
+        const storedUser = localStorage.getItem("user");
+        const signedUser = storedUser
+          ? (JSON.parse(storedUser) as User)
+          : null;
+
+        if (signedUser) {
+          const providerUser = await becomeProviderService(signedUser, {
+            bio,
+            specialtyIds,
+          });
+          updateUser(providerUser);
+        }
+      }
+
+      navigate(
+        accountType === UserRole.PROVIDER
+          ? "/orders/provider"
+          : "/orders/client",
+      );
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Erro ao cadastrar usuario.",
+          : "Erro ao cadastrar usuário.",
       );
     } finally {
       setLoading(false);
@@ -101,7 +177,7 @@ export function RegisterForm() {
     >
       <div className="register-form__header">
         <h1>Cadastre-se</h1>
-        <p>Crie sua conta para testar o fluxo autenticado do MVP.</p>
+        <p>Escolha como quer entrar no MVP e siga para o painel correto.</p>
       </div>
 
       {error ? (
@@ -111,6 +187,35 @@ export function RegisterForm() {
       ) : null}
 
       <div className="register-form__fields">
+        <div className="register-form__role-grid" role="radiogroup">
+          <button
+            type="button"
+            className={
+              accountType === UserRole.CLIENT
+                ? "register-form__role-card register-form__role-card--active"
+                : "register-form__role-card"
+            }
+            onClick={() => setAccountType(UserRole.CLIENT)}
+            disabled={loading}
+          >
+            <strong>Cliente</strong>
+            <span>Criar ordens, escolher prestadores e avaliar serviços.</span>
+          </button>
+          <button
+            type="button"
+            className={
+              accountType === UserRole.PROVIDER
+                ? "register-form__role-card register-form__role-card--active"
+                : "register-form__role-card"
+            }
+            onClick={() => setAccountType(UserRole.PROVIDER)}
+            disabled={loading}
+          >
+            <strong>Prestador</strong>
+            <span>Ver ordens disponíveis e se candidatar a serviços.</span>
+          </button>
+        </div>
+
         <Input
           name="name"
           placeholder="Nome"
@@ -146,6 +251,42 @@ export function RegisterForm() {
           autoComplete="tel"
           inputMode="tel"
         />
+
+        {accountType === UserRole.PROVIDER && (
+          <div className="register-form__provider-fields">
+            <label>
+              Bio profissional
+              <textarea
+                value={bio}
+                onChange={(event) => setBio(event.target.value)}
+                disabled={loading}
+                placeholder="Conte sua experiência, região de atendimento e tipo de serviço que faz."
+              />
+            </label>
+            <fieldset>
+              <legend>Especialidades</legend>
+              <div className="register-form__specialties">
+                {specialtyOptions.map((specialty) => (
+                  <label key={specialty.id}>
+                    <input
+                      type="checkbox"
+                      checked={specialtyIds.includes(specialty.id)}
+                      onChange={(event) => {
+                        setSpecialtyIds((currentIds) =>
+                          event.target.checked
+                            ? [...currentIds, specialty.id]
+                            : currentIds.filter((id) => id !== specialty.id),
+                        );
+                      }}
+                      disabled={loading}
+                    />
+                    <span>{specialty.name}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+        )}
       </div>
 
       <button
@@ -158,7 +299,7 @@ export function RegisterForm() {
 
       <div className="register-form__footer">
         <p>
-          Ja tem conta? <Link to="/">Entre</Link>
+          Já tem conta? <Link to="/">Entre</Link>
         </p>
       </div>
     </form>

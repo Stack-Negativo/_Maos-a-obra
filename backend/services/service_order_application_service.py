@@ -164,6 +164,42 @@ class ServiceOrderApplicationService:
         await self.application_repository.session.refresh(application)
         return application
 
+    async def reject_application(
+        self, client_user_id: UUID, application_id: UUID
+    ) -> ServiceOrderApplication:
+        application = await self.application_repository.get_by_id(application_id)
+        if not application:
+            raise NotFoundException("Candidatura não encontrada.")
+
+        if application.status != ApplicationStatus.PENDING:
+            raise BusinessRuleViolation(
+                "Apenas candidaturas pendentes podem ser recusadas."
+            )
+
+        order = await self.order_repository.get_by_id(application.service_order_id)
+        if not order:
+            raise NotFoundException("Ordem de Serviço vinculada não encontrada.")
+
+        if order.client_id != client_user_id:
+            raise BusinessRuleViolation(
+                "Você não tem permissão para recusar candidaturas nesta ordem."
+            )
+
+        application.status = ApplicationStatus.REJECTED
+
+        history = ServiceOrderHistory(
+            service_order_id=order.id,
+            old_status=order.status,
+            new_status=order.status,
+            actor_id=client_user_id,
+            reason="Application rejected",
+        )
+        await self.history_repository.create(history)
+
+        await self.application_repository.session.commit()
+        await self.application_repository.session.refresh(application)
+        return application
+
     async def list_order_applications(
         self, user_id: UUID, order_id: UUID
     ) -> list[ServiceOrderApplication]:
@@ -173,6 +209,11 @@ class ServiceOrderApplicationService:
 
         # Rule: Only owner or admin can see all applications
         if order.client_id != user_id:
+            admin = await self.provider_repository.get_admin_by_user_id(user_id)
+            if admin:
+                apps = await self.application_repository.list_by_order(order_id)
+                return list(apps)
+
             # Check if user is a provider who applied
             provider = await self.provider_repository.get_by_user_id(user_id)
             if not provider:

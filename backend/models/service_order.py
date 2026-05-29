@@ -16,6 +16,7 @@ from domain.value_objects.money import Money
 if TYPE_CHECKING:
     from models.address import Address
     from models.provider import Provider
+    from models.service_order_application import ServiceOrderApplication
     from models.specialty import Specialty
     from models.user import User
 
@@ -72,6 +73,11 @@ class ServiceOrder(BaseEntity, Base):
     )
     address: Mapped["Address"] = relationship("Address")
     specialty: Mapped["Specialty"] = relationship("Specialty")
+    applications: Mapped[list["ServiceOrderApplication"]] = relationship(
+        "ServiceOrderApplication",
+        back_populates="service_order",
+        cascade="all, delete-orphan",
+    )
 
     @property
     def preferred_range(self) -> DateRange:

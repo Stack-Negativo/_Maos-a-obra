@@ -31,7 +31,10 @@ class ServiceOrderApplication(BaseEntity, Base):
     )
 
     # Relationships
-    service_order: Mapped["ServiceOrder"] = relationship("ServiceOrder")
+    service_order: Mapped["ServiceOrder"] = relationship(
+        "ServiceOrder",
+        back_populates="applications",
+    )
     provider: Mapped["Provider"] = relationship("Provider")
 
     __table_args__ = (

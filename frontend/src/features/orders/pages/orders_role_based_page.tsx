@@ -1,4 +1,4 @@
-import { useAuth } from "@/features/auth/providers/auth_provider";
+import { useAuthContext } from "@/app/providers/auth_provider/use_auth_context";
 import { UserRole } from "@/features/auth/types/auth_types";
 import { OrdersPage } from "./orders_page";
 import { OrdersClientPage } from "./orders_client_page";
@@ -6,7 +6,7 @@ import { OrdersProviderPage } from "./orders_provider_page";
 import { OrdersAdminPage } from "./orders_admin_page";
 
 export function OrdersRoleBasedPage() {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
 
   if (!user) {
     return <div>Carregando...</div>;

@@ -1,10 +1,12 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from api import (
     addresses,
+    admin,
     auth,
     health,
     providers,
@@ -15,7 +17,7 @@ from api import (
     users,
 )
 from core.config import get_settings
-from core.database import check_db_connection
+from core.database import AsyncSessionLocal, check_db_connection
 from core.exceptions import (
     AuthenticationException,
     AuthorizationException,
@@ -27,6 +29,7 @@ from core.exceptions import (
     ValidationException,
 )
 from core.logging_config import setup_logging
+from services.admin_bootstrap import ensure_admin_user
 
 settings = get_settings()
 
@@ -41,6 +44,10 @@ async def lifespan(_app: FastAPI):
     if not await check_db_connection():
         raise RuntimeError("Database connection failed on startup!")
     print("Database connection successfully validated.")
+
+    async with AsyncSessionLocal() as session:
+        await ensure_admin_user(session, settings)
+    print("Admin user ensured.")
 
     yield
     # Clean up or shut down resources here if needed
@@ -57,6 +64,19 @@ app = FastAPI(
     docs_url="/api/v1/docs",
     redoc_url="/api/v1/redoc",
     openapi_url="/api/v1/openapi.json",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://0.0.0.0:5173",
+    ],
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1|0\.0\.0\.0|host\.docker\.internal|[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+):(5173|4173)",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -91,6 +111,7 @@ async def app_exception_handler(_request: Request, exc: BaseAppException):
 
 # Include API routers - Explicit Mapping
 app.include_router(health.router, prefix="/api/v1")
+app.include_router(admin.router, prefix="/api/v1/admin")
 app.include_router(auth.router, prefix="/api/v1/auth")
 app.include_router(users.router, prefix="/api/v1/users")
 app.include_router(providers.router, prefix="/api/v1/providers")

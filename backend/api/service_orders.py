@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 
 from models.user import User
+from repositories.provider_repository import ProviderRepository
 from schemas.review import (
     ReviewCreate,
     ReviewListResponse,
@@ -20,6 +21,7 @@ from services.service_order_service import ServiceOrderService
 
 from .deps import (
     get_current_user,
+    get_provider_repository,
     get_review_service,
     get_service_order_service,
 )
@@ -47,6 +49,19 @@ async def list_my_orders(
     return {"orders": orders}
 
 
+@router.get(
+    "/providers/me",
+    response_model=ServiceOrderListResponse,
+    summary="List orders available to providers",
+)
+async def list_provider_orders(
+    current_user: Annotated[User, Depends(get_current_user)],
+    service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
+):
+    orders = await service.list_provider_orders(current_user.id)
+    return {"orders": orders}
+
+
 @router.get("/{id}", response_model=ServiceOrderResponse)
 async def get_order(
     id: UUID,
@@ -54,11 +69,6 @@ async def get_order(
     service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
 ):
     order = await service.get_order(id)
-    # Check if user is owner or admin (future)
-    if order.client_id != current_user.id:
-        from core.exceptions import AuthorizationException
-
-        raise AuthorizationException("Você não tem permissão para acessar esta ordem.")
     return order
 
 
@@ -144,6 +154,7 @@ async def list_order_history(
     id: UUID,
     current_user: Annotated[User, Depends(get_current_user)],
     service: Annotated[ServiceOrderService, Depends(get_service_order_service)],
+    provider_repo: Annotated[ProviderRepository, Depends(get_provider_repository)],
 ):
     """
     List all status transitions and events for an OS.
@@ -152,8 +163,9 @@ async def list_order_history(
     order = await service.get_order(id)
     is_client = order.client_id == current_user.id
     is_provider = order.provider and order.provider.user_id == current_user.id
+    is_admin = bool(await provider_repo.get_admin_by_user_id(current_user.id))
 
-    if not (is_client or is_provider):
+    if not (is_client or is_provider or is_admin):
         from core.exceptions import AuthorizationException
 
         raise AuthorizationException(

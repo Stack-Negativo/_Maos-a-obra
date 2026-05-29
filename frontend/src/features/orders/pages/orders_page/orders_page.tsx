@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { AppShell } from "@/shared/components";
 import { useOrders } from "../../hooks/use_orders";
 import { OrderCard } from "../../components";
-import { OrderStatus } from "../../types";
 
 import "./orders_page.css";
 

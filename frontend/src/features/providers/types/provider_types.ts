@@ -2,6 +2,7 @@ import type { Specialty } from "@/features/specialties/types/specialty_types";
 
 export type ProviderProfile = {
   id: string;
+  userId?: string;
   name: string;
   bio: string;
   specialties: Specialty[];

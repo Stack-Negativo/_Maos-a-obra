@@ -24,6 +24,9 @@ class UserResponse(UserBase):
     id: UUID
     email: EmailStr
     is_active: bool
+    is_provider: bool = False
+    is_admin: bool = False
+    role: str = "CLIENT"
     created_at: datetime
     updated_at: datetime
 

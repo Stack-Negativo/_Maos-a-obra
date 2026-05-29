@@ -17,4 +17,31 @@ export const specialtiesApi = {
 
     return response.data;
   },
+
+  create: async (payload: {
+    name: string;
+    description: string;
+    is_active: boolean;
+  }) => {
+    const response = await httpClient.post<
+      BaseApiResponse<SpecialtyApiResponse>
+    >("/specialties/", payload);
+
+    return response.data;
+  },
+
+  update: async (
+    specialtyId: string,
+    payload: Partial<{
+      name: string;
+      description: string;
+      is_active: boolean;
+    }>,
+  ) => {
+    const response = await httpClient.patch<
+      BaseApiResponse<SpecialtyApiResponse>
+    >(`/specialties/${specialtyId}`, payload);
+
+    return response.data;
+  },
 };
