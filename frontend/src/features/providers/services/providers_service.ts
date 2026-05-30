@@ -13,11 +13,18 @@ export function notifyProvidersChanged() {
   window.dispatchEvent(new Event(PROVIDERS_CHANGED_EVENT));
 }
 
+function createProviderPhoto(seed: string) {
+  return `https://api.dicebear.com/9.x/personas/svg?seed=${encodeURIComponent(seed)}`;
+}
+
 function mapApiProvider(provider: ProviderApiResponse): ProviderProfile {
+  const name = provider.user?.full_name ?? provider.user_id;
+
   return {
     id: provider.id,
     userId: provider.user_id,
-    name: provider.user?.full_name ?? provider.user_id,
+    name,
+    photoUrl: createProviderPhoto(name),
     bio: provider.bio ?? "",
     specialties: provider.specialties.map((item) => ({
       id: item.specialty.id,
@@ -94,6 +101,7 @@ export function upsertMockProviderProfile(input: {
     id: input.id ?? input.userId ?? "",
     userId: input.userId,
     name: input.name,
+    photoUrl: createProviderPhoto(input.name),
     bio: input.bio,
     specialties: input.specialties,
     ratingAverage: 0,

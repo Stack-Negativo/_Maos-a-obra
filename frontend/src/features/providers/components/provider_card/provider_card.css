@@ -7,7 +7,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
   transition:
     transform 0.15s ease,
     border-color 0.15s ease,
@@ -25,7 +25,7 @@
 .provider-card:hover {
   transform: translateY(-1px);
   border-color: var(--color-provider);
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--shadow-card-hover), var(--shadow-inset);
 }
 
 .provider-card__top {
@@ -53,6 +53,14 @@
   color: var(--color-provider);
   font-size: 0.82rem;
   font-weight: 900;
+  box-shadow: var(--shadow-inset);
+  overflow: hidden;
+}
+
+.provider-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .provider-card__top strong {
@@ -74,6 +82,7 @@
   color: var(--color-success);
   font-size: 0.74rem;
   font-weight: 800;
+  box-shadow: var(--shadow-inset);
 }
 
 .provider-card__status--suspended {
@@ -95,6 +104,7 @@
   color: var(--color-text-secondary);
   font-size: 0.76rem;
   font-weight: 800;
+  box-shadow: var(--shadow-inset);
 }
 
 .provider-card__meta {
@@ -130,10 +140,12 @@
   transition:
     transform 0.16s ease,
     background 0.16s ease,
-    border-color 0.16s ease;
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .provider-card__actions button:hover:not(:disabled) {
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 16%, transparent);
   transform: translateY(-1px);
 }
 
@@ -146,6 +158,10 @@
   border-color: var(--color-danger);
   background: var(--color-danger-bg);
   color: var(--color-danger);
+}
+
+.provider-card__actions .provider-card__danger:hover:not(:disabled) {
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-danger) 14%, transparent);
 }
 
 @media (max-width: 560px) {

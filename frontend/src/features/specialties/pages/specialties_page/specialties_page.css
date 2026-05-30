@@ -19,7 +19,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .specialties-page__header::after {
@@ -55,6 +55,7 @@
   background: color-mix(in srgb, var(--color-brand-light) 72%, var(--color-card));
   color: var(--color-brand-dark) !important;
   font-weight: 700;
+  box-shadow: var(--shadow-inset);
 }
 
 .specialties-page__header-actions {
@@ -92,7 +93,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .specialties-page__actions .input {
@@ -129,7 +130,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .specialties-page__panel::before {
@@ -173,6 +174,8 @@
   background: var(--color-warning-bg);
   color: var(--color-warning);
   font-size: 0.8rem;
+  font-weight: 850;
+  box-shadow: var(--shadow-inset);
 }
 
 .specialties-page__form {
@@ -243,6 +246,8 @@
 }
 
 .specialties-page__request {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -251,6 +256,7 @@
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-inset);
   transition:
     border-color 0.16s ease,
     transform 0.16s ease,
@@ -259,7 +265,7 @@
 
 .specialties-page__request:hover {
   border-color: color-mix(in srgb, var(--color-brand) 34%, var(--color-border));
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
   transform: translateY(-1px);
 }
 
@@ -295,6 +301,7 @@
   color: var(--color-brand-dark);
   font-size: 0.76rem;
   font-weight: 850;
+  box-shadow: var(--shadow-inset);
 }
 
 .specialties-page__actions button:disabled {
@@ -308,7 +315,7 @@
   border-radius: 10px;
   background: var(--color-card);
   color: var(--color-text-secondary);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .specialties-page__state--error {

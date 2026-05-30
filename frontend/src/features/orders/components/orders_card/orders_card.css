@@ -1,14 +1,28 @@
 .orders-card {
+  position: relative;
+  overflow: hidden;
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 20px;
-  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: var(--shadow-card), var(--shadow-inset);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.orders-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-brand);
 }
 
 .orders-card:hover {
   border-color: color-mix(in srgb, var(--color-brand) 32%, var(--color-border));
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--shadow-card-hover), var(--shadow-inset);
   transform: translateY(-2px);
 }
 
@@ -43,11 +57,12 @@
 .orders-card__badge {
   display: inline-block;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  box-shadow: var(--shadow-inset);
 }
 
 .orders-card__badge--success {
@@ -104,8 +119,37 @@
   gap: 8px;
 }
 
-.orders-card__meta-icon {
-  font-size: 16px;
+.orders-card__meta-label {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: var(--color-surface-elevated);
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.orders-card__provider-avatar {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-provider-soft);
+  color: var(--color-provider);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.orders-card__provider-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .orders-card__rating {
@@ -135,9 +179,13 @@
   border: none;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 800;
   cursor: pointer;
-  transition: background-color 0.2s, opacity 0.2s;
+  transition:
+    background 0.16s ease,
+    opacity 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
 }
 
 .orders-card__btn--primary {
@@ -147,6 +195,8 @@
 
 .orders-card__btn--primary:hover:not(:disabled) {
   background-color: var(--color-brand-hover);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 18%, transparent);
+  transform: translateY(-1px);
 }
 
 .orders-card__btn--danger {
@@ -156,6 +206,7 @@
 
 .orders-card__btn--danger:hover:not(:disabled) {
   filter: brightness(0.95);
+  transform: translateY(-1px);
 }
 
 .orders-card__btn:disabled {

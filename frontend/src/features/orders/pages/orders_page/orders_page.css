@@ -15,7 +15,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .orders-page__header::after {
@@ -105,7 +105,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .orders-page__filters .input {
@@ -129,13 +129,19 @@
   font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
   white-space: nowrap;
 }
 
 .orders-page__filter-tab:hover {
   border-color: var(--color-brand);
   color: var(--color-brand);
+  transform: translateY(-1px);
 }
 
 .orders-page__filter-tab.active {
@@ -156,11 +162,17 @@
   font-weight: 800;
   text-decoration: none;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 18%, transparent);
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .orders-page__create-btn:hover {
-  opacity: 0.9;
+  background: var(--color-brand-hover);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--color-brand) 24%, transparent);
+  transform: translateY(-1px);
 }
 
 .orders-page__toolbar {
@@ -177,11 +189,18 @@
   font-size: 0.84rem;
   font-weight: 800;
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition:
+    border-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease,
+    background 0.16s ease;
 }
 
 .orders-page__refresh-btn:hover:not(:disabled) {
   border-color: var(--color-brand);
+  color: var(--color-brand-dark);
+  background: var(--color-surface-elevated);
+  transform: translateY(-1px);
 }
 
 .orders-page__refresh-btn:disabled {
@@ -229,7 +248,7 @@
   border-radius: 10px;
   background: var(--color-card);
   color: var(--color-text-secondary);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .orders-page__loading,
@@ -240,7 +259,7 @@
   background: var(--color-card);
   text-align: center;
   color: var(--color-text-secondary);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .orders-page__empty p {
@@ -295,7 +314,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .orders-flow-card--client {
@@ -304,6 +323,14 @@
 
 .orders-flow-card--provider {
   border-left: 4px solid var(--color-provider);
+}
+
+.orders-flow-card--provider::after {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-provider) 30%, transparent),
+    transparent 72%
+  );
 }
 
 .orders-flow-card::after {
@@ -348,6 +375,10 @@
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.orders-flow-card--provider .orders-flow-card__eyebrow {
+  color: var(--color-provider);
 }
 
 .orders-flow-card__status {
@@ -402,7 +433,8 @@
     background 0.16s ease,
     border-color 0.16s ease,
     color 0.16s ease,
-    transform 0.16s ease;
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .orders-flow-card__actions button:hover:not(:disabled),
@@ -410,6 +442,7 @@
 .orders-flow-card__review button:hover:not(:disabled),
 .orders-flow-card__link:hover {
   transform: translateY(-1px);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 18%, transparent);
 }
 
 .orders-flow-card__actions button:disabled,
@@ -423,6 +456,12 @@
   border: 1px solid var(--color-border);
   background: var(--color-card);
   color: var(--color-text-secondary);
+}
+
+.orders-flow-card__actions .orders-flow-card__ghost:hover:not(:disabled) {
+  border-color: var(--color-brand);
+  color: var(--color-brand-dark);
+  box-shadow: none;
 }
 
 .orders-flow-card__actions .orders-flow-card__ghost:hover,
@@ -578,7 +617,7 @@
   border: 1px solid color-mix(in srgb, var(--color-provider) 34%, var(--color-border));
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .orders-page__provider-context div {
@@ -611,7 +650,7 @@
   border: 1px solid color-mix(in srgb, var(--color-provider) 42%, var(--color-border));
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .orders-page__provider-management-head {
@@ -711,7 +750,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
   transition:
     transform 0.16s ease,
     box-shadow 0.16s ease,
@@ -721,7 +760,7 @@
 .orders-page__admin-workbench article:hover {
   transform: translateY(-1px);
   border-color: color-mix(in srgb, var(--color-brand) 36%, var(--color-border));
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--shadow-card-hover), var(--shadow-inset);
 }
 
 .orders-page__admin-workbench article::after {

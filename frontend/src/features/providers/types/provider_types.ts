@@ -4,6 +4,7 @@ export type ProviderProfile = {
   id: string;
   userId?: string;
   name: string;
+  photoUrl?: string;
   bio: string;
   specialties: Specialty[];
   ratingAverage: number;

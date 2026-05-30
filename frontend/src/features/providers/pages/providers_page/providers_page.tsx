@@ -9,6 +9,15 @@ import { useProviders } from "../../hooks/use_providers";
 
 import "./providers_page.css";
 
+function getProviderInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
 export function ProvidersPage() {
   const { user } = useAuthContext();
   const isProvider = user?.role === UserRole.PROVIDER;
@@ -232,9 +241,18 @@ export function ProvidersPage() {
                 {providers.map((provider) => (
                   <article className="providers-admin-card" key={provider.id}>
                     <div className="providers-admin-card__main">
-                      <div>
-                        <strong>{provider.name}</strong>
-                        <p>{provider.bio || "Bio profissional não informada."}</p>
+                      <div className="providers-admin-card__identity">
+                        <span className="providers-admin-card__avatar">
+                          {provider.photoUrl ? (
+                            <img src={provider.photoUrl} alt="" loading="lazy" />
+                          ) : (
+                            getProviderInitials(provider.name) || "P"
+                          )}
+                        </span>
+                        <div>
+                          <strong>{provider.name}</strong>
+                          <p>{provider.bio || "Bio profissional não informada."}</p>
+                        </div>
                       </div>
                       <span
                         className={

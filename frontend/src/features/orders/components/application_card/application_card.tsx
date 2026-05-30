@@ -22,6 +22,15 @@ const STATUS_COLORS = {
   REJECTED: "danger",
 };
 
+function getProviderInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
 export function ApplicationCard({
   provider,
   status,
@@ -37,12 +46,21 @@ export function ApplicationCard({
     <article className="application-card">
       <div className="application-card__header">
         <div className="application-card__provider">
-          <strong className="application-card__name">
-            {provider.name}
-          </strong>
-          <span className="application-card__rating">
-            ⭐ {provider.ratingAverage.toFixed(1)} ({provider.completedServices} serviços)
+          <span className="application-card__avatar">
+            {provider.photoUrl ? (
+              <img src={provider.photoUrl} alt="" loading="lazy" />
+            ) : (
+              getProviderInitials(provider.name) || "P"
+            )}
           </span>
+          <div>
+            <strong className="application-card__name">
+              {provider.name}
+            </strong>
+            <span className="application-card__rating">
+              Nota {provider.ratingAverage.toFixed(1)} ({provider.completedServices} serviços)
+            </span>
+          </div>
         </div>
         <span
           className={`application-card__status application-card__status--${statusColorClass}`}
@@ -73,14 +91,14 @@ export function ApplicationCard({
             onClick={onAccept}
             disabled={isLoading}
           >
-            {isLoading ? "Processando..." : "✓ Aceitar"}
+            {isLoading ? "Processando..." : "Aceitar"}
           </button>
           <button
             className="application-card__btn application-card__btn--reject"
             onClick={onReject}
             disabled={isLoading}
           >
-            {isLoading ? "Processando..." : "✕ Recusar"}
+            {isLoading ? "Processando..." : "Recusar"}
           </button>
         </div>
       )}

@@ -19,6 +19,7 @@ export interface Address {
 export interface Provider {
   id: string;
   name: string;
+  photoUrl?: string;
   bio?: string;
   ratingAverage: number;
   completedServices: number;

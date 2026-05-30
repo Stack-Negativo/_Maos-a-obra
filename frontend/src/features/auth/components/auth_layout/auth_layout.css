@@ -5,7 +5,9 @@
   place-items: center;
   padding: 2rem;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--color-brand) 12%, transparent), transparent 34%),
+    radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--color-brand) 16%, transparent), transparent 24rem),
+    radial-gradient(circle at 105% 20%, color-mix(in srgb, var(--color-provider) 12%, transparent), transparent 22rem),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-brand) 10%, transparent), transparent 34%),
     linear-gradient(180deg, var(--color-surface-elevated), var(--color-surface)),
     var(--color-surface);
 }
@@ -28,7 +30,8 @@
   width: 58px;
   height: 58px;
   margin-bottom: 1rem;
-  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--color-brand) 72%, var(--color-border));
+  border-radius: 14px;
   background: var(--color-brand);
   color: var(--color-on-brand);
   font-weight: 850;
@@ -60,4 +63,10 @@
   color: var(--color-brand);
   text-decoration: none;
   font-weight: 800;
+  transition: color 0.16s ease;
+}
+
+.auth-layout__footer a:hover {
+  color: var(--color-brand-hover);
+  text-decoration: underline;
 }

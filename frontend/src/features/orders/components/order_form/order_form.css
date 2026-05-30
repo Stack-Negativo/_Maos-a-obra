@@ -10,16 +10,29 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
 
 .order-form__guide {
   position: sticky;
   top: 92px;
+  overflow: hidden;
   display: grid;
   gap: 1rem;
   padding: 1rem;
   border-left: 4px solid var(--color-brand);
+}
+
+.order-form__guide::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-brand) 32%, transparent),
+    transparent 72%
+  );
 }
 
 .order-form__guide-eyebrow {
@@ -64,6 +77,7 @@
   background: var(--color-brand-light);
   color: var(--color-brand-dark);
   font-size: 0.78rem;
+  box-shadow: var(--shadow-inset);
 }
 
 .order-form__content {
@@ -98,6 +112,7 @@
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: var(--color-surface);
+  box-shadow: var(--shadow-inset);
 }
 
 .order-form__section-heading {
@@ -178,10 +193,14 @@
   font-family: inherit;
   outline: none;
   resize: vertical;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .order-form textarea:focus {
   border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 14%, transparent);
 }
 
 .order-form textarea:disabled {
@@ -205,10 +224,14 @@
   font-size: 0.92rem;
   outline: none;
   cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .order-form select:focus {
   border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 14%, transparent);
 }
 
 .order-form select:disabled {
@@ -231,11 +254,17 @@
   font-size: 0.95rem;
   font-weight: 850;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 18%, transparent);
+  transition:
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
 }
 
 .order-form__submit:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--color-brand-hover);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--color-brand) 24%, transparent);
+  transform: translateY(-1px);
 }
 
 .order-form__submit:disabled {

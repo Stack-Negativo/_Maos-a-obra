@@ -47,6 +47,10 @@ function createId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
 }
 
+function createProviderPhoto(seed: string) {
+  return `https://api.dicebear.com/9.x/personas/svg?seed=${encodeURIComponent(seed)}`;
+}
+
 const seededSpecialties: Specialty[] = [
   {
     id: "spec-eletrica",
@@ -117,6 +121,7 @@ const seededProviders: ProviderProfile[] = [
     id: "provider-rafael",
     userId: "user-prestador",
     name: "Rafael Prestador",
+    photoUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=160&q=80",
     bio: "Eletricista residencial com foco em reparos rápidos, instalações seguras e atendimento em apartamentos.",
     specialties: [seededSpecialties[0]],
     ratingAverage: 4.8,
@@ -127,6 +132,7 @@ const seededProviders: ProviderProfile[] = [
     id: "provider-lucas",
     userId: "user-lucas",
     name: "Lucas Hidráulica",
+    photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80",
     bio: "Especialista em vazamentos, torneiras, registros e manutenção hidráulica preventiva.",
     specialties: [seededSpecialties[1]],
     ratingAverage: 4.6,
@@ -137,6 +143,7 @@ const seededProviders: ProviderProfile[] = [
     id: "provider-paula",
     userId: "user-paula",
     name: "Paula Pinturas",
+    photoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80",
     bio: "Pintora residencial com experiência em acabamento fino, pintura interna e pequenos reparos.",
     specialties: [seededSpecialties[2]],
     ratingAverage: 4.9,
@@ -395,6 +402,7 @@ export const mockStore = {
         id: createId("provider"),
         userId: user.id,
         name: user.name,
+        photoUrl: createProviderPhoto(user.name),
         bio: input.bio ?? "",
         specialties,
         ratingAverage: 0,
@@ -448,6 +456,7 @@ export const mockStore = {
       id: storedUser.providerId ?? createId("provider"),
       userId: storedUser.id,
       name: storedUser.name,
+      photoUrl: createProviderPhoto(storedUser.name),
       bio: input.bio.trim(),
       specialties,
       ratingAverage: 0,
@@ -602,6 +611,7 @@ export const mockStore = {
       id: user.providerId ?? createId("provider"),
       userId: user.id,
       name: user.name,
+      photoUrl: createProviderPhoto(user.name),
       bio: payload.bio,
       specialties: payload.specialties,
       ratingAverage: 0,

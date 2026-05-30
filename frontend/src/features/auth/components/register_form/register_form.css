@@ -1,11 +1,21 @@
 .register-form {
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 1rem;
   padding: 1.25rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
+}
+
+.register-form::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-brand), var(--color-provider));
 }
 
 .register-form__header {
@@ -49,11 +59,13 @@
   transition:
     border-color 0.16s ease,
     background 0.16s ease,
-    transform 0.16s ease;
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .register-form__role-card:hover:not(:disabled) {
   border-color: var(--color-brand);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 12%, transparent);
   transform: translateY(-1px);
 }
 
@@ -101,6 +113,15 @@
   background: var(--color-card);
   color: var(--color-text);
   resize: vertical;
+  outline: none;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.register-form__provider-fields textarea:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 14%, transparent);
 }
 
 .register-form__specialties {
@@ -121,6 +142,16 @@
   background: var(--color-card);
   color: var(--color-text);
   cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.register-form__specialties label:hover {
+  border-color: var(--color-brand);
+  background: color-mix(in srgb, var(--color-brand-light) 46%, var(--color-card));
+  transform: translateY(-1px);
 }
 
 .register-form__error {
@@ -142,11 +173,17 @@
   color: var(--color-on-brand);
   font-weight: 800;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 18%, transparent);
+  transition:
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
 }
 
 .register-form__submit:hover {
   background: var(--color-brand-hover);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--color-brand) 24%, transparent);
+  transform: translateY(-1px);
 }
 
 .register-form__submit:disabled {

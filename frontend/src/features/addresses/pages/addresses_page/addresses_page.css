@@ -4,6 +4,8 @@
 }
 
 .addresses-page__header {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -13,7 +15,15 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
+}
+
+.addresses-page__header::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--color-brand);
 }
 
 .addresses-page__header h1 {
@@ -58,6 +68,20 @@
   font-size: 0.84rem;
   font-weight: 800;
   text-decoration: none;
+  transition:
+    border-color 0.16s ease,
+    color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.addresses-page__back-link:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand-dark);
+  background: var(--color-surface-elevated);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--color-brand) 12%, transparent);
+  transform: translateY(-1px);
 }
 
 .addresses-page__content {
@@ -75,7 +99,12 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
+}
+
+.address-form {
+  position: sticky;
+  top: 86px;
 }
 
 .address-form h2 {
@@ -128,6 +157,18 @@
   border: 1px solid var(--color-brand);
   background: var(--color-brand);
   color: var(--color-on-brand);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 16%, transparent);
+  transition:
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.address-form__submit:hover:not(:disabled),
+.addresses-list__toolbar button:hover:not(:disabled) {
+  background: var(--color-brand-hover);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--color-brand) 22%, transparent);
+  transform: translateY(-1px);
 }
 
 .address-form__submit:disabled,
@@ -148,6 +189,7 @@
   border-radius: 10px;
   background: var(--color-surface-elevated);
   color: var(--color-text-secondary);
+  box-shadow: var(--shadow-inset);
 }
 
 .addresses-list__items {
@@ -156,6 +198,8 @@
 }
 
 .address-card {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -164,18 +208,41 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-inset);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.address-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-brand);
 }
 
 .address-card:hover {
   border-color: var(--color-brand);
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--shadow-card-hover), var(--shadow-inset);
+  transform: translateY(-1px);
 }
 
 .address-form__secondary {
   border: 1px solid var(--color-border);
   background: var(--color-card);
   color: var(--color-text-secondary);
+  transition:
+    border-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.address-form__secondary:hover:not(:disabled) {
+  border-color: var(--color-brand);
+  color: var(--color-brand-dark);
+  transform: translateY(-1px);
 }
 
 .address-form__actions,
@@ -203,6 +270,11 @@
   border: 1px solid var(--color-danger);
   background: var(--color-card);
   color: var(--color-danger);
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease;
 }
 
 .address-card__actions button:first-child {
@@ -212,6 +284,7 @@
 
 .address-card button:hover {
   background: var(--color-danger-bg);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 860px) {
@@ -233,5 +306,9 @@
 
   .address-card {
     display: grid;
+  }
+
+  .address-form {
+    position: static;
   }
 }
