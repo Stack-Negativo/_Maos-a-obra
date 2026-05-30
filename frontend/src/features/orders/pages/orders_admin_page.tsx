@@ -54,6 +54,7 @@ export function OrdersAdminPage() {
     error: providersError,
     suspendProvider,
     unsuspendProvider,
+    deleteProvider,
     refresh: refreshProviders,
   } = useProviders();
   const [search, setSearch] = useState("");
@@ -69,9 +70,21 @@ export function OrdersAdminPage() {
       setActionError(
         err instanceof Error
           ? err.message
-          : "Nao foi possivel executar a acao administrativa.",
+          : "Não foi possível concluir a ação administrativa.",
       );
     }
+  }
+
+  async function confirmDeleteProvider(providerId: string, providerName: string) {
+    const confirmed = window.confirm(
+      `Excluir o perfil de prestador de ${providerName}? Esta ação não remove o usuário e só será permitida se ele não estiver vinculado a ordens.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteProvider(providerId);
   }
 
   const filteredOrders = useMemo(
@@ -129,7 +142,7 @@ export function OrdersAdminPage() {
         <header className="orders-page__header">
           <div>
             <span className="orders-page__eyebrow">Administração</span>
-            <h1>Central Administrativa</h1>
+            <h1>Central administrativa</h1>
             <p>
               Acompanhe o funil inteiro de ordens, candidaturas,
               agendamentos, execução, pagamento e histórico finalizado.
@@ -177,10 +190,12 @@ export function OrdersAdminPage() {
           <div className="orders-page__provider-management-head">
             <div>
               <span className="orders-page__eyebrow">Gestão de prestadores</span>
-              <h2>Suspender ou reativar acesso</h2>
+              <h2>Suspender, reativar ou excluir acesso</h2>
               <p>
                 Controle administrativo direto: prestadores suspensos deixam de
-                participar do fluxo operacional até serem reativados.
+                participar do fluxo operacional até serem reativados. A exclusão
+                remove apenas o perfil de prestador quando ele ainda não possui
+                ordens vinculadas.
               </p>
             </div>
             <button
@@ -211,39 +226,53 @@ export function OrdersAdminPage() {
                   <div>
                     <strong>{provider.name}</strong>
                     <span>
-                      {provider.isSuspended ? "Suspenso" : "Ativo"} ·{" "}
+                      {provider.isSuspended ? "Suspenso" : "Ativo"} -{" "}
                       {provider.specialties
                         .map((specialty) => specialty.name)
                         .join(", ") || "Sem especialidade"}
                     </span>
                   </div>
 
-                  {provider.isSuspended ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void unsuspendProvider(provider.id);
-                      }}
-                      disabled={updatingProviderId === provider.id}
-                    >
-                      {updatingProviderId === provider.id
-                        ? "Reativando..."
-                        : "Reativar"}
-                    </button>
-                  ) : (
+                  <div className="orders-page__provider-actions">
+                    {provider.isSuspended ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          void unsuspendProvider(provider.id);
+                        }}
+                        disabled={updatingProviderId === provider.id}
+                      >
+                        {updatingProviderId === provider.id
+                          ? "Reativando..."
+                          : "Reativar"}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="orders-page__provider-management-danger"
+                        onClick={() => {
+                          void suspendProvider(provider.id);
+                        }}
+                        disabled={updatingProviderId === provider.id}
+                      >
+                        {updatingProviderId === provider.id
+                          ? "Suspendendo..."
+                          : "Suspender"}
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="orders-page__provider-management-danger"
                       onClick={() => {
-                        void suspendProvider(provider.id);
+                        void confirmDeleteProvider(provider.id, provider.name);
                       }}
                       disabled={updatingProviderId === provider.id}
                     >
                       {updatingProviderId === provider.id
-                        ? "Suspendendo..."
-                        : "Suspender"}
+                        ? "Processando..."
+                        : "Excluir perfil"}
                     </button>
-                  )}
+                  </div>
                 </article>
               ))}
             </div>
@@ -291,97 +320,6 @@ export function OrdersAdminPage() {
                 : ""}
             </p>
           </article>
-        </section>
-
-        <section className="orders-page__provider-control">
-          <div className="orders-page__section-heading">
-            <div>
-              <span className="orders-page__eyebrow">Controle operacional</span>
-              <h2>Prestadores</h2>
-              <p>
-                Suspenda temporariamente prestadores com baixa qualidade,
-                conflito operacional ou necessidade de revisão cadastral.
-              </p>
-            </div>
-            <button
-              type="button"
-              className="orders-page__refresh-btn"
-              onClick={() => {
-                void refreshProviders();
-              }}
-              disabled={providersLoading}
-            >
-              {providersLoading ? "Atualizando..." : "Atualizar prestadores"}
-            </button>
-          </div>
-
-          {providersError ? (
-            <p className="orders-page__state">{providersError}</p>
-          ) : providersLoading ? (
-            <p className="orders-page__state">Carregando prestadores...</p>
-          ) : providers.length === 0 ? (
-            <p className="orders-page__state">Nenhum prestador encontrado.</p>
-          ) : (
-            <div className="orders-page__provider-grid">
-              {providers.map((provider) => (
-                <article className="orders-page__provider-admin-card" key={provider.id}>
-                  <div className="orders-page__provider-admin-main">
-                    <div>
-                      <strong>{provider.name}</strong>
-                      <p>{provider.bio || "Bio profissional não informada."}</p>
-                    </div>
-                    <span
-                      className={
-                        provider.isSuspended
-                          ? "orders-page__provider-admin-status orders-page__provider-admin-status--suspended"
-                          : "orders-page__provider-admin-status"
-                      }
-                    >
-                      {provider.isSuspended ? "Suspenso" : "Ativo"}
-                    </span>
-                  </div>
-
-                  <div className="orders-page__provider-admin-meta">
-                    <span>Nota {provider.ratingAverage.toFixed(1)}</span>
-                    <span>{provider.completedServices} serviço(s)</span>
-                    <span>
-                      {provider.specialties.map((specialty) => specialty.name).join(", ")}
-                    </span>
-                  </div>
-
-                  <div className="orders-page__provider-admin-actions">
-                    <strong>Ação administrativa</strong>
-                    {provider.isSuspended ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          void unsuspendProvider(provider.id);
-                        }}
-                        disabled={updatingProviderId === provider.id}
-                      >
-                        {updatingProviderId === provider.id
-                          ? "Reativando..."
-                          : "Reativar prestador"}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="orders-page__provider-admin-danger"
-                        onClick={() => {
-                          void suspendProvider(provider.id);
-                        }}
-                        disabled={updatingProviderId === provider.id}
-                      >
-                        {updatingProviderId === provider.id
-                          ? "Suspendendo..."
-                          : "Suspender prestador"}
-                      </button>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
         </section>
 
         <section className="orders-page__filters">

@@ -3,8 +3,8 @@
 
   margin-bottom: 8px;
 
-  color: #111827;
+  color: var(--color-text);
 
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 750;
 }

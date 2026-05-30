@@ -48,6 +48,23 @@ const APPLICATION_STATUS_LABELS = {
   CANCELLED: "Cancelada",
 } as const;
 
+function getActionErrorMessage(error: unknown) {
+  return error instanceof Error
+    ? error.message
+    : "Não foi possível concluir esta ação agora.";
+}
+
+function formatHistoryActor(actor: string) {
+  const labels: Record<string, string> = {
+    ADMIN: "Admin",
+    CLIENT: "Cliente",
+    PROVIDER: "Prestador",
+    SYSTEM: "Sistema",
+  };
+
+  return labels[actor] ?? actor;
+}
+
 export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -61,6 +78,7 @@ export function OrderDetailPage() {
   const [scheduleValue, setScheduleValue] = useState("");
   const [detailRating, setDetailRating] = useState(5);
   const [detailComment, setDetailComment] = useState("");
+  const [actionError, setActionError] = useState<string | null>(null);
   const {
     getOrderById,
     acceptApplication,
@@ -215,6 +233,15 @@ export function OrderDetailPage() {
     },
   ];
 
+  const runOrderAction = async (action: () => Promise<void>) => {
+    try {
+      setActionError(null);
+      await action();
+    } catch (err) {
+      setActionError(getActionErrorMessage(err));
+    }
+  };
+
   return (
     <AppShell>
       <div className="order-detail-page">
@@ -307,7 +334,7 @@ export function OrderDetailPage() {
               <h2 className="order-detail-page__section-title">
                 Linha do tempo
               </h2>
-              <span>Fluxo completo da solicitação</span>
+              <span>Acompanhe o andamento do atendimento</span>
             </div>
             <ol className="order-detail-page__timeline">
               {timelineItems.map((item) => (
@@ -335,13 +362,18 @@ export function OrderDetailPage() {
                 <h2 className="order-detail-page__section-title">
                   Próxima ação
                 </h2>
-                <span>Execute somente a etapa disponível neste status</span>
+                <span>A etapa muda conforme a ordem avança</span>
               </div>
+              {actionError && (
+                <div className="order-detail-page__action-error" role="alert">
+                  {actionError}
+                </div>
+              )}
               <div className="orders-flow-card__actions">
                 {(canClientSchedule || canAdminSchedule) && (
                   <div className="order-detail-page__schedule-form">
                     <label className="orders-flow-card__field">
-                      Data e horário oficiais
+                      Data e horário combinados
                       <input
                         type="datetime-local"
                         min={minScheduleValue}
@@ -355,7 +387,9 @@ export function OrderDetailPage() {
                       type="button"
                       disabled={!selectedScheduleValue}
                       onClick={() =>
-                        scheduleOrder(order.id, selectedScheduleValue)
+                        void runOrderAction(() =>
+                          scheduleOrder(order.id, selectedScheduleValue),
+                        )
                       }
                     >
                       Confirmar agendamento
@@ -363,21 +397,33 @@ export function OrderDetailPage() {
                   </div>
                 )}
                 {(canProviderStart || canAdminStart) && (
-                  <button type="button" onClick={() => startOrder(order.id)}>
-                    Iniciar serviço
+                  <button
+                    type="button"
+                    onClick={() =>
+                      void runOrderAction(() => startOrder(order.id))
+                    }
+                  >
+                    Iniciar atendimento
                   </button>
                 )}
                 {(canProviderFinish || canAdminFinish) && (
-                  <button type="button" onClick={() => finishOrder(order.id)}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      void runOrderAction(() => finishOrder(order.id))
+                    }
+                  >
                     Encerrar atendimento
                   </button>
                 )}
                 {canAdminConfirm && (
                   <button
                     type="button"
-                    onClick={() => confirmFinished(order.id)}
+                    onClick={() =>
+                      void runOrderAction(() => confirmFinished(order.id))
+                    }
                   >
-                    Confirmar que o serviço foi finalizado
+                    Confirmar conclusão
                   </button>
                 )}
                 {canCancel && (
@@ -385,10 +431,12 @@ export function OrderDetailPage() {
                     type="button"
                     className="orders-flow-card__ghost"
                     onClick={() =>
-                      cancelOrder(
-                        order.id,
-                        "Cancelamento solicitado.",
-                        isAdmin ? "ADMIN" : "CLIENT",
+                      void runOrderAction(() =>
+                        cancelOrder(
+                          order.id,
+                          "Cancelamento solicitado.",
+                          isAdmin ? "ADMIN" : "CLIENT",
+                        ),
                       )
                     }
                   >
@@ -424,16 +472,18 @@ export function OrderDetailPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      confirmFinished(order.id, {
-                        rating: detailRating,
-                        comment: detailComment.trim() || undefined,
-                        reviewedAt: new Date().toISOString(),
+                      void runOrderAction(async () => {
+                        await confirmFinished(order.id, {
+                          rating: detailRating,
+                          comment: detailComment.trim() || undefined,
+                          reviewedAt: new Date().toISOString(),
+                        });
+                        setDetailRating(5);
+                        setDetailComment("");
                       });
-                      setDetailRating(5);
-                      setDetailComment("");
                     }}
                   >
-                    Confirmar que o serviço foi finalizado
+                    Confirmar conclusão
                   </button>
                 </form>
               )}
@@ -453,7 +503,7 @@ export function OrderDetailPage() {
           {order.history && order.history.length > 0 && (
             <section className="order-detail-page__section">
               <h2 className="order-detail-page__section-title">
-                Histórico de auditoria
+                Atualizações da ordem
               </h2>
               <div className="order-detail-page__audit-list">
                 {[...order.history].reverse().map((event) => (
@@ -466,7 +516,8 @@ export function OrderDetailPage() {
                       {event.description && <p>{event.description}</p>}
                     </div>
                     <span>
-                      {event.actor} · {formatDateTime(event.createdAt)}
+                      {formatHistoryActor(event.actor)} -{" "}
+                      {formatDateTime(event.createdAt)}
                     </span>
                   </article>
                 ))}
@@ -545,7 +596,9 @@ export function OrderDetailPage() {
                             <button
                               type="button"
                               onClick={() =>
-                                acceptApplication(order.id, application.id)
+                                void runOrderAction(() =>
+                                  acceptApplication(order.id, application.id),
+                                )
                               }
                             >
                               Aceitar
@@ -554,7 +607,9 @@ export function OrderDetailPage() {
                               type="button"
                               className="orders-flow-card__ghost"
                               onClick={() =>
-                                rejectApplication(order.id, application.id)
+                                void runOrderAction(() =>
+                                  rejectApplication(order.id, application.id),
+                                )
                               }
                             >
                               Recusar

@@ -58,7 +58,22 @@ export function OrdersClientPage() {
   const [viewMode, setViewMode] = useState<
     "active" | "selection" | "schedule" | "confirmation" | "history"
   >("active");
+  const [actionError, setActionError] = useState<string | null>(null);
   const minScheduleValue = toDateTimeLocalValue(new Date().toISOString());
+
+  async function runAction(action: () => Promise<void>) {
+    setActionError(null);
+
+    try {
+      await action();
+    } catch (err) {
+      setActionError(
+        err instanceof Error
+          ? err.message
+          : "Não foi possível concluir a ação. Tente novamente.",
+      );
+    }
+  }
 
   const visibleOrders = useMemo(() => {
     return orders.filter((order) => {
@@ -130,7 +145,7 @@ export function OrdersClientPage() {
     {
       label: "Agendar",
       value: counts.schedule,
-      text: "Prestadores aceitos aguardando horário oficial.",
+      text: "Prestadores aceitos aguardando horário.",
     },
     {
       label: "Confirmar finalização",
@@ -145,14 +160,14 @@ export function OrdersClientPage() {
         <header className="orders-page__header">
           <div>
             <span className="orders-page__eyebrow">Cliente</span>
-            <h1>Minhas Ordens de Serviço</h1>
+            <h1>Minhas ordens</h1>
             <p>
               Crie ordens, acompanhe candidaturas, selecione prestadores,
               confirme agendamentos e avalie serviços finalizados.
             </p>
             <p className="orders-page__summary">
               {visibleOrders.length} ordem
-              {visibleOrders.length === 1 ? "" : "s"} nesta visão
+              {visibleOrders.length === 1 ? "" : "s"} nesta etapa
             </p>
           </div>
 
@@ -161,7 +176,7 @@ export function OrdersClientPage() {
               className="orders-page__new-order-btn"
               onClick={() => navigate("/orders/create")}
             >
-              + Nova Ordem
+              Nova ordem
             </button>
           </div>
         </header>
@@ -210,7 +225,7 @@ export function OrdersClientPage() {
               }`}
               onClick={() => setViewMode("confirmation")}
             >
-              Confirmar serviço finalizado ({counts.confirmation})
+              Confirmar finalização ({counts.confirmation})
             </button>
             <button
               className={`orders-page__filter-tab ${
@@ -223,11 +238,30 @@ export function OrdersClientPage() {
           </div>
         </section>
 
+        {actionError && (
+          <p className="orders-page__error" role="alert">
+            {actionError}
+          </p>
+        )}
+
         {loading ? (
           <p className="orders-page__state">Carregando ordens...</p>
         ) : visibleOrders.length === 0 ? (
           <div className="orders-page__empty">
-            <p>Nenhuma ordem nesta visão.</p>
+            <p>
+              {orders.length === 0
+                ? "Você ainda não tem ordens cadastradas."
+                : "Nenhuma ordem nesta etapa no momento."}
+            </p>
+            {orders.length === 0 && (
+              <button
+                type="button"
+                className="orders-page__empty-btn"
+                onClick={() => navigate("/orders/create")}
+              >
+                Criar primeira ordem
+              </button>
+            )}
           </div>
         ) : (
           <div className="orders-page__list">
@@ -286,7 +320,7 @@ export function OrdersClientPage() {
                       </span>
                     )}
                     {latestHistoryEvent && (
-                      <span>Último evento: {latestHistoryEvent.title}</span>
+                      <span>Última atualização: {latestHistoryEvent.title}</span>
                     )}
                   </div>
 
@@ -309,18 +343,22 @@ export function OrdersClientPage() {
                           <div className="orders-flow-card__actions">
                             <button
                               type="button"
-                              onClick={() =>
-                                acceptApplication(order.id, application.id)
-                              }
+                              onClick={() => {
+                                void runAction(() =>
+                                  acceptApplication(order.id, application.id),
+                                );
+                              }}
                             >
                               Aceitar
                             </button>
                             <button
                               type="button"
                               className="orders-flow-card__ghost"
-                              onClick={() =>
-                                rejectApplication(order.id, application.id)
-                              }
+                              onClick={() => {
+                                void runAction(() =>
+                                  rejectApplication(order.id, application.id),
+                                );
+                              }}
                             >
                               Recusar
                             </button>
@@ -365,7 +403,11 @@ export function OrdersClientPage() {
                       <button
                         type="button"
                         disabled={!scheduleValue}
-                        onClick={() => scheduleOrder(order.id, scheduleValue)}
+                        onClick={() => {
+                          void runAction(() =>
+                            scheduleOrder(order.id, scheduleValue),
+                          );
+                        }}
                       >
                         Confirmar agendamento
                       </button>
@@ -378,7 +420,7 @@ export function OrdersClientPage() {
                         type="button"
                         onClick={() => handleConfirmFinished(order.id)}
                       >
-                        Confirmar que o serviço foi finalizado
+                        Confirmar finalização
                       </button>
                     )}
                     {![
@@ -390,7 +432,9 @@ export function OrdersClientPage() {
                       <button
                         type="button"
                         className="orders-flow-card__ghost"
-                        onClick={() => cancelOrder(order.id)}
+                        onClick={() => {
+                          void runAction(() => cancelOrder(order.id));
+                        }}
                       >
                         Cancelar ordem
                       </button>
@@ -432,14 +476,16 @@ export function OrdersClientPage() {
                       <button
                         type="button"
                         onClick={() => {
-                          confirmFinished(order.id, {
-                            rating,
-                            comment: comment.trim() || undefined,
-                            reviewedAt: new Date().toISOString(),
+                          void runAction(async () => {
+                            await confirmFinished(order.id, {
+                              rating,
+                              comment: comment.trim() || undefined,
+                              reviewedAt: new Date().toISOString(),
+                            });
+                            setRatingOrderId(null);
+                            setComment("");
+                            setRating(5);
                           });
-                          setRatingOrderId(null);
-                          setComment("");
-                          setRating(5);
                         }}
                       >
                         Salvar avaliação

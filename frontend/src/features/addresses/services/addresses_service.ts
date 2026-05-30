@@ -53,7 +53,7 @@ export async function listAddresses(): Promise<Address[]> {
   );
 
   if (!response.data.success) {
-    throw new Error(response.data.error?.message ?? "Falha ao buscar enderecos");
+    throw new Error(response.data.error?.message ?? "Falha ao buscar endereços");
   }
 
   return response.data.data.map(mapAddress);
@@ -72,7 +72,7 @@ export async function createAddress(
   );
 
   if (!response.data.success) {
-    throw new Error(response.data.error?.message ?? "Falha ao criar endereco");
+    throw new Error(response.data.error?.message ?? "Falha ao criar endereço");
   }
 
   return mapAddress(response.data.data);
@@ -93,7 +93,7 @@ export async function updateAddress(
 
   if (!response.data.success) {
     throw new Error(
-      response.data.error?.message ?? "Falha ao atualizar endereco",
+      response.data.error?.message ?? "Falha ao atualizar endereço",
     );
   }
 

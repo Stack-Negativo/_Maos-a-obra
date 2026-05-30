@@ -2,11 +2,13 @@ from collections.abc import Sequence
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from models.provider import Admin, Provider, ProviderSpecialty
+from models.service_order import ServiceOrder
+from models.service_order_application import ServiceOrderApplication
 
 
 class ProviderRepository:
@@ -53,6 +55,22 @@ class ProviderRepository:
         for key, value in data.items():
             setattr(provider, key, value)
         return provider
+
+    async def has_assigned_orders(self, provider_id: UUID) -> bool:
+        result = await self.session.execute(
+            select(ServiceOrder.id)
+            .where(ServiceOrder.provider_id == provider_id)
+            .limit(1)
+        )
+        return result.scalar_one_or_none() is not None
+
+    async def delete(self, provider: Provider) -> None:
+        await self.session.execute(
+            delete(ServiceOrderApplication).where(
+                ServiceOrderApplication.provider_id == provider.id
+            )
+        )
+        await self.session.delete(provider)
 
     async def link_specialties(
         self, provider_id: UUID, specialty_ids: list[UUID]

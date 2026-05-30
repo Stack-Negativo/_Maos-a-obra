@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { loginService } from "@/features/auth/services/auth_service";
 import type { User } from "@/features/auth/types/auth_types";
@@ -160,6 +160,18 @@ export function AuthProvider({
 
     setUser(null);
   }
+
+  useEffect(() => {
+    function handleAuthExpired() {
+      signOut();
+    }
+
+    window.addEventListener("maos-a-obra:auth-expired", handleAuthExpired);
+
+    return () => {
+      window.removeEventListener("maos-a-obra:auth-expired", handleAuthExpired);
+    };
+  }, []);
 
   return (
     <AuthContext.Provider

@@ -4,7 +4,7 @@ type Props = {
 
 export function MainLayout({ children }: Props) {
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-[var(--color-surface)] text-[var(--color-text)]">
       {children}
     </div>
   );

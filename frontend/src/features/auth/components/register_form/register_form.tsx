@@ -14,7 +14,7 @@ import { Input } from "@/shared/ui/input";
 
 import "./register_form.css";
 
-const SPECIALTIES_ERROR = "Nao foi possivel carregar especialidades do backend.";
+const SPECIALTIES_ERROR = "Não foi possível carregar as especialidades.";
 
 export function RegisterForm() {
   const navigate = useNavigate();
@@ -101,7 +101,7 @@ export function RegisterForm() {
     }
 
     if (!email.includes("@")) {
-      return "Informe um email valido.";
+      return "Informe um email válido.";
     }
 
     if (password.length < 8) {
@@ -109,16 +109,16 @@ export function RegisterForm() {
     }
 
     if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
-      return "A senha deve ter pelo menos uma letra e um numero.";
+      return "A senha deve ter pelo menos uma letra e um número.";
     }
 
     if (!/^\d{10,11}$/.test(phone.replace(/\D/g, ""))) {
-      return "Informe um telefone com 10 ou 11 digitos.";
+      return "Informe um telefone com 10 ou 11 dígitos.";
     }
 
     if (accountType === UserRole.PROVIDER) {
       if (bio.trim().length < 20) {
-        return "Descreva sua experiencia como prestador em pelo menos 20 caracteres.";
+        return "Descreva sua experiência como prestador em pelo menos 20 caracteres.";
       }
 
       if (specialtyOptions.length === 0) {
@@ -187,7 +187,7 @@ export function RegisterForm() {
       );
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "Erro ao cadastrar usuario.");
+      setError(err instanceof Error ? err.message : "Erro ao cadastrar usuário.");
     } finally {
       setLoading(false);
     }
@@ -225,7 +225,7 @@ export function RegisterForm() {
             disabled={loading}
           >
             <strong>Cliente</strong>
-            <span>Criar ordens, escolher prestadores e avaliar servicos.</span>
+            <span>Criar ordens, escolher prestadores e avaliar serviços.</span>
           </button>
           <button
             type="button"
@@ -240,7 +240,7 @@ export function RegisterForm() {
             disabled={loading || specialtiesLoading}
           >
             <strong>Prestador</strong>
-            <span>Ver ordens disponiveis e se candidatar a servicos.</span>
+            <span>Ver ordens disponíveis e se candidatar a serviços.</span>
           </button>
         </div>
 
@@ -288,7 +288,7 @@ export function RegisterForm() {
                 value={bio}
                 onChange={(event) => setBio(event.target.value)}
                 disabled={loading}
-                placeholder="Conte sua experiencia, regiao de atendimento e tipo de servico que faz."
+                placeholder="Conte sua experiência, região de atendimento e tipo de serviço que faz."
               />
             </label>
             <fieldset disabled={loading || specialtiesLoading}>
@@ -339,7 +339,7 @@ export function RegisterForm() {
 
       <div className="register-form__footer">
         <p>
-          Ja tem conta? <Link to="/">Entre</Link>
+          Já tem conta? <Link to="/">Entre</Link>
         </p>
       </div>
     </form>

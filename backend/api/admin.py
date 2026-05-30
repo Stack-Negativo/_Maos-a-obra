@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 from models.user import User
 from repositories.provider_repository import ProviderRepository
@@ -94,6 +94,18 @@ async def unsuspend_provider(
 ) -> APIResponse[ProviderResponse]:
     provider = await service.unsuspend_provider(provider_id)
     return APIResponse(data=ProviderResponse.model_validate(provider))
+
+
+@router.delete(
+    "/providers/{provider_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_provider(
+    provider_id: UUID,
+    _admin_user: Annotated[User, Depends(get_current_admin_user)],
+    service: Annotated[ProviderService, Depends(get_provider_service)],
+) -> None:
+    await service.delete_provider(provider_id)
 
 
 @router.post(

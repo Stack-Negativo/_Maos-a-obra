@@ -8,6 +8,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
+  box-shadow: var(--shadow-card);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -23,7 +24,7 @@
 .specialty-card:hover {
   transform: translateY(-2px);
   border-color: var(--color-brand);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .specialty-card__header {
@@ -79,6 +80,7 @@
 }
 
 .specialty-card button:hover {
+  background: var(--color-surface-elevated);
   border-color: var(--color-brand);
   color: var(--color-brand-dark);
   transform: translateY(-1px);

@@ -130,3 +130,20 @@ class ProviderService:
         if not updated_provider:
             raise NotFoundException("Provider disappeared after reactivation")
         return updated_provider
+
+    async def delete_provider(self, provider_id: UUID) -> None:
+        provider = await self.provider_repository.get_by_id(provider_id)
+        if not provider:
+            raise NotFoundException("Provider profile not found")
+
+        has_assigned_orders = await self.provider_repository.has_assigned_orders(
+            provider_id
+        )
+        if has_assigned_orders:
+            raise BusinessRuleViolation(
+                "Nao e possivel excluir prestador vinculado a ordens. "
+                "Suspenda o prestador para impedir novas candidaturas."
+            )
+
+        await self.provider_repository.delete(provider)
+        await self.provider_repository.session.commit()

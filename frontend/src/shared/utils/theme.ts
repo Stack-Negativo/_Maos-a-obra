@@ -1,4 +1,5 @@
 const THEME_STORAGE_KEY = "maos_a_obra_theme";
+const LEGACY_THEME_STORAGE_KEY = "theme";
 
 function getPreferredTheme() {
   if (typeof window === "undefined") {
@@ -10,6 +11,11 @@ function getPreferredTheme() {
     return storedTheme;
   }
 
+  const legacyTheme = localStorage.getItem(LEGACY_THEME_STORAGE_KEY);
+  if (legacyTheme === "light" || legacyTheme === "dark") {
+    return legacyTheme;
+  }
+
   return window.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
@@ -18,6 +24,7 @@ function getPreferredTheme() {
 function applyTheme(theme: "light" | "dark") {
   document.documentElement.dataset.theme = theme;
   localStorage.setItem(THEME_STORAGE_KEY, theme);
+  localStorage.setItem(LEGACY_THEME_STORAGE_KEY, theme);
 }
 
 export function initializeTheme() {
