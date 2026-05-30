@@ -108,4 +108,10 @@ export const providerApi = {
 
     return response.data;
   },
+
+  delete: async (
+    providerId: string,
+  ): Promise<void> => {
+    await httpClient.delete(`/admin/providers/${providerId}`);
+  },
 };

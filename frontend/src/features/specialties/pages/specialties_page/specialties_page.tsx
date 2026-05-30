@@ -49,7 +49,7 @@ export function SpecialtiesPage() {
     }
 
     if (formDescription.trim().length < 10) {
-      setFormError("Informe uma descricao com pelo menos 10 caracteres.");
+      setFormError("Informe uma descrição com pelo menos 10 caracteres.");
       return;
     }
 
@@ -69,7 +69,7 @@ export function SpecialtiesPage() {
       setFormError(
         err instanceof Error
           ? err.message
-          : "Nao foi possivel salvar a especialidade.",
+          : "Não foi possível salvar a especialidade.",
       );
     } finally {
       setSubmitting(false);
@@ -84,20 +84,23 @@ export function SpecialtiesPage() {
             <h1>Especialidades</h1>
             <p>
               {isAdmin
-                ? "Gerencie o catalogo operacional usado para casar ordens com prestadores elegiveis."
-                : "Revise as especialidades cadastradas no catalogo."}
+                ? "Gerencie as categorias de serviço disponíveis para clientes e prestadores."
+                : "Revise as especialidades disponíveis na plataforma."}
             </p>
             <p className="specialties-page__summary">
               {activeCount} ativa{activeCount === 1 ? "" : "s"} de{" "}
               {allSpecialties.length} especialidade
               {allSpecialties.length === 1 ? "" : "s"} cadastrada
-              {allSpecialties.length === 1 ? "" : "s"}.
+              {allSpecialties.length === 1 ? "" : "s"}
             </p>
           </div>
 
           <div className="specialties-page__header-actions">
-            <Link to="/dashboard" className="specialties-page__back-link">
-              Voltar ao dashboard
+            <Link
+              to={isAdmin ? "/orders/admin" : "/orders/provider"}
+              className="specialties-page__back-link"
+            >
+              Voltar para ordens
             </Link>
           </div>
         </header>
@@ -125,7 +128,7 @@ export function SpecialtiesPage() {
           <section className="specialties-page__panel">
             <div>
               <h2>Cadastrar especialidade</h2>
-              <p>A especialidade criada entra ativa no catalogo.</p>
+              <p>A especialidade criada fica disponível imediatamente no catálogo.</p>
             </div>
             {formError && (
               <p className="specialties-page__form-error" role="alert">
@@ -145,7 +148,7 @@ export function SpecialtiesPage() {
                 disabled={submitting}
               />
               <textarea
-                placeholder="Descricao operacional"
+                placeholder="Descrição operacional"
                 value={formDescription}
                 onChange={(event) => setFormDescription(event.target.value)}
                 disabled={submitting}
@@ -161,11 +164,8 @@ export function SpecialtiesPage() {
           <section className="specialties-page__panel">
             <div className="specialties-page__panel-header">
               <div>
-                <h2>Solicitacoes de prestadores</h2>
-                <p>
-                  Esta lista so aparece quando houver solicitacoes persistidas
-                  no backend.
-                </p>
+                <h2>Solicitações de prestadores</h2>
+                <p>Avalie novas categorias sugeridas por prestadores.</p>
               </div>
               <strong>{pendingRequests.length} pendente(s)</strong>
             </div>
@@ -238,10 +238,9 @@ export function SpecialtiesPage() {
 
         {isProvider && (
           <section className="specialties-page__panel">
-            <h2>Catalogo disponivel</h2>
+            <h2>Catálogo disponível</h2>
             <p>
-              Novas especialidades devem ser criadas pelo admin enquanto nao
-              houver endpoint de solicitacao no backend.
+              Caso atenda uma categoria que ainda não aparece aqui, solicite ao administrador.
             </p>
           </section>
         )}

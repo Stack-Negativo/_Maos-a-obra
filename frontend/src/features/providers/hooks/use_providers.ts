@@ -5,6 +5,7 @@ import type { Specialty } from "@/features/specialties/types/specialty_types";
 
 import {
   createProviderProfile,
+  deleteProvider as deleteProviderService,
   listProviders,
   PROVIDERS_CHANGED_EVENT,
   suspendProvider,
@@ -195,6 +196,22 @@ export function useProviders() {
     }
   }
 
+  async function removeProvider(providerId: string) {
+    setUpdatingProviderId(providerId);
+    setError(null);
+
+    try {
+      await deleteProviderService(providerId);
+      setProviders((currentProviders) =>
+        currentProviders.filter((provider) => provider.id !== providerId),
+      );
+    } catch {
+      setError("Nao foi possivel excluir o prestador.");
+    } finally {
+      setUpdatingProviderId(null);
+    }
+  }
+
   const filteredProviders = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -240,6 +257,7 @@ export function useProviders() {
     submitProvider,
     suspendProvider: suspend,
     unsuspendProvider: unsuspend,
+    deleteProvider: removeProvider,
     refresh,
   };
 }

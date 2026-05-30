@@ -1,5 +1,7 @@
 import httpClient from "@/api/http-client";
 import type { ApiResponse as BaseApiResponse } from "@/api/auth";
+import { isMockMode } from "@/shared/mocks/mock_mode";
+import { mockStore } from "@/shared/mocks/mock_store";
 import type { Address, AddressPayload } from "../types/address_types";
 
 type AddressApiResponse = {
@@ -42,6 +44,10 @@ function toApiPayload(payload: AddressPayload) {
 }
 
 export async function listAddresses(): Promise<Address[]> {
+  if (isMockMode()) {
+    return mockStore.listAddresses();
+  }
+
   const response = await httpClient.get<BaseApiResponse<AddressApiResponse[]>>(
     "/addresses/",
   );
@@ -56,6 +62,10 @@ export async function listAddresses(): Promise<Address[]> {
 export async function createAddress(
   payload: AddressPayload,
 ): Promise<Address> {
+  if (isMockMode()) {
+    return mockStore.createAddress(payload);
+  }
+
   const response = await httpClient.post<BaseApiResponse<AddressApiResponse>>(
     "/addresses/",
     toApiPayload(payload),
@@ -72,6 +82,10 @@ export async function updateAddress(
   addressId: string,
   payload: AddressPayload,
 ): Promise<Address> {
+  if (isMockMode()) {
+    return mockStore.updateAddress(addressId, payload);
+  }
+
   const response = await httpClient.patch<BaseApiResponse<AddressApiResponse>>(
     `/addresses/${addressId}`,
     toApiPayload(payload),
@@ -87,5 +101,10 @@ export async function updateAddress(
 }
 
 export async function deleteAddress(addressId: string): Promise<void> {
+  if (isMockMode()) {
+    mockStore.deleteAddress(addressId);
+    return;
+  }
+
   await httpClient.delete(`/addresses/${addressId}`);
 }

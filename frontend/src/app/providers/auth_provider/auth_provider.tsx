@@ -3,6 +3,7 @@ import { useState } from "react";
 import { loginService } from "@/features/auth/services/auth_service";
 import type { User } from "@/features/auth/types/auth_types";
 import { UserRole } from "@/features/auth/types/auth_types";
+import { isMockMode } from "@/shared/mocks/mock_mode";
 
 import { AuthContext } from "./auth_context";
 
@@ -37,8 +38,15 @@ export function AuthProvider({
     useState<User | null>(() => {
       const storedUser =
         localStorage.getItem("user");
+      const storedToken = localStorage.getItem("token");
 
       clearLegacyMockStorage();
+
+      if (isMockMode() && storedToken && !storedToken.startsWith("mock-token:")) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        return null;
+      }
 
       if (!storedUser) {
         return null;
@@ -80,6 +88,12 @@ export function AuthProvider({
   const [token, setToken] =
     useState<string | null>(() => {
       const storedToken = localStorage.getItem("token");
+
+      if (isMockMode() && storedToken && !storedToken.startsWith("mock-token:")) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        return null;
+      }
 
       if (storedToken === "mock-token-mvp") {
         localStorage.removeItem("token");

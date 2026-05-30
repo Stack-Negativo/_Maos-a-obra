@@ -12,7 +12,22 @@
 }
 
 .specialties-page__header {
+  position: relative;
+  overflow: hidden;
   flex-wrap: wrap;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-card);
+  box-shadow: var(--shadow-card);
+}
+
+.specialties-page__header::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--color-brand);
 }
 
 .specialties-page__header h1 {
@@ -30,6 +45,14 @@
 }
 
 .specialties-page__summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  margin-top: 0.55rem;
+  padding: 0 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--color-brand) 28%, var(--color-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-brand-light) 72%, var(--color-card));
   color: var(--color-brand-dark) !important;
   font-weight: 700;
 }
@@ -49,6 +72,18 @@
   font-size: 0.84rem;
   font-weight: 800;
   text-decoration: none;
+  transition:
+    border-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.specialties-page__back-link:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand-dark);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--color-brand) 16%, transparent);
+  transform: translateY(-1px);
 }
 
 .specialties-page__actions {
@@ -57,6 +92,7 @@
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
+  box-shadow: var(--shadow-card);
 }
 
 .specialties-page__actions .input {
@@ -72,9 +108,21 @@
   color: var(--color-on-brand);
   font-weight: 800;
   cursor: pointer;
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.specialties-page__actions button:hover:not(:disabled) {
+  background: var(--color-brand-hover);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-brand) 22%, transparent);
+  transform: translateY(-1px);
 }
 
 .specialties-page__panel {
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 1rem;
   padding: 1rem;
@@ -82,6 +130,18 @@
   border-radius: 10px;
   background: var(--color-card);
   box-shadow: var(--shadow-card);
+}
+
+.specialties-page__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-brand) 22%, transparent),
+    transparent 72%
+  );
 }
 
 .specialties-page__panel h2 {
@@ -131,6 +191,12 @@
   background: var(--color-card);
   color: var(--color-text);
   resize: vertical;
+  outline: none;
+}
+
+.specialties-page__form textarea:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 14%, transparent);
 }
 
 .specialties-page__form button,
@@ -145,6 +211,17 @@
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.specialties-page__form button:hover:not(:disabled),
+.specialties-page__request-actions button:hover:not(:disabled) {
+  background: var(--color-brand-hover);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-brand) 20%, transparent);
+  transform: translateY(-1px);
 }
 
 .specialties-page__form button:disabled {
@@ -173,7 +250,17 @@
   padding: 0.85rem;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
+  transition:
+    border-color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.specialties-page__request:hover {
+  border-color: color-mix(in srgb, var(--color-brand) 34%, var(--color-border));
+  box-shadow: var(--shadow-card);
+  transform: translateY(-1px);
 }
 
 .specialties-page__request strong {
@@ -221,10 +308,11 @@
   border-radius: 10px;
   background: var(--color-card);
   color: var(--color-text-secondary);
+  box-shadow: var(--shadow-card);
 }
 
 .specialties-page__state--error {
-  border-color: #fecaca;
+  border-color: var(--color-danger);
   background: var(--color-danger-bg);
   color: var(--color-danger);
 }

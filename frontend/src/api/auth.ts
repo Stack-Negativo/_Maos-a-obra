@@ -32,10 +32,16 @@ export type UserApiResponse = {
   id: string;
   email: string;
   full_name: string;
+  phone?: string;
   nome?: string;
   role?: string;
   is_provider?: boolean;
   is_admin?: boolean;
+};
+
+export type UpdateMeApiPayload = {
+  full_name: string;
+  phone: string;
 };
 
 export const authApi = {
@@ -88,6 +94,16 @@ export const authApi = {
     const response = await httpClient.get<
       ApiResponse<UserApiResponse>
     >("/auth/me", config);
+
+    return response.data;
+  },
+
+  updateMe: async (
+    payload: UpdateMeApiPayload,
+  ): Promise<ApiResponse<UserApiResponse>> => {
+    const response = await httpClient.patch<
+      ApiResponse<UserApiResponse>
+    >("/auth/me", payload);
 
     return response.data;
   },
