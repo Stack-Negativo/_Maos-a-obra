@@ -1,6 +1,8 @@
 import type { Specialty } from "@/features/specialties/types/specialty_types";
 import { providerApi } from "@/api/providers";
 import type { ProviderApiResponse } from "@/api/providers";
+import { isMockMode } from "@/shared/mocks/mock_mode";
+import { mockStore } from "@/shared/mocks/mock_store";
 import axios from "axios";
 
 import type { ProviderPayload, ProviderProfile } from "../types/provider_types";
@@ -44,6 +46,10 @@ function isAdminSession() {
 }
 
 export async function listProviders(): Promise<ProviderProfile[]> {
+  if (isMockMode()) {
+    return mockStore.listProviders();
+  }
+
   const response = isAdminSession()
     ? await providerApi.listAdmin()
     : await providerApi.list();
@@ -58,6 +64,12 @@ export async function listProviders(): Promise<ProviderProfile[]> {
 export async function createProviderProfile(
   payload: ProviderPayload,
 ): Promise<ProviderProfile> {
+  if (isMockMode()) {
+    const provider = mockStore.createProviderProfile(payload);
+    notifyProvidersChanged();
+    return provider;
+  }
+
   const response = await providerApi.register({
     bio: payload.bio,
     specialty_ids: payload.specialties.map((specialty) => specialty.id),
@@ -91,6 +103,12 @@ export function upsertMockProviderProfile(input: {
 }
 
 export async function suspendProvider(providerId: string) {
+  if (isMockMode()) {
+    const provider = mockStore.suspendProvider(providerId);
+    notifyProvidersChanged();
+    return provider;
+  }
+
   const response = await providerApi.suspend(providerId);
 
   if (!response.success) {
@@ -102,6 +120,12 @@ export async function suspendProvider(providerId: string) {
 }
 
 export async function unsuspendProvider(providerId: string) {
+  if (isMockMode()) {
+    const provider = mockStore.unsuspendProvider(providerId);
+    notifyProvidersChanged();
+    return provider;
+  }
+
   const response = await providerApi.unsuspend(providerId);
 
   if (!response.success) {
@@ -113,6 +137,12 @@ export async function unsuspendProvider(providerId: string) {
 }
 
 export async function deleteProvider(providerId: string) {
+  if (isMockMode()) {
+    mockStore.deleteProvider(providerId);
+    notifyProvidersChanged();
+    return;
+  }
+
   try {
     await providerApi.delete(providerId);
   } catch (error) {

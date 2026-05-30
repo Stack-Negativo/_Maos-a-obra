@@ -1,4 +1,5 @@
 import { Input } from "@/shared/ui/input";
+import { isMockMode } from "@/shared/mocks/mock_mode";
 
 import { useAuth } from "../../hooks/use_auth";
 
@@ -17,6 +18,24 @@ export function LoginForm() {
     handleLogin,
   } = useAuth();
 
+  const demoAccounts = [
+    {
+      label: "Admin",
+      email: "admin@maosaobra.com.br",
+      password: "Admin12345",
+    },
+    {
+      label: "Cliente",
+      email: "cliente@maosaobra.com.br",
+      password: "Cliente123",
+    },
+    {
+      label: "Prestador",
+      email: "prestador@maosaobra.com.br",
+      password: "Prestador123",
+    },
+  ];
+
   return (
     <form
       className="login-form"
@@ -29,6 +48,26 @@ export function LoginForm() {
         <h1>Bem-vindo de volta</h1>
         <p>Acesse sua conta para acompanhar solicitações, atendimentos e prestadores.</p>
       </div>
+
+      {isMockMode() && (
+        <div className="login-form__demo">
+          <strong>Contas para teste</strong>
+          <div>
+            {demoAccounts.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                onClick={() => {
+                  setEmail(account.email);
+                  setPassword(account.password);
+                }}
+              >
+                {account.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {error ? (
         <p className="login-form__error" role="alert">

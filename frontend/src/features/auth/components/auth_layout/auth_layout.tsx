@@ -9,9 +9,7 @@ type AuthLayoutProps = {
   children: ReactNode;
 };
 
-export function AuthLayout({
-  children,
-}: AuthLayoutProps) {
+export function AuthLayout({ children }: AuthLayoutProps) {
   useEffect(() => {
     initializeTheme();
   }, []);

@@ -4,6 +4,8 @@ import { Link, NavLink } from "react-router-dom";
 
 import { useAuthContext } from "@/app/providers/auth_provider/use_auth_context";
 import { UserRole } from "@/features/auth/types/auth_types";
+import { isMockMode, MOCK_MODE_LABEL } from "@/shared/mocks/mock_mode";
+import { mockStore } from "@/shared/mocks/mock_store";
 import { initializeTheme, toggleTheme } from "@/shared/utils/theme";
 
 import "./app_shell.css";
@@ -79,6 +81,19 @@ export function AppShell({ children }: AppShellProps) {
             { label: "Perfil", to: "/profile" },
           ];
 
+  function resetMockData() {
+    const confirmed = window.confirm(
+      "Resetar os dados mockados e voltar para as contas iniciais?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    mockStore.reset();
+    signOut();
+  }
+
   return (
     <div
       className={`app-shell app-shell--${
@@ -117,6 +132,18 @@ export function AppShell({ children }: AppShellProps) {
               {effectiveRole ? roleLabels[effectiveRole] : "Cliente"} - {user?.email ?? ""}
             </span>
           </div>
+          {isMockMode() && (
+            <div className="app-shell__mock-badge">{MOCK_MODE_LABEL}</div>
+          )}
+          {isMockMode() && (
+            <button
+              type="button"
+              className="app-shell__reset-demo"
+              onClick={resetMockData}
+            >
+              Resetar demo
+            </button>
+          )}
           <div className="app-shell__role-badge" aria-label="Perfil do usuário">
             {effectiveRole ? roleLabels[effectiveRole] : "Cliente"}
           </div>

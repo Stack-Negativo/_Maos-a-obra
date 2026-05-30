@@ -1,19 +1,38 @@
-export function initializeTheme() {
-  const storedTheme = localStorage.getItem("theme");
+const THEME_STORAGE_KEY = "maos_a_obra_theme";
+const LEGACY_THEME_STORAGE_KEY = "theme";
 
-  if (storedTheme === "dark" || storedTheme === "light") {
-    document.documentElement.dataset.theme = storedTheme;
-    return;
+function getPreferredTheme() {
+  if (typeof window === "undefined") {
+    return "light";
   }
 
-  document.documentElement.dataset.theme = "dark";
-  localStorage.setItem("theme", "dark");
+  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  if (storedTheme === "light" || storedTheme === "dark") {
+    return storedTheme;
+  }
+
+  const legacyTheme = localStorage.getItem(LEGACY_THEME_STORAGE_KEY);
+  if (legacyTheme === "light" || legacyTheme === "dark") {
+    return legacyTheme;
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function applyTheme(theme: "light" | "dark") {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem(THEME_STORAGE_KEY, theme);
+  localStorage.setItem(LEGACY_THEME_STORAGE_KEY, theme);
+}
+
+export function initializeTheme() {
+  applyTheme(getPreferredTheme());
 }
 
 export function toggleTheme() {
-  const currentTheme = document.documentElement.dataset.theme;
-  const nextTheme = currentTheme === "dark" ? "light" : "dark";
-
-  document.documentElement.dataset.theme = nextTheme;
-  localStorage.setItem("theme", nextTheme);
+  const currentTheme =
+    document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  applyTheme(currentTheme === "dark" ? "light" : "dark");
 }

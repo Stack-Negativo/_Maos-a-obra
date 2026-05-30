@@ -1,23 +1,33 @@
-# Mãos a Obra
+# Mãos à Obra
 
-Sistema de intermediação de serviços residenciais entre tomadores e prestadores. O projeto tem como objetivo conectar clientes a prestadores de serviços de forma segura, com suporte a agendamento, auditoria de status, pagamento (mock) e sistema de avaliação 360.
+Sistema de intermediação de serviços residenciais entre clientes e prestadores. O projeto conecta solicitações de serviço a profissionais, com suporte a candidaturas, agendamento, auditoria de status, pagamento mock e avaliação.
 
-## Estrutura do Repositório
+## Estrutura
 
-- `/backend`: API RESTful construída em FastAPI com arquitetura limpa (Domain-Driven Design simplificado).
-- `/frontend`: Aplicação SPA (React + Vite).
-- `/docs`: Documentação técnica detalhada sobre arquitetura, domínio e regras de negócio.
+- `/backend`: API RESTful em FastAPI com arquitetura inspirada em Clean Architecture.
+- `/frontend`: SPA em React + Vite.
+- `/docs`: documentação técnica, domínio e regras de negócio.
 
-## Pré-requisitos
-- Docker & Docker Compose
-- Node.js (para o frontend)
-- Python 3.12+ (para o backend)
+## Frontend mockado
 
-## Como rodar
-Utilize o docker-compose para subir toda a infraestrutura necessária:
+O frontend roda em modo mock por padrão, usando `localStorage`, para permitir validação completa sem backend.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Contas de teste:
+
+- Admin: `admin@maosaobra.com.br` / `Admin12345`
+- Cliente: `cliente@maosaobra.com.br` / `Cliente123`
+- Prestador: `prestador@maosaobra.com.br` / `Prestador123`
+
+Para consumir a API real, configure `VITE_DATA_MODE=api`.
+
+## Docker
+
 ```bash
 docker-compose up --build
 ```
-
----
-Este projeto é parte de uma atividade acadêmica de Engenharia de Software.

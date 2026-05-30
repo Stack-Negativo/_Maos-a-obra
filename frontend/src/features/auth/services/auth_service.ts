@@ -4,6 +4,8 @@ import { authApi } from "@/api/auth";
 import { providerApi } from "@/api/providers";
 import { listSpecialties } from "@/features/specialties/services/specialties_service";
 import { notifyProvidersChanged } from "@/features/providers/services/providers_service";
+import { isMockMode } from "@/shared/mocks/mock_mode";
+import { mockStore } from "@/shared/mocks/mock_store";
 import type { AuthResponse, LoginPayload, RegisterPayload, User } from "../types";
 import { UserRole } from "../types/auth_types";
 
@@ -65,6 +67,10 @@ export async function updateProfileService(data: {
   name: string;
   phone: string;
 }): Promise<Pick<User, "name" | "phone">> {
+  if (isMockMode()) {
+    return mockStore.updateProfile(data);
+  }
+
   const response = await authApi.updateMe({
     full_name: data.name.trim(),
     phone: data.phone.replace(/\D/g, ""),
@@ -84,9 +90,15 @@ export async function becomeProviderService(
   user: User,
   data: {
     bio: string;
-    specialtyIds: string[];
+  specialtyIds: string[];
   },
 ) {
+  if (isMockMode()) {
+    const providerUser = mockStore.becomeProvider(user, data);
+    notifyProvidersChanged();
+    return providerUser;
+  }
+
   const response = await providerApi.register({
     bio: data.bio.trim(),
     specialty_ids: data.specialtyIds,
@@ -118,6 +130,10 @@ export async function becomeProviderService(
 }
 
 export async function loginService(data: LoginPayload): Promise<AuthResponse> {
+  if (isMockMode()) {
+    return mockStore.login(data.email, data.password);
+  }
+
   try {
     const loginResponse = await authApi.login({
       email: data.email,
@@ -188,6 +204,15 @@ export async function loginService(data: LoginPayload): Promise<AuthResponse> {
 export async function registerService(
   data: RegisterPayload,
 ): Promise<{ id: string; name: string; email: string }> {
+  if (isMockMode()) {
+    const response = mockStore.register(data);
+    return {
+      id: response.user.id,
+      name: response.user.name,
+      email: response.user.email,
+    };
+  }
+
   let response;
 
   try {

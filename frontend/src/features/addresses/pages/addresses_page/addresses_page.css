@@ -113,6 +113,7 @@
 }
 
 .address-form__submit,
+.address-form__secondary,
 .addresses-list__toolbar button,
 .address-card button {
   min-height: 44px;
@@ -171,6 +172,19 @@
   box-shadow: var(--shadow-card-hover);
 }
 
+.address-form__secondary {
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-text-secondary);
+}
+
+.address-form__actions,
+.address-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
 .address-card strong {
   display: block;
   color: var(--color-text);
@@ -189,6 +203,11 @@
   border: 1px solid var(--color-danger);
   background: var(--color-card);
   color: var(--color-danger);
+}
+
+.address-card__actions button:first-child {
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
 }
 
 .address-card button:hover {

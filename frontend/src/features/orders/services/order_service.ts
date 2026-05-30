@@ -1,5 +1,7 @@
 import httpClient from "@/api/http-client";
 import type { ApiResponse } from "@/api/auth";
+import { isMockMode } from "@/shared/mocks/mock_mode";
+import { mockStore } from "@/shared/mocks/mock_store";
 import type {
   Order,
   CreateOrderInput,
@@ -327,6 +329,10 @@ function buildSchedulePayload(scheduledAtValue: string) {
 
 export const orderService = {
   async listOrders(): Promise<Order[]> {
+    if (isMockMode()) {
+      return mockStore.listOrders("client");
+    }
+
     ensureApiSession();
     const response = await httpClient.get<OrdersApiResponse>(
       `${ORDERS_BASE_URL}/me`,
@@ -335,6 +341,10 @@ export const orderService = {
   },
 
   async getOrderById(id: string): Promise<Order> {
+    if (isMockMode()) {
+      return mockStore.getOrderById(id);
+    }
+
     ensureApiSession();
     const response = await httpClient.get<ApiOrder>(
       `${ORDERS_BASE_URL}/${id}`,
@@ -343,6 +353,10 @@ export const orderService = {
   },
 
   async createOrder(input: CreateOrderInput): Promise<Order> {
+    if (isMockMode()) {
+      return mockStore.createOrder(input);
+    }
+
     ensureApiSession();
     const payload = buildCreatePayload(input);
     const response = await httpClient.post<ApiOrder>(
@@ -353,6 +367,10 @@ export const orderService = {
   },
 
   async cancelOrder(id: string): Promise<Order> {
+    if (isMockMode()) {
+      return mockStore.cancelOrder(id, "Cancelamento solicitado pelo cliente.");
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiOrder>(
       `${ORDERS_BASE_URL}/${id}/cancel`,
@@ -364,6 +382,10 @@ export const orderService = {
   },
 
   async cancelOrderAsAdmin(id: string, reason: string): Promise<Order> {
+    if (isMockMode()) {
+      return mockStore.cancelOrder(id, reason);
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiResponse<ApiOrder>>(
       `${ADMIN_BASE_URL}/orders/${id}/cancel`,
@@ -374,6 +396,10 @@ export const orderService = {
   },
 
   async expireOrderAsAdmin(id: string, reason: string): Promise<Order> {
+    if (isMockMode()) {
+      return mockStore.expireOrder(id, reason);
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiResponse<ApiOrder>>(
       `${ADMIN_BASE_URL}/orders/${id}/expire`,
@@ -384,6 +410,10 @@ export const orderService = {
   },
 
   async listProviderOrders(): Promise<Order[]> {
+    if (isMockMode()) {
+      return mockStore.listOrders("provider");
+    }
+
     ensureApiSession();
     const response = await httpClient.get<OrdersApiResponse>(
       `${ORDERS_BASE_URL}/providers/me`,
@@ -392,6 +422,10 @@ export const orderService = {
   },
 
   async listProviderFeed(): Promise<Order[]> {
+    if (isMockMode()) {
+      return mockStore.listOrders("provider");
+    }
+
     ensureApiSession();
     const response = await httpClient.get<ApiResponse<OrdersApiResponse>>(
       `${PROVIDERS_BASE_URL}/feed`,
@@ -400,6 +434,10 @@ export const orderService = {
   },
 
   async listAdminOrders(): Promise<Order[]> {
+    if (isMockMode()) {
+      return mockStore.listOrders("admin");
+    }
+
     ensureApiSession();
     const response = await httpClient.get<ApiResponse<OrdersApiResponse>>(
       `${ADMIN_BASE_URL}/orders`,
@@ -408,6 +446,10 @@ export const orderService = {
   },
 
   async getApplications(orderId: string): Promise<Application[]> {
+    if (isMockMode()) {
+      return mockStore.getApplications(orderId);
+    }
+
     ensureApiSession();
     const response = await httpClient.get<ApplicationsApiResponse>(
       `${APPLICATIONS_BASE_URL}/${orderId}/list`,
@@ -416,6 +458,10 @@ export const orderService = {
   },
 
   async applyForOrder(orderId: string): Promise<Application> {
+    if (isMockMode()) {
+      return mockStore.applyForOrder(orderId);
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiApplication>(
       `${APPLICATIONS_BASE_URL}/${orderId}/apply`,
@@ -427,6 +473,10 @@ export const orderService = {
     orderId: string,
     applicationId: string,
   ): Promise<Application> {
+    if (isMockMode()) {
+      return mockStore.acceptApplication(applicationId);
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiApplication>(
       `${APPLICATIONS_BASE_URL}/${applicationId}/accept`,
@@ -438,6 +488,10 @@ export const orderService = {
     orderId: string,
     applicationId: string,
   ): Promise<Application> {
+    if (isMockMode()) {
+      return mockStore.rejectApplication(applicationId);
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiApplication>(
       `${APPLICATIONS_BASE_URL}/${applicationId}/reject`,
@@ -446,6 +500,10 @@ export const orderService = {
   },
 
   async cancelApplication(applicationId: string): Promise<Application> {
+    if (isMockMode()) {
+      return mockStore.cancelApplication(applicationId);
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiApplication>(
       `${APPLICATIONS_BASE_URL}/${applicationId}/cancel`,
@@ -454,6 +512,10 @@ export const orderService = {
   },
 
   async scheduleOrder(orderId: string, scheduledAtValue: string) {
+    if (isMockMode()) {
+      return mockStore.scheduleOrder(orderId, scheduledAtValue);
+    }
+
     ensureApiSession();
     await httpClient.post(
       `${SCHEDULING_BASE_URL}/orders/${orderId}`,
@@ -463,6 +525,10 @@ export const orderService = {
   },
 
   async startOrder(orderId: string) {
+    if (isMockMode()) {
+      return mockStore.startOrder(orderId);
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiOrder>(
       `${ORDERS_BASE_URL}/${orderId}/start`,
@@ -471,6 +537,10 @@ export const orderService = {
   },
 
   async finishOrder(orderId: string) {
+    if (isMockMode()) {
+      return mockStore.finishOrder(orderId);
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiOrder>(
       `${ORDERS_BASE_URL}/${orderId}/finish`,
@@ -479,6 +549,10 @@ export const orderService = {
   },
 
   async confirmOrder(orderId: string) {
+    if (isMockMode()) {
+      return mockStore.confirmOrder(orderId);
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiOrder>(
       `${ORDERS_BASE_URL}/${orderId}/confirm`,
@@ -493,6 +567,10 @@ export const orderService = {
       comment?: string;
     },
   ) {
+    if (isMockMode()) {
+      return mockStore.createReview(orderId, review);
+    }
+
     ensureApiSession();
     const response = await httpClient.post<ApiReview>(
       `${ORDERS_BASE_URL}/${orderId}/reviews`,
@@ -506,6 +584,11 @@ export const orderService = {
   },
 
   async getReviews(orderId: string): Promise<OrderReview[]> {
+    if (isMockMode()) {
+      const order = mockStore.getOrderById(orderId);
+      return order.review ? [order.review] : [];
+    }
+
     ensureApiSession();
     const response = await httpClient.get<ReviewsApiResponse>(
       `${ORDERS_BASE_URL}/${orderId}/reviews`,
@@ -515,6 +598,10 @@ export const orderService = {
   },
 
   async getHistory(orderId: string): Promise<OrderHistoryEvent[]> {
+    if (isMockMode()) {
+      return mockStore.getOrderById(orderId).history ?? [];
+    }
+
     ensureApiSession();
     const response = await httpClient.get<HistoryApiResponse>(
       `${ORDERS_BASE_URL}/${orderId}/history`,

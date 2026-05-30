@@ -39,6 +39,11 @@ export type UserApiResponse = {
   is_admin?: boolean;
 };
 
+export type UpdateMeApiPayload = {
+  full_name: string;
+  phone: string;
+};
+
 export const authApi = {
   register: async (
     payload: RegisterApiPayload,
@@ -93,14 +98,12 @@ export const authApi = {
     return response.data;
   },
 
-  updateMe: async (payload: {
-    full_name?: string;
-    phone?: string;
-  }): Promise<ApiResponse<UserApiResponse>> => {
-    const response = await httpClient.patch<ApiResponse<UserApiResponse>>(
-      "/users/me",
-      payload,
-    );
+  updateMe: async (
+    payload: UpdateMeApiPayload,
+  ): Promise<ApiResponse<UserApiResponse>> => {
+    const response = await httpClient.patch<
+      ApiResponse<UserApiResponse>
+    >("/auth/me", payload);
 
     return response.data;
   },

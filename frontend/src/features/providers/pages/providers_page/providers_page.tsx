@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 
+import { useAuthContext } from "@/app/providers/auth_provider/use_auth_context";
+import { UserRole } from "@/features/auth/types/auth_types";
 import { AppShell } from "@/shared/components";
 import { Input } from "@/shared/ui/input";
 
-import { useAuthContext } from "@/app/providers/auth_provider/use_auth_context";
-import { UserRole } from "@/features/auth/types/auth_types";
 import { useProviders } from "../../hooks/use_providers";
 
 import "./providers_page.css";
@@ -64,13 +64,12 @@ export function ProvidersPage() {
               da rede que atende as ordens de serviço.
             </p>
             <p className="providers-page__summary">
-              {totalProviders} prestador{totalProviders === 1 ? "" : "es"} no
-              sistema.
+              {totalProviders} prestador{totalProviders === 1 ? "" : "es"} no sistema
             </p>
           </div>
 
-          <Link to="/dashboard" className="providers-page__back-link">
-            Voltar ao dashboard
+          <Link to={isAdmin ? "/orders/admin" : "/orders/provider"} className="providers-page__back-link">
+            Voltar para ordens
           </Link>
         </header>
 
@@ -103,9 +102,10 @@ export function ProvidersPage() {
               }}
             >
               <div>
-                <h2>Novo prestador</h2>
+                <h2>Perfil profissional</h2>
                 <p>
-                  Cadastre seu perfil profissional para receber solicitações compatíveis.
+                  Mantenha sua apresentação e especialidades atualizadas para
+                  aparecer nas ordens compatíveis.
                 </p>
               </div>
 
@@ -156,7 +156,7 @@ export function ProvidersPage() {
                 className="provider-form__submit"
                 disabled={submitting}
               >
-                {submitting ? "Salvando..." : "Adicionar prestador"}
+                {submitting ? "Salvando..." : "Salvar perfil"}
               </button>
             </form>
           ) : isAdmin ? (
@@ -164,23 +164,23 @@ export function ProvidersPage() {
               <div>
                 <h2>Governança da rede</h2>
                 <p>
-                  Perfis criados por cadastro de prestador ou pelo botão “Quero
-                  me tornar prestador” aparecem nesta visão administrativa.
+                  Acompanhe prestadores ativos, suspensos e especialidades
+                  cadastradas para manter a operação organizada.
                 </p>
               </div>
               <div className="provider-form__insights">
                 <span>{activeProviders} ativo(s)</span>
                 <span>{suspendedProviders} suspenso(s)</span>
-                <span>{specialties.length} especialidade(s) ativas</span>
+                <span>{specialties.length} especialidade(s)</span>
               </div>
             </div>
           ) : (
             <div className="provider-form provider-form--disabled">
               <div>
-                <h2>Perfil de prestador</h2>
+                <h2>Rede de prestadores</h2>
                 <p>
-                  Somente prestadores podem cadastrar um perfil profissional.
-                  Clientes podem procurar e avaliar prestadores disponíveis.
+                  Clientes podem consultar a rede, acompanhar avaliações e
+                  escolher prestadores quando houver candidaturas.
                 </p>
               </div>
             </div>
@@ -258,35 +258,35 @@ export function ProvidersPage() {
                       <span>{provider.completedServices} serviço(s)</span>
                     </div>
 
-                    <div className="providers-admin-card__actions">
-                      <strong>Ação administrativa</strong>
-                      {provider.isSuspended ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            void unsuspendProvider(provider.id);
-                          }}
-                          disabled={updatingProviderId === provider.id}
-                        >
-                          {updatingProviderId === provider.id
-                            ? "Reativando..."
-                            : "Reativar prestador"}
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="providers-admin-card__danger"
-                          onClick={() => {
-                            void suspendProvider(provider.id);
-                          }}
-                          disabled={updatingProviderId === provider.id}
-                        >
-                          {updatingProviderId === provider.id
-                            ? "Suspendendo..."
-                            : "Suspender prestador"}
-                        </button>
-                      )}
-                      {isAdmin && (
+                    {isAdmin && (
+                      <div className="providers-admin-card__actions">
+                        <strong>Ação administrativa</strong>
+                        {provider.isSuspended ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              void unsuspendProvider(provider.id);
+                            }}
+                            disabled={updatingProviderId === provider.id}
+                          >
+                            {updatingProviderId === provider.id
+                              ? "Reativando..."
+                              : "Reativar prestador"}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="providers-admin-card__danger"
+                            onClick={() => {
+                              void suspendProvider(provider.id);
+                            }}
+                            disabled={updatingProviderId === provider.id}
+                          >
+                            {updatingProviderId === provider.id
+                              ? "Suspendendo..."
+                              : "Suspender prestador"}
+                          </button>
+                        )}
                         <button
                           type="button"
                           className="providers-admin-card__danger"
@@ -302,8 +302,8 @@ export function ProvidersPage() {
                             ? "Processando..."
                             : "Excluir prestador"}
                         </button>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </article>
                 ))}
               </div>

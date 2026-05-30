@@ -34,14 +34,13 @@ export function AddressesPage() {
             <h1>Endereços</h1>
             <p>Cadastre seus locais de atendimento para agilizar novas solicitações.</p>
             <p className="addresses-page__summary">
-              {totalAddresses} endereço{totalAddresses === 1 ? "" : "s"} no
-              sistema.
+              {totalAddresses} endereço{totalAddresses === 1 ? "" : "s"} no sistema
             </p>
           </div>
 
           <div className="addresses-page__header-actions">
-            <Link to="/dashboard" className="addresses-page__back-link">
-              Voltar ao dashboard
+            <Link to="/orders/client" className="addresses-page__back-link">
+              Ver minhas ordens
             </Link>
           </div>
         </header>
@@ -122,27 +121,29 @@ export function AddressesPage() {
               />
             </div>
 
-            <button
-              type="submit"
-              className="address-form__submit"
-              disabled={submitting}
-            >
-              {submitting
-                ? "Salvando..."
-                : editingAddressId
-                  ? "Salvar alterações"
-                  : "Adicionar endereço"}
-            </button>
-            {editingAddressId ? (
+            <div className="address-form__actions">
               <button
-                type="button"
+                type="submit"
                 className="address-form__submit"
-                onClick={cancelEditingAddress}
                 disabled={submitting}
               >
-                Cancelar edição
+                {submitting
+                  ? "Salvando..."
+                  : editingAddressId
+                    ? "Salvar alterações"
+                    : "Adicionar endereço"}
               </button>
-            ) : null}
+              {editingAddressId ? (
+                <button
+                  type="button"
+                  className="address-form__secondary"
+                  onClick={cancelEditingAddress}
+                  disabled={submitting}
+                >
+                  Cancelar edição
+                </button>
+              ) : null}
+            </div>
           </form>
 
           <section className="addresses-list">
@@ -188,20 +189,22 @@ export function AddressesPage() {
                       <small>CEP {address.zipCode}</small>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => startEditingAddress(address)}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void removeAddress(address.id);
-                      }}
-                    >
-                      Remover
-                    </button>
+                    <div className="address-card__actions">
+                      <button
+                        type="button"
+                        onClick={() => startEditingAddress(address)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          void removeAddress(address.id);
+                        }}
+                      >
+                        Remover
+                      </button>
+                    </div>
                   </article>
                 ))}
               </div>

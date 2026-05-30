@@ -91,13 +91,16 @@ export function SpecialtiesPage() {
               {activeCount} ativa{activeCount === 1 ? "" : "s"} de{" "}
               {allSpecialties.length} especialidade
               {allSpecialties.length === 1 ? "" : "s"} cadastrada
-              {allSpecialties.length === 1 ? "" : "s"}.
+              {allSpecialties.length === 1 ? "" : "s"}
             </p>
           </div>
 
           <div className="specialties-page__header-actions">
-            <Link to="/dashboard" className="specialties-page__back-link">
-              Voltar ao dashboard
+            <Link
+              to={isAdmin ? "/orders/admin" : "/orders/provider"}
+              className="specialties-page__back-link"
+            >
+              Voltar para ordens
             </Link>
           </div>
         </header>
@@ -145,7 +148,7 @@ export function SpecialtiesPage() {
                 disabled={submitting}
               />
               <textarea
-                placeholder="Descricao operacional"
+                placeholder="Descrição operacional"
                 value={formDescription}
                 onChange={(event) => setFormDescription(event.target.value)}
                 disabled={submitting}
@@ -161,10 +164,8 @@ export function SpecialtiesPage() {
           <section className="specialties-page__panel">
             <div className="specialties-page__panel-header">
               <div>
-                <h2>Solicitacoes de prestadores</h2>
-                <p>
-                  Avalie novas categorias sugeridas por prestadores.
-                </p>
+                <h2>Solicitações de prestadores</h2>
+                <p>Avalie novas categorias sugeridas por prestadores.</p>
               </div>
               <strong>{pendingRequests.length} pendente(s)</strong>
             </div>
@@ -237,7 +238,7 @@ export function SpecialtiesPage() {
 
         {isProvider && (
           <section className="specialties-page__panel">
-            <h2>Catalogo disponivel</h2>
+            <h2>Catálogo disponível</h2>
             <p>
               Caso atenda uma categoria que ainda não aparece aqui, solicite ao administrador.
             </p>

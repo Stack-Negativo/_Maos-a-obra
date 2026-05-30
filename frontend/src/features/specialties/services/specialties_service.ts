@@ -1,4 +1,6 @@
 import { specialtiesApi } from "@/api/specialties";
+import { isMockMode } from "@/shared/mocks/mock_mode";
+import { mockStore } from "@/shared/mocks/mock_store";
 
 import type { Specialty, SpecialtyRequest } from "../types/specialty_types";
 
@@ -25,6 +27,10 @@ function mapSpecialty(item: {
 }
 
 export async function listSpecialties(): Promise<Specialty[]> {
+  if (isMockMode()) {
+    return mockStore.listSpecialties();
+  }
+
   const response = await specialtiesApi.getAll();
 
   if (!response.success) {
@@ -37,6 +43,10 @@ export async function listSpecialties(): Promise<Specialty[]> {
 }
 
 export async function listSpecialtyRequests(): Promise<SpecialtyRequest[]> {
+  if (isMockMode()) {
+    return mockStore.listSpecialtyRequests();
+  }
+
   return [];
 }
 
@@ -45,6 +55,10 @@ export async function createSpecialty(input: {
   description: string;
   isActive?: boolean;
 }) {
+  if (isMockMode()) {
+    return mockStore.createSpecialty(input);
+  }
+
   const specialties = await listSpecialties();
   const alreadyExists = specialties.some(
     (specialty) => normalizeText(specialty.name) === normalizeText(input.name),
@@ -70,6 +84,10 @@ export async function createSpecialty(input: {
 }
 
 export async function toggleSpecialtyStatus(specialtyId: string) {
+  if (isMockMode()) {
+    return mockStore.toggleSpecialtyStatus(specialtyId);
+  }
+
   const specialties = await listSpecialties();
   const currentSpecialty = specialties.find(
     (specialty) => specialty.id === specialtyId,
@@ -99,12 +117,18 @@ export async function requestSpecialty(..._args: unknown[]) {
   );
 }
 
-export async function approveSpecialtyRequest(..._args: unknown[]) {
-  void _args;
+export async function approveSpecialtyRequest(requestId: string) {
+  if (isMockMode()) {
+    return mockStore.approveSpecialtyRequest(requestId).request;
+  }
+
   throw new Error("Não há solicitações de especialidade pendentes.");
 }
 
-export async function rejectSpecialtyRequest(..._args: unknown[]) {
-  void _args;
+export async function rejectSpecialtyRequest(requestId: string) {
+  if (isMockMode()) {
+    return mockStore.rejectSpecialtyRequest(requestId);
+  }
+
   throw new Error("Não há solicitações de especialidade pendentes.");
 }

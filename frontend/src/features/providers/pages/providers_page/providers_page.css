@@ -4,6 +4,8 @@
 }
 
 .providers-page__header {
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -14,6 +16,14 @@
   border-radius: 10px;
   background: var(--color-card);
   box-shadow: var(--shadow-card);
+}
+
+.providers-page__header::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--color-provider);
 }
 
 .providers-page__header h1 {
@@ -61,6 +71,18 @@
   font-size: 0.84rem;
   font-weight: 800;
   text-decoration: none;
+  transition:
+    border-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.providers-page__back-link:hover {
+  border-color: var(--color-provider);
+  color: var(--color-brand-dark);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--color-provider) 16%, transparent);
+  transform: translateY(-1px);
 }
 
 .providers-page__metrics {
@@ -79,6 +101,10 @@
   border-radius: 10px;
   background: var(--color-card);
   box-shadow: var(--shadow-card);
+  transition:
+    border-color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .providers-page__metrics article::before {
@@ -87,6 +113,12 @@
   inset: 0 auto 0 0;
   width: 4px;
   background: var(--color-provider);
+}
+
+.providers-page__metrics article:hover {
+  border-color: color-mix(in srgb, var(--color-provider) 38%, var(--color-border));
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
 }
 
 .providers-page__metrics span {
@@ -116,6 +148,11 @@
   border-radius: 10px;
   background: var(--color-card);
   box-shadow: var(--shadow-card);
+}
+
+.provider-form {
+  position: sticky;
+  top: 86px;
 }
 
 .provider-form h2 {
@@ -154,6 +191,7 @@
 .provider-form textarea:focus,
 .providers-list__toolbar select:focus {
   border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 14%, transparent);
 }
 
 .provider-form__error {
@@ -206,12 +244,22 @@
   font-size: 0.78rem;
   font-weight: 800;
   cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease;
 }
 
 .provider-form__chip--active {
   border-color: var(--color-brand);
   background: var(--color-brand-light);
   color: var(--color-brand-dark);
+}
+
+.provider-form__chip:hover:not(:disabled) {
+  border-color: var(--color-provider);
+  transform: translateY(-1px);
 }
 
 .provider-form__submit,
@@ -224,6 +272,17 @@
   color: var(--color-on-brand);
   font-weight: 800;
   cursor: pointer;
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.provider-form__submit:hover:not(:disabled),
+.providers-list__toolbar button:hover:not(:disabled) {
+  background: var(--color-brand-hover);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-brand) 22%, transparent);
+  transform: translateY(-1px);
 }
 
 .provider-form__submit:disabled,
@@ -253,6 +312,8 @@
 }
 
 .providers-admin-card {
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 0.8rem;
   padding: 1rem;
@@ -261,6 +322,16 @@
   border-radius: 10px;
   background: var(--color-card);
   box-shadow: var(--shadow-card);
+  transition:
+    border-color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.providers-admin-card:hover {
+  border-color: color-mix(in srgb, var(--color-provider) 38%, var(--color-border));
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
 }
 
 .providers-admin-card__main,
@@ -331,6 +402,14 @@
   font-size: 0.82rem;
   font-weight: 850;
   cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.providers-admin-card__actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .providers-admin-card__actions .providers-admin-card__danger {
@@ -354,5 +433,9 @@
   .providers-admin-card__main,
   .providers-admin-card__actions {
     display: grid;
+  }
+
+  .provider-form {
+    position: static;
   }
 }

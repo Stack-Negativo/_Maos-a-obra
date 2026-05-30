@@ -29,6 +29,9 @@
   --color-provider-soft: #d9efec;
   --color-admin: #6d40d8;
   --color-admin-soft: #e8e1fb;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
   --shadow-card: 0 12px 28px rgba(23, 33, 43, 0.08);
   --shadow-card-hover: 0 18px 42px rgba(23, 33, 43, 0.12);
 }
@@ -62,6 +65,9 @@
   --color-provider-soft: #153f3c;
   --color-admin: #b197ff;
   --color-admin-soft: #2b2247;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
   --shadow-card: 0 16px 38px rgba(0, 0, 0, 0.24);
   --shadow-card-hover: 0 22px 52px rgba(0, 0, 0, 0.34);
 }
@@ -88,6 +94,7 @@ body {
       var(--color-surface) 36rem
     );
   color: var(--color-text);
+  text-rendering: optimizeLegibility;
 }
 
 :root[data-theme="dark"] body {
@@ -121,6 +128,37 @@ select:focus-visible {
 
 a {
   color: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-brand) 24%, transparent);
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid var(--color-surface);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text-muted) 55%, transparent);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-text-muted) 78%, transparent);
 }
 
 :root[data-theme="dark"] .orders-page__filters,
