@@ -113,6 +113,10 @@ function unwrapResponse<T>(response: T | ApiResponse<T>) {
 
 function ensureApiSession() {}
 
+function createProviderPhoto(seed: string) {
+  return `https://api.dicebear.com/9.x/personas/svg?seed=${encodeURIComponent(seed)}`;
+}
+
 type OrdersApiResponse = {
   orders: ApiOrder[];
 };
@@ -130,13 +134,16 @@ type HistoryApiResponse = {
 };
 
 function mapProvider(apiProvider: ApiProvider): Provider {
+  const name =
+    apiProvider.name ??
+    apiProvider.user?.full_name ??
+    apiProvider.user_id ??
+    "Prestador";
+
   return {
     id: apiProvider.id,
-    name:
-      apiProvider.name ??
-      apiProvider.user?.full_name ??
-      apiProvider.user_id ??
-      "Prestador",
+    name,
+    photoUrl: createProviderPhoto(name),
     bio: apiProvider.bio,
     ratingAverage: apiProvider.rating_average ?? 0,
     completedServices: apiProvider.total_reviews ?? 0,

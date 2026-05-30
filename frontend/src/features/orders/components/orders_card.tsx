@@ -24,6 +24,15 @@ const STATUS_BADGE_COLORS: Record<
   danger: "danger",
 };
 
+function getProviderInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
 export function OrdersCard({
   order,
   onRefresh,
@@ -102,16 +111,16 @@ export function OrdersCard({
 
       <div className="orders-card__meta">
         <span className="orders-card__meta-item">
-          <span className="orders-card__meta-icon">🏷️</span>
+          <span className="orders-card__meta-label">Especialidade</span>
           {order.specialty.name}
         </span>
         <span className="orders-card__meta-item">
-          <span className="orders-card__meta-icon">📍</span>
+          <span className="orders-card__meta-label">Local</span>
           {order.address.street}, {order.address.number} -{" "}
           {order.address.city}, {order.address.state}
         </span>
         <span className="orders-card__meta-item">
-          <span className="orders-card__meta-icon">📅</span>
+          <span className="orders-card__meta-label">Prazo</span>
           {preferredDate.toLocaleDateString("pt-BR")} (
           {daysRemaining > 0
             ? `em ${daysRemaining} dias`
@@ -122,10 +131,16 @@ export function OrdersCard({
         </span>
         {order.selectedProvider && (
           <span className="orders-card__meta-item orders-card__meta-item--provider">
-            <span className="orders-card__meta-icon">👤</span>
+            <span className="orders-card__provider-avatar">
+              {order.selectedProvider.photoUrl ? (
+                <img src={order.selectedProvider.photoUrl} alt="" loading="lazy" />
+              ) : (
+                getProviderInitials(order.selectedProvider.name) || "P"
+              )}
+            </span>
             <strong>{order.selectedProvider.name}</strong>
             <span className="orders-card__rating">
-              ⭐ {order.selectedProvider.ratingAverage.toFixed(1)}
+              Nota {order.selectedProvider.ratingAverage.toFixed(1)}
             </span>
           </span>
         )}
@@ -143,7 +158,7 @@ export function OrdersCard({
           onClick={handleViewDetails}
           disabled={isLoading}
         >
-          Ver Detalhes e Candidatos
+          Ver detalhes
         </button>
         {canCancel && (
           <button
@@ -151,7 +166,7 @@ export function OrdersCard({
             onClick={handleCancel}
             disabled={isLoading}
           >
-            {isLoading ? "Cancelando..." : "Cancelar Ordem"}
+            {isLoading ? "Cancelando..." : "Cancelar ordem"}
           </button>
         )}
       </div>

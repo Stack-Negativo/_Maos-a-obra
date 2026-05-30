@@ -12,6 +12,7 @@ import {
   PAYMENT_STATUS_LABELS,
   OrderStatus,
 } from "../../types/order_types";
+import type { Order, Provider } from "../../types/order_types";
 
 import "./order_detail_page.css";
 
@@ -48,6 +49,89 @@ const APPLICATION_STATUS_LABELS = {
   CANCELLED: "Cancelada",
 } as const;
 
+type OrderChatMessage = {
+  id: string;
+  authorName: string;
+  authorRole: "CLIENT" | "PROVIDER" | "ADMIN" | "SYSTEM";
+  body: string;
+  createdAt: string;
+};
+
+const CHAT_STORAGE_PREFIX = "maos_a_obra_order_chat_v1:";
+
+function getProviderInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
+function createInitialChat(order: Order): OrderChatMessage[] {
+  const messages: OrderChatMessage[] = [
+    {
+      id: `${order.id}-system-chat`,
+      authorName: "Mãos à Obra",
+      authorRole: "SYSTEM",
+      body: "Chat da ordem criado para centralizar alinhamentos, horários e combinados.",
+      createdAt: order.createdAt,
+    },
+  ];
+
+  if (order.selectedProvider) {
+    messages.push({
+      id: `${order.id}-provider-chat`,
+      authorName: order.selectedProvider.name,
+      authorRole: "PROVIDER",
+      body: `Olá, vou acompanhar a ordem "${order.title}". Podemos alinhar detalhes por aqui.`,
+      createdAt: order.updatedAt,
+    });
+  }
+
+  return messages;
+}
+
+function readOrderChat(order: Order) {
+  const stored = localStorage.getItem(`${CHAT_STORAGE_PREFIX}${order.id}`);
+  if (!stored) {
+    return createInitialChat(order);
+  }
+
+  try {
+    return JSON.parse(stored) as OrderChatMessage[];
+  } catch {
+    return createInitialChat(order);
+  }
+}
+
+function writeOrderChat(orderId: string, messages: OrderChatMessage[]) {
+  localStorage.setItem(`${CHAT_STORAGE_PREFIX}${orderId}`, JSON.stringify(messages));
+}
+
+function getRoleLabel(role: OrderChatMessage["authorRole"]) {
+  const labels = {
+    ADMIN: "Admin",
+    CLIENT: "Cliente",
+    PROVIDER: "Prestador",
+    SYSTEM: "Sistema",
+  };
+
+  return labels[role];
+}
+
+function ProviderPhoto({ provider }: { provider: Provider }) {
+  return (
+    <span className="order-detail-page__provider-photo">
+      {provider.photoUrl ? (
+        <img src={provider.photoUrl} alt="" loading="lazy" />
+      ) : (
+        getProviderInitials(provider.name) || "P"
+      )}
+    </span>
+  );
+}
+
 function getActionErrorMessage(error: unknown) {
   return error instanceof Error
     ? error.message
@@ -79,6 +163,14 @@ export function OrderDetailPage() {
   const [detailRating, setDetailRating] = useState(5);
   const [detailComment, setDetailComment] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
+  const [chatState, setChatState] = useState<{
+    orderId: string | null;
+    messages: OrderChatMessage[];
+  }>({
+    orderId: null,
+    messages: [],
+  });
+  const [chatDraft, setChatDraft] = useState("");
   const {
     getOrderById,
     acceptApplication,
@@ -118,6 +210,8 @@ export function OrderDetailPage() {
   }
 
   const applications = order.applications ?? [];
+  const chatMessages =
+    chatState.orderId === order.id ? chatState.messages : readOrderChat(order);
   const selectedScheduleValue =
     scheduleValue ||
     toDateTimeLocalValue(order.scheduledAt ?? order.preferredDate);
@@ -242,6 +336,38 @@ export function OrderDetailPage() {
     }
   };
 
+  function sendChatMessage() {
+    const body = chatDraft.trim();
+    if (!body || !order) {
+      return;
+    }
+
+    const authorRole =
+      user?.role === UserRole.ADMIN
+        ? "ADMIN"
+        : user?.role === UserRole.PROVIDER
+          ? "PROVIDER"
+          : "CLIENT";
+    const nextSequence = chatMessages.length + 1;
+    const nextMessages = [
+      ...chatMessages,
+      {
+        id: `${order.id}-chat-${nextSequence}`,
+        authorName: user?.name ?? getRoleLabel(authorRole),
+        authorRole,
+        body,
+        createdAt: new Date().toISOString(),
+      } satisfies OrderChatMessage,
+    ];
+
+    setChatState({
+      orderId: order.id,
+      messages: nextMessages,
+    });
+    writeOrderChat(order.id, nextMessages);
+    setChatDraft("");
+  }
+
   return (
     <AppShell>
       <div className="order-detail-page">
@@ -320,10 +446,13 @@ export function OrderDetailPage() {
                   <label className="order-detail-page__info-label">
                     Prestador selecionado
                   </label>
-                  <p className="order-detail-page__info-value">
-                    {order.selectedProvider.name} - nota{" "}
-                    {order.selectedProvider.ratingAverage.toFixed(1)}
-                  </p>
+                  <div className="order-detail-page__provider-line">
+                    <ProviderPhoto provider={order.selectedProvider} />
+                    <p className="order-detail-page__info-value">
+                      {order.selectedProvider.name} - nota{" "}
+                      {order.selectedProvider.ratingAverage.toFixed(1)}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -490,6 +619,50 @@ export function OrderDetailPage() {
             </section>
           )}
 
+          <section className="order-detail-page__section order-detail-page__section--chat">
+            <div className="order-detail-page__section-heading">
+              <h2 className="order-detail-page__section-title">
+                Chat da ordem
+              </h2>
+              <span>Mensagens salvas nesta demonstração</span>
+            </div>
+
+            <div className="order-detail-page__chat-list">
+              {chatMessages.map((message) => (
+                <article
+                  className={`order-detail-page__chat-message order-detail-page__chat-message--${message.authorRole.toLowerCase()}`}
+                  key={message.id}
+                >
+                  <div className="order-detail-page__chat-meta">
+                    <strong>{message.authorName}</strong>
+                    <span>
+                      {getRoleLabel(message.authorRole)} -{" "}
+                      {formatDateTime(message.createdAt)}
+                    </span>
+                  </div>
+                  <p>{message.body}</p>
+                </article>
+              ))}
+            </div>
+
+            <form
+              className="order-detail-page__chat-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                sendChatMessage();
+              }}
+            >
+              <textarea
+                value={chatDraft}
+                onChange={(event) => setChatDraft(event.target.value)}
+                placeholder="Escreva uma mensagem para alinhar detalhes da ordem"
+              />
+              <button type="submit" disabled={!chatDraft.trim()}>
+                Enviar mensagem
+              </button>
+            </form>
+          </section>
+
           {order.review && (
             <section className="order-detail-page__section">
               <h2 className="order-detail-page__section-title">Avaliação</h2>
@@ -583,12 +756,15 @@ export function OrderDetailPage() {
                       className="orders-flow-card__candidate"
                       key={application.id}
                     >
-                      <div>
-                        <strong>{application.provider.name}</strong>
-                        <span>
-                          {APPLICATION_STATUS_LABELS[application.status]} · nota{" "}
-                          {application.provider.ratingAverage.toFixed(1)}
-                        </span>
+                      <div className="order-detail-page__candidate-main">
+                        <ProviderPhoto provider={application.provider} />
+                        <div>
+                          <strong>{application.provider.name}</strong>
+                          <span>
+                            {APPLICATION_STATUS_LABELS[application.status]} · nota{" "}
+                            {application.provider.ratingAverage.toFixed(1)}
+                          </span>
+                        </div>
                       </div>
                       {(isClient || isAdmin) &&
                         application.status === "PENDING" && (

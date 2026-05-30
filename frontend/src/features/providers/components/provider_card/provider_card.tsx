@@ -28,7 +28,13 @@ export function ProviderCard({
     <article className="provider-card">
       <div className="provider-card__top">
         <div className="provider-card__identity">
-          <span className="provider-card__avatar">{initials || "P"}</span>
+          <span className="provider-card__avatar">
+            {provider.photoUrl ? (
+              <img src={provider.photoUrl} alt="" loading="lazy" />
+            ) : (
+              initials || "P"
+            )}
+          </span>
           <div>
             <strong>{provider.name}</strong>
             <p>{provider.bio}</p>

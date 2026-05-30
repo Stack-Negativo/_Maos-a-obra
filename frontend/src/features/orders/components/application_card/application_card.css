@@ -1,17 +1,31 @@
 .application-card {
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 1rem;
   padding: 1.15rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
-  box-shadow: var(--shadow-card);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-card), var(--shadow-inset);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.application-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-provider);
 }
 
 .application-card:hover {
   border-color: var(--color-brand);
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--shadow-card-hover), var(--shadow-inset);
+  transform: translateY(-1px);
 }
 
 .application-card__header {
@@ -23,8 +37,31 @@
 
 .application-card__provider {
   display: grid;
-  gap: 0.35rem;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
   flex: 1;
+}
+
+.application-card__avatar {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-provider-soft);
+  color: var(--color-provider);
+  font-size: 0.82rem;
+  font-weight: 900;
+  box-shadow: var(--shadow-inset);
+}
+
+.application-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .application-card__name {
@@ -44,6 +81,7 @@
   font-size: 0.74rem;
   font-weight: 800;
   white-space: nowrap;
+  box-shadow: var(--shadow-inset);
 }
 
 .application-card__status--pending {
@@ -81,6 +119,7 @@
   color: var(--color-text-secondary);
   font-size: 0.74rem;
   font-weight: 800;
+  box-shadow: var(--shadow-inset);
 }
 
 .application-card__actions {
@@ -101,10 +140,12 @@
   cursor: pointer;
   transition:
     opacity 0.2s ease,
-    transform 0.16s ease;
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .application-card__btn:hover:not(:disabled) {
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 12%, transparent);
   transform: translateY(-1px);
 }
 

@@ -32,8 +32,9 @@
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 14px;
-  --shadow-card: 0 12px 28px rgba(23, 33, 43, 0.08);
+  --shadow-card: 0 10px 24px rgba(23, 33, 43, 0.07);
   --shadow-card-hover: 0 18px 42px rgba(23, 33, 43, 0.12);
+  --shadow-inset: inset 0 1px 0 color-mix(in srgb, #ffffff 76%, transparent);
 }
 
 :root[data-theme="dark"] {
@@ -70,6 +71,7 @@
   --radius-lg: 14px;
   --shadow-card: 0 16px 38px rgba(0, 0, 0, 0.24);
   --shadow-card-hover: 0 22px 52px rgba(0, 0, 0, 0.34);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 * {
@@ -88,6 +90,7 @@ body,
 body {
   font-family: "Segoe UI", Arial, Helvetica, sans-serif;
   background:
+    radial-gradient(circle at 22% -10%, color-mix(in srgb, var(--color-brand) 11%, transparent), transparent 24rem),
     linear-gradient(
       180deg,
       var(--color-surface-elevated) 0%,
@@ -99,6 +102,7 @@ body {
 
 :root[data-theme="dark"] body {
   background:
+    radial-gradient(circle at 22% -10%, color-mix(in srgb, var(--color-brand) 13%, transparent), transparent 24rem),
     linear-gradient(180deg, var(--color-surface-elevated) 0%, var(--color-surface) 32rem);
 }
 
@@ -136,6 +140,11 @@ a {
 
 button {
   -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  text-underline-offset: 0.18em;
 }
 
 button:active {

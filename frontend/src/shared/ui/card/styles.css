@@ -6,5 +6,5 @@
   border-radius: 10px;
   background: var(--color-card);
   color: var(--color-text);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
 }
