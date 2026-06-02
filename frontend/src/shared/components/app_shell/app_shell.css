@@ -1,33 +1,52 @@
 .app-shell {
   min-height: 100vh;
-  background: transparent;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  align-items: start;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-card) 92%, transparent) 0,
+      color-mix(in srgb, var(--color-card) 92%, transparent) 280px,
+      transparent 280px
+    );
 }
 
 .app-shell__topbar {
   position: sticky;
   top: 0;
   z-index: 10;
-  min-height: 68px;
+  min-height: 100vh;
   display: grid;
-  grid-template-columns: auto minmax(220px, 1fr) auto;
-  align-items: center;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
   gap: 1rem;
-  padding: 0 1.35rem;
-  border-bottom: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-card) 90%, transparent);
+  padding: 1rem;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 0;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 94%, transparent), color-mix(in srgb, var(--color-surface-elevated) 88%, transparent));
   backdrop-filter: blur(18px);
   box-shadow:
-    0 1px 0 color-mix(in srgb, var(--color-border) 50%, transparent),
-    0 12px 28px color-mix(in srgb, var(--color-text) 5%, transparent);
+    1px 0 0 color-mix(in srgb, var(--color-border) 50%, transparent),
+    18px 0 42px color-mix(in srgb, var(--color-text) 5%, transparent);
 }
 
 .app-shell__brand {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 76%, transparent);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 16%, transparent), transparent 8rem),
+    color-mix(in srgb, var(--color-card) 86%, transparent);
   color: var(--color-text);
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: 1.02rem;
+  font-weight: 900;
   text-decoration: none;
   min-width: max-content;
   transition: color 0.16s ease, transform 0.16s ease;
@@ -42,9 +61,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid color-mix(in srgb, var(--color-brand) 70%, var(--color-border));
+  border-radius: 12px;
   background: var(--color-brand);
   color: var(--color-on-brand);
   font-size: 0.78rem;
@@ -53,22 +73,25 @@
 }
 
 .app-shell__nav {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  justify-content: stretch;
   gap: 0.35rem;
   min-width: 0;
-  padding: 0.25rem;
+  padding: 0.4rem;
   border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--color-surface-elevated) 68%, transparent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface-elevated) 74%, transparent);
+  box-shadow: var(--shadow-inset);
 }
 
 .app-shell__nav-link {
-  min-height: 36px;
+  width: 100%;
+  min-height: 42px;
   display: inline-flex;
   align-items: center;
-  padding: 0 0.85rem;
-  border-radius: 8px;
+  justify-content: flex-start;
+  padding: 0 0.9rem;
+  border-radius: 10px;
   color: var(--color-text-secondary);
   font-size: 0.82rem;
   font-weight: 700;
@@ -89,24 +112,43 @@
   background: var(--color-brand-light);
   color: var(--color-brand-dark);
   box-shadow:
+    inset 3px 0 0 var(--color-brand),
     inset 0 0 0 1px color-mix(in srgb, var(--color-brand) 16%, transparent),
     0 8px 18px color-mix(in srgb, var(--color-brand) 10%, transparent);
 }
 
 .app-shell__user {
+  width: 100%;
+  display: grid;
+  align-self: end;
+  gap: 0.75rem;
+  min-width: 0;
+  margin-top: auto;
+  padding: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 76%, transparent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-card) 84%, transparent);
+  box-shadow: var(--shadow-inset);
+}
+
+.app-shell__profile {
+  width: 100%;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
-  min-width: 0;
-  justify-content: flex-end;
+  padding: 0.25rem 0.7rem 0.25rem 0.3rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-surface-elevated) 72%, transparent);
 }
 
 .app-shell__avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
   background: var(--color-brand);
   color: var(--color-on-brand);
@@ -138,12 +180,21 @@
   white-space: nowrap;
 }
 
+.app-shell__actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .app-shell__role-select,
 .app-shell__user button {
+  width: 100%;
   min-height: 34px;
   padding: 0.4rem 0.65rem;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 999px;
   background: var(--color-card);
   color: var(--color-text-secondary);
   font-size: 0.78rem;
@@ -168,13 +219,15 @@
 }
 
 .app-shell__role-select {
-  max-width: 7.75rem;
+  max-width: none;
 }
 
 .app-shell__role-badge {
+  grid-column: 1 / -1;
   min-height: 34px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   padding: 0 0.7rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
@@ -191,24 +244,10 @@
   color: var(--color-on-brand);
 }
 
-.app-shell__mock-badge {
-  min-height: 34px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 0.7rem;
-  border: 1px solid var(--color-info);
-  border-radius: 999px;
-  background: var(--color-info-bg);
-  color: var(--color-info);
-  font-size: 0.75rem;
-  font-weight: 850;
-  box-shadow: var(--shadow-inset);
-}
-
 .app-shell__reset-demo {
-  border-color: var(--color-info) !important;
+  border-color: color-mix(in srgb, var(--color-border) 80%, transparent) !important;
   background: var(--color-card) !important;
-  color: var(--color-info) !important;
+  color: var(--color-text-muted) !important;
 }
 
 .app-shell--provider .app-shell__brand-icon,
@@ -227,27 +266,80 @@
 }
 
 .app-shell__content {
-  width: min(100%, 1180px);
+  width: min(100%, 1320px);
   margin: 0 auto;
-  padding: 1.35rem 1.5rem 2.5rem;
+  padding: 2rem clamp(1.25rem, 3vw, 2.5rem) 3rem;
 }
 
 @media (max-width: 980px) {
+  .app-shell {
+    display: block;
+    background: transparent;
+  }
+
   .app-shell__topbar {
     height: auto;
+    min-height: auto;
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
     padding: 0.85rem 1rem;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+    box-shadow:
+      0 1px 0 color-mix(in srgb, var(--color-border) 50%, transparent),
+      0 12px 28px color-mix(in srgb, var(--color-text) 5%, transparent);
+  }
+
+  .app-shell__brand {
+    padding: 0;
+    border: 0;
+    background: transparent;
   }
 
   .app-shell__nav {
+    display: flex;
     justify-content: flex-start;
     overflow-x: auto;
     width: 100%;
+    border-radius: 999px;
+  }
+
+  .app-shell__nav-link {
+    width: auto;
+    justify-content: center;
+    border-radius: 999px;
   }
 
   .app-shell__user {
+    display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
+    margin-top: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .app-shell__profile {
+    max-width: 100%;
+    width: auto;
+    border-radius: 999px;
+  }
+
+  .app-shell__actions {
+    display: flex;
+    flex-wrap: wrap;
+    width: auto;
+  }
+
+  .app-shell__role-select,
+  .app-shell__user button {
+    width: auto;
+  }
+
+  .app-shell__role-badge {
+    grid-column: auto;
   }
 
   .app-shell__user-copy {

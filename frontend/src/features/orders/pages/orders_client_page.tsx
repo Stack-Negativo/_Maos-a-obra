@@ -9,6 +9,7 @@ import {
   OrderStatus,
 } from "../types/order_types";
 import type { Order } from "../types/order_types";
+import type { Provider } from "../types/order_types";
 import { ORDER_STATUS_LABELS } from "../types/order_types";
 
 import "./orders_page/orders_page.css";
@@ -35,6 +36,34 @@ function getScheduleValue(
   return (
     scheduleValues[order.id] ??
     toDateTimeLocalValue(order.scheduledAt ?? order.preferredDate)
+  );
+}
+
+function getProviderInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
+function ProviderMiniCard({ provider }: { provider: Provider }) {
+  return (
+    <div className="orders-flow-card__provider-mini">
+      <span className="orders-flow-card__provider-avatar">
+        {provider.photoUrl ? (
+          <img src={provider.photoUrl} alt="" loading="lazy" />
+        ) : (
+          getProviderInitials(provider.name) || "P"
+        )}
+      </span>
+      <div>
+        <span>Prestador</span>
+        <strong>{provider.name}</strong>
+      </div>
+      <small>Nota {provider.ratingAverage.toFixed(1)}</small>
+    </div>
   );
 }
 
@@ -303,9 +332,6 @@ export function OrdersClientPage() {
                         {new Date(order.scheduledAt).toLocaleString("pt-BR")}
                       </span>
                     )}
-                    {order.selectedProvider && (
-                      <span>Prestador: {order.selectedProvider.name}</span>
-                    )}
                     {order.review && (
                       <span>
                         Avaliação: {order.review.rating}/5
@@ -324,6 +350,10 @@ export function OrdersClientPage() {
                     )}
                   </div>
 
+                  {order.selectedProvider && (
+                    <ProviderMiniCard provider={order.selectedProvider} />
+                  )}
+
                   {pendingApplications.length > 0 && (
                     <div className="orders-flow-card__panel">
                       <h3>Candidatos para esta ordem</h3>
@@ -332,13 +362,26 @@ export function OrdersClientPage() {
                           className="orders-flow-card__candidate"
                           key={application.id}
                         >
-                          <div>
-                            <strong>{application.provider.name}</strong>
-                            <span>
-                              Nota {application.provider.ratingAverage.toFixed(1)}
-                              {" - "}
-                              {application.provider.completedServices} serviços
+                          <div className="orders-flow-card__candidate-main">
+                            <span className="orders-flow-card__provider-avatar">
+                              {application.provider.photoUrl ? (
+                                <img
+                                  src={application.provider.photoUrl}
+                                  alt=""
+                                  loading="lazy"
+                                />
+                              ) : (
+                                getProviderInitials(application.provider.name) || "P"
+                              )}
                             </span>
+                            <div>
+                              <strong>{application.provider.name}</strong>
+                              <span>
+                                Nota {application.provider.ratingAverage.toFixed(1)}
+                                {" - "}
+                                {application.provider.completedServices} serviços
+                              </span>
+                            </div>
                           </div>
                           <div className="orders-flow-card__actions">
                             <button
