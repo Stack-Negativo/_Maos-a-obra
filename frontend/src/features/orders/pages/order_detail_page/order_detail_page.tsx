@@ -132,6 +132,28 @@ function ProviderPhoto({ provider }: { provider: Provider }) {
   );
 }
 
+function ProviderSpotlight({ provider }: { provider: Provider }) {
+  return (
+    <section className="order-detail-page__provider-spotlight">
+      <ProviderPhoto provider={provider} />
+      <div className="order-detail-page__provider-profile">
+        <span>Profissional confirmado</span>
+        <strong>{provider.name}</strong>
+        {provider.bio && <p>{provider.bio}</p>}
+        <div className="order-detail-page__provider-specialties">
+          {provider.specialties.map((specialty) => (
+            <span key={specialty.id}>{specialty.name}</span>
+          ))}
+        </div>
+      </div>
+      <div className="order-detail-page__provider-score">
+        <strong>{provider.ratingAverage.toFixed(1)}</strong>
+        <span>{provider.completedServices} serviço(s)</span>
+      </div>
+    </section>
+  );
+}
+
 function getActionErrorMessage(error: unknown) {
   return error instanceof Error
     ? error.message
@@ -412,6 +434,10 @@ export function OrderDetailPage() {
               </article>
             ))}
           </section>
+
+          {order.selectedProvider && (
+            <ProviderSpotlight provider={order.selectedProvider} />
+          )}
 
           <section className="order-detail-page__section order-detail-page__section--details">
             <div className="order-detail-page__section-heading">

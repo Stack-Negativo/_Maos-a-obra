@@ -47,8 +47,94 @@ function createId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
 }
 
+const providerPhotoUrls = [
+  "/provider-photos/rafael-eletricista.png",
+  "/provider-photos/lucas-hidraulica.png",
+  "/provider-photos/paula-pinturas.png",
+];
+
 function createProviderPhoto(seed: string) {
-  return `https://api.dicebear.com/9.x/personas/svg?seed=${encodeURIComponent(seed)}`;
+  const hash = Array.from(seed).reduce(
+    (sum, character) => sum + character.charCodeAt(0),
+    0,
+  );
+  return providerPhotoUrls[hash % providerPhotoUrls.length];
+}
+
+function getSeededProviderPhoto(provider: { id: string; name: string }) {
+  return (
+    seededProviders.find((seededProvider) => seededProvider.id === provider.id)
+      ?.photoUrl ??
+    seededProviders.find((seededProvider) => seededProvider.name === provider.name)
+      ?.photoUrl ??
+    createProviderPhoto(provider.id || provider.name)
+  );
+}
+
+function withProviderPhoto<T extends { id: string; name: string; photoUrl?: string }>(
+  provider: T,
+): T & { photoUrl: string } {
+  return {
+    ...provider,
+    photoUrl:
+      provider.photoUrl?.startsWith("/provider-photos/")
+        ? provider.photoUrl
+        : getSeededProviderPhoto(provider),
+  };
+}
+
+function hydrateProviderPhotos(store: MockStore) {
+  let changed = false;
+  const providers = store.providers.map((provider) => {
+    const hydratedProvider = withProviderPhoto(provider);
+    if (hydratedProvider.photoUrl !== provider.photoUrl) {
+      changed = true;
+    }
+    return hydratedProvider;
+  });
+  const providersById = new Map(providers.map((provider) => [provider.id, provider]));
+
+  const orders = store.orders.map((order) => {
+    let selectedProvider = order.selectedProvider;
+    if (selectedProvider) {
+      const hydratedProvider = withProviderPhoto(
+        providersById.get(selectedProvider.id) ?? selectedProvider,
+      );
+      if (hydratedProvider.photoUrl !== selectedProvider.photoUrl) {
+        changed = true;
+      }
+      selectedProvider = hydratedProvider;
+    }
+
+    const applications = order.applications?.map((application) => {
+      const hydratedProvider = withProviderPhoto(
+        providersById.get(application.provider.id) ?? application.provider,
+      );
+      if (hydratedProvider.photoUrl !== application.provider.photoUrl) {
+        changed = true;
+      }
+      return {
+        ...application,
+        provider: hydratedProvider,
+      };
+    });
+
+    return {
+      ...order,
+      selectedProvider,
+      applications,
+    };
+  });
+
+  if (!changed) {
+    return store;
+  }
+
+  return {
+    ...store,
+    providers,
+    orders,
+  };
 }
 
 const seededSpecialties: Specialty[] = [
@@ -121,7 +207,7 @@ const seededProviders: ProviderProfile[] = [
     id: "provider-rafael",
     userId: "user-prestador",
     name: "Rafael Prestador",
-    photoUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=160&q=80",
+    photoUrl: "/provider-photos/rafael-eletricista.png",
     bio: "Eletricista residencial com foco em reparos rápidos, instalações seguras e atendimento em apartamentos.",
     specialties: [seededSpecialties[0]],
     ratingAverage: 4.8,
@@ -132,7 +218,7 @@ const seededProviders: ProviderProfile[] = [
     id: "provider-lucas",
     userId: "user-lucas",
     name: "Lucas Hidráulica",
-    photoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80",
+    photoUrl: "/provider-photos/lucas-hidraulica.png",
     bio: "Especialista em vazamentos, torneiras, registros e manutenção hidráulica preventiva.",
     specialties: [seededSpecialties[1]],
     ratingAverage: 4.6,
@@ -143,7 +229,7 @@ const seededProviders: ProviderProfile[] = [
     id: "provider-paula",
     userId: "user-paula",
     name: "Paula Pinturas",
-    photoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80",
+    photoUrl: "/provider-photos/paula-pinturas.png",
     bio: "Pintora residencial com experiência em acabamento fino, pintura interna e pequenos reparos.",
     specialties: [seededSpecialties[2]],
     ratingAverage: 4.9,
@@ -284,7 +370,12 @@ function readStore(): MockStore {
   }
 
   try {
-    return JSON.parse(stored) as MockStore;
+    const parsedStore = JSON.parse(stored) as MockStore;
+    const hydratedStore = hydrateProviderPhotos(parsedStore);
+    if (hydratedStore !== parsedStore) {
+      writeStore(hydratedStore);
+    }
+    return hydratedStore;
   } catch {
     const seeded = seedStore();
     localStorage.setItem(STORE_KEY, JSON.stringify(seeded));

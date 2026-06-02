@@ -51,7 +51,7 @@ export function LoginForm() {
 
       {isMockMode() && (
         <div className="login-form__demo">
-          <strong>Contas para teste</strong>
+          <strong>Acessos rápidos</strong>
           <div>
             {demoAccounts.map((account) => (
               <button

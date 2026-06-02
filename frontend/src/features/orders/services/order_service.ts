@@ -114,7 +114,16 @@ function unwrapResponse<T>(response: T | ApiResponse<T>) {
 function ensureApiSession() {}
 
 function createProviderPhoto(seed: string) {
-  return `https://api.dicebear.com/9.x/personas/svg?seed=${encodeURIComponent(seed)}`;
+  const photos = [
+    "/provider-photos/rafael-eletricista.png",
+    "/provider-photos/lucas-hidraulica.png",
+    "/provider-photos/paula-pinturas.png",
+  ];
+  const hash = Array.from(seed).reduce(
+    (sum, character) => sum + character.charCodeAt(0),
+    0,
+  );
+  return photos[hash % photos.length];
 }
 
 type OrdersApiResponse = {

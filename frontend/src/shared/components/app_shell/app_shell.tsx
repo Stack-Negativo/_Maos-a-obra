@@ -4,7 +4,7 @@ import { Link, NavLink } from "react-router-dom";
 
 import { useAuthContext } from "@/app/providers/auth_provider/use_auth_context";
 import { UserRole } from "@/features/auth/types/auth_types";
-import { isMockMode, MOCK_MODE_LABEL } from "@/shared/mocks/mock_mode";
+import { isMockMode } from "@/shared/mocks/mock_mode";
 import { mockStore } from "@/shared/mocks/mock_store";
 import { initializeTheme, toggleTheme } from "@/shared/utils/theme";
 
@@ -83,7 +83,7 @@ export function AppShell({ children }: AppShellProps) {
 
   function resetMockData() {
     const confirmed = window.confirm(
-      "Resetar os dados mockados e voltar para as contas iniciais?",
+      "Reiniciar o ambiente de apresentação e voltar para as contas iniciais?",
     );
 
     if (!confirmed) {
@@ -125,38 +125,40 @@ export function AppShell({ children }: AppShellProps) {
         </nav>
 
         <div className="app-shell__user">
-          <span className="app-shell__avatar">{getInitials(user?.name)}</span>
-          <div className="app-shell__user-copy">
-            <strong>{user?.name ?? "Conta"}</strong>
-            <span>
-              {effectiveRole ? roleLabels[effectiveRole] : "Cliente"} - {user?.email ?? ""}
-            </span>
+          <div className="app-shell__profile">
+            <span className="app-shell__avatar">{getInitials(user?.name)}</span>
+            <div className="app-shell__user-copy">
+              <strong>{user?.name ?? "Conta"}</strong>
+              <span>
+                {effectiveRole ? roleLabels[effectiveRole] : "Cliente"} - {user?.email ?? ""}
+              </span>
+            </div>
           </div>
-          {isMockMode() && (
-            <div className="app-shell__mock-badge">{MOCK_MODE_LABEL}</div>
-          )}
-          {isMockMode() && (
+          <div className="app-shell__actions">
+            <div className="app-shell__role-badge" aria-label="Perfil do usuário">
+              {effectiveRole ? roleLabels[effectiveRole] : "Cliente"}
+            </div>
             <button
               type="button"
-              className="app-shell__reset-demo"
-              onClick={resetMockData}
+              className="app-shell__theme-toggle"
+              onClick={toggleTheme}
             >
-              Resetar demo
+              Tema
             </button>
-          )}
-          <div className="app-shell__role-badge" aria-label="Perfil do usuário">
-            {effectiveRole ? roleLabels[effectiveRole] : "Cliente"}
+            {isMockMode() && (
+              <button
+                type="button"
+                className="app-shell__reset-demo"
+                onClick={resetMockData}
+                title="Reiniciar ambiente de apresentação"
+              >
+                Reiniciar
+              </button>
+            )}
+            <button type="button" onClick={signOut}>
+              Sair
+            </button>
           </div>
-          <button
-            type="button"
-            className="app-shell__theme-toggle"
-            onClick={toggleTheme}
-          >
-            Tema
-          </button>
-          <button type="button" onClick={signOut}>
-            Sair
-          </button>
         </div>
       </header>
 
