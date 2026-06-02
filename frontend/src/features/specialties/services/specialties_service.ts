@@ -110,10 +110,18 @@ export async function toggleSpecialtyStatus(specialtyId: string) {
   return mapSpecialty(response.data);
 }
 
-export async function requestSpecialty(..._args: unknown[]) {
-  void _args;
+export async function requestSpecialty(input: {
+  name: string;
+  description: string;
+  requestedBy: string;
+  requestedByName: string;
+}) {
+  if (isMockMode()) {
+    return mockStore.requestSpecialty(input);
+  }
+
   throw new Error(
-    "Solicitação de especialidade indisponível no momento. Peça ao admin para criar a categoria.",
+    "Solicitacao de especialidade indisponivel no backend atual. Peca ao admin para criar a categoria.",
   );
 }
 

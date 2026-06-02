@@ -345,3 +345,72 @@
     max-width: none;
   }
 }
+
+.specialties-page__panel--provider-request {
+  border-color: color-mix(in srgb, var(--color-provider) 34%, var(--color-border));
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-provider) 10%, transparent), transparent 14rem),
+    var(--color-card);
+}
+
+.specialties-page__panel--provider-request::before {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-provider) 34%, transparent),
+    transparent 72%
+  );
+}
+
+.specialties-page__panel--provider-request .specialties-page__panel-header strong {
+  background: var(--color-provider-soft);
+  color: var(--color-provider);
+}
+
+.specialties-page__panel--tip {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--color-surface-elevated) 72%, var(--color-card));
+}
+
+.specialties-page__form--request button {
+  border-color: var(--color-provider);
+  background: var(--color-provider);
+}
+
+.specialties-page__form--request button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-provider) 84%, #000000);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-provider) 20%, transparent);
+}
+
+.specialties-page__form-success {
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--color-success);
+  border-radius: 8px;
+  background: var(--color-success-bg);
+  color: var(--color-success) !important;
+  font-weight: 750;
+}
+
+.specialties-page__requests--compact {
+  gap: 0.55rem;
+}
+
+.specialties-page__request-status--approved {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.specialties-page__request-status--rejected {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.specialties-page__request-status--pending {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+:root[data-theme="dark"] .specialties-page__panel--provider-request {
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-provider) 8%, transparent), transparent 14rem),
+    color-mix(in srgb, var(--color-card) 96%, var(--color-surface-elevated));
+}

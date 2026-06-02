@@ -37,15 +37,16 @@
 
 .application-card__provider {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.75rem;
-  align-items: center;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: flex-start;
   flex: 1;
+  min-width: 0;
 }
 
 .application-card__avatar {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -65,13 +66,44 @@
 }
 
 .application-card__name {
+  display: block;
+  overflow: hidden;
   color: var(--color-text);
   font-size: 1rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.application-card__provider-copy {
+  display: grid;
+  gap: 0.38rem;
+  min-width: 0;
 }
 
 .application-card__rating {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.application-card__rating span {
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--color-provider) 24%, var(--color-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-provider-soft) 42%, var(--color-card));
   color: var(--color-text-secondary);
-  font-size: 0.82rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.application-card__rating strong {
+  color: var(--color-provider);
+  font-size: 0.8rem;
 }
 
 .application-card__status {

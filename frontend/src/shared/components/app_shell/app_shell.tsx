@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
 
@@ -6,7 +6,12 @@ import { useAuthContext } from "@/app/providers/auth_provider/use_auth_context";
 import { UserRole } from "@/features/auth/types/auth_types";
 import { isMockMode } from "@/shared/mocks/mock_mode";
 import { mockStore } from "@/shared/mocks/mock_store";
-import { initializeTheme, toggleTheme } from "@/shared/utils/theme";
+import {
+  getCurrentTheme,
+  initializeTheme,
+  toggleTheme,
+} from "@/shared/utils/theme";
+import type { AppTheme } from "@/shared/utils/theme";
 
 import "./app_shell.css";
 
@@ -48,6 +53,7 @@ function getInitials(name?: string) {
 
 export function AppShell({ children }: AppShellProps) {
   const { user, signOut } = useAuthContext();
+  const [theme, setTheme] = useState<AppTheme>(() => getCurrentTheme());
 
   useEffect(() => {
     initializeTheme();
@@ -64,26 +70,26 @@ export function AppShell({ children }: AppShellProps) {
   const visibleNavItems =
     effectiveRole === UserRole.ADMIN
       ? [
-          { label: "Administração", to: orderRoute },
-          { label: "Catálogo", to: "/specialties" },
-          { label: "Prestadores", to: "/providers" },
-          { label: "Perfil", to: "/profile" },
+          { icon: "📊", label: "Administracao", to: orderRoute },
+          { icon: "🧰", label: "Catalogo", to: "/specialties" },
+          { icon: "👷", label: "Prestadores", to: "/providers" },
+          { icon: "👤", label: "Perfil", to: "/profile" },
         ]
       : effectiveRole === UserRole.PROVIDER
         ? [
-            { label: "Ordens", to: orderRoute },
-            { label: "Especialidades", to: "/specialties" },
-            { label: "Perfil", to: "/profile" },
+            { icon: "🧾", label: "Ordens", to: orderRoute },
+            { icon: "🧰", label: "Especialidades", to: "/specialties" },
+            { icon: "👤", label: "Perfil", to: "/profile" },
           ]
         : [
-            { label: "Endereços", to: "/addresses" },
-            { label: "Minhas Ordens", to: orderRoute },
-            { label: "Perfil", to: "/profile" },
+            { icon: "📍", label: "Enderecos", to: "/addresses" },
+            { icon: "🧾", label: "Minhas Ordens", to: orderRoute },
+            { icon: "👤", label: "Perfil", to: "/profile" },
           ];
 
   function resetMockData() {
     const confirmed = window.confirm(
-      "Reiniciar o ambiente de apresentação e voltar para as contas iniciais?",
+      "Reiniciar o ambiente de apresentacao e voltar para as contas iniciais?",
     );
 
     if (!confirmed) {
@@ -105,10 +111,10 @@ export function AppShell({ children }: AppShellProps) {
           <span className="app-shell__brand-icon" aria-hidden="true">
             MO
           </span>
-          <span>Mãos à Obra</span>
+          <span>Maos a Obra</span>
         </Link>
 
-        <nav className="app-shell__nav" aria-label="Navegação principal">
+        <nav className="app-shell__nav" aria-label="Navegacao principal">
           {visibleNavItems.map((item) => (
             <NavLink
               key={item.to}
@@ -119,7 +125,10 @@ export function AppShell({ children }: AppShellProps) {
                   : "app-shell__nav-link"
               }
             >
-              {item.label}
+              <span className="app-shell__nav-icon" aria-hidden="true">
+                {item.icon}
+              </span>
+              <span>{item.label}</span>
             </NavLink>
           ))}
         </nav>
@@ -130,33 +139,40 @@ export function AppShell({ children }: AppShellProps) {
             <div className="app-shell__user-copy">
               <strong>{user?.name ?? "Conta"}</strong>
               <span>
-                {effectiveRole ? roleLabels[effectiveRole] : "Cliente"} - {user?.email ?? ""}
+                {effectiveRole ? roleLabels[effectiveRole] : "Cliente"} -{" "}
+                {user?.email ?? ""}
               </span>
             </div>
           </div>
           <div className="app-shell__actions">
-            <div className="app-shell__role-badge" aria-label="Perfil do usuário">
+            <div className="app-shell__role-badge" aria-label="Perfil do usuario">
               {effectiveRole ? roleLabels[effectiveRole] : "Cliente"}
             </div>
             <button
               type="button"
               className="app-shell__theme-toggle"
-              onClick={toggleTheme}
+              aria-label={
+                theme === "dark" ? "Tema escuro ativo" : "Tema claro ativo"
+              }
+              onClick={() => setTheme(toggleTheme())}
             >
-              Tema
+              <span aria-hidden="true">
+                {theme === "dark" ? "🌙 Noite" : "☀️ Dia"}
+              </span>
+              <strong>{theme === "dark" ? "Escuro" : "Claro"}</strong>
             </button>
             {isMockMode() && (
               <button
                 type="button"
                 className="app-shell__reset-demo"
                 onClick={resetMockData}
-                title="Reiniciar ambiente de apresentação"
+                title="Reiniciar ambiente de apresentacao"
               >
-                Reiniciar
+                🔄 Reiniciar
               </button>
             )}
             <button type="button" onClick={signOut}>
-              Sair
+              🚪 Sair
             </button>
           </div>
         </div>

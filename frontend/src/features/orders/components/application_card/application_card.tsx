@@ -53,13 +53,16 @@ export function ApplicationCard({
               getProviderInitials(provider.name) || "P"
             )}
           </span>
-          <div>
+          <div className="application-card__provider-copy">
             <strong className="application-card__name">
               {provider.name}
             </strong>
-            <span className="application-card__rating">
-              Nota {provider.ratingAverage.toFixed(1)} ({provider.completedServices} serviços)
-            </span>
+            <div className="application-card__rating">
+              <span>
+                ⭐ Nota <strong>{provider.ratingAverage.toFixed(1)}</strong>
+              </span>
+              <span>🧾 {provider.completedServices} serviços</span>
+            </div>
           </div>
         </div>
         <span

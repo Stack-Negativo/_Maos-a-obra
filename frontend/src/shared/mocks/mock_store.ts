@@ -579,6 +579,48 @@ export const mockStore = {
     return readStore().specialtyRequests;
   },
 
+  requestSpecialty(input: {
+    name: string;
+    description: string;
+    requestedBy: string;
+    requestedByName: string;
+  }) {
+    const store = readStore();
+    const name = input.name.trim();
+    const description = input.description.trim();
+    const normalizedName = name.toLowerCase();
+    const existsInCatalog = store.specialties.some(
+      (specialty) => specialty.name.toLowerCase() === normalizedName,
+    );
+    const existsAsPendingRequest = store.specialtyRequests.some(
+      (request) =>
+        request.status === "PENDING" &&
+        request.name.toLowerCase() === normalizedName,
+    );
+
+    if (existsInCatalog) {
+      throw new Error("Essa especialidade ja existe no catalogo.");
+    }
+
+    if (existsAsPendingRequest) {
+      throw new Error("Ja existe uma solicitacao pendente para essa especialidade.");
+    }
+
+    const request: SpecialtyRequest = {
+      id: createId("spec-req"),
+      name,
+      description,
+      requestedBy: input.requestedBy,
+      requestedByName: input.requestedByName,
+      status: "PENDING",
+      createdAt: now(),
+    };
+
+    store.specialtyRequests.unshift(request);
+    writeStore(store);
+    return request;
+  },
+
   createSpecialty(input: { name: string; description: string; isActive?: boolean }) {
     const store = readStore();
     const name = input.name.trim();
@@ -617,14 +659,24 @@ export const mockStore = {
     if (!request) {
       throw new Error("Solicitação não encontrada.");
     }
+    const exists = store.specialties.some(
+      (specialty) => specialty.name.toLowerCase() === request.name.toLowerCase(),
+    );
     request.status = "APPROVED";
     request.reviewedAt = now();
-    const specialty = this.createSpecialty({
+    if (exists) {
+      writeStore(store);
+      return { request, specialty: undefined };
+    }
+
+    const specialty: Specialty = {
+      id: createId("spec"),
       name: request.name,
       description: request.description,
       isActive: true,
-    });
-    writeStore(readStore());
+    };
+    store.specialties.push(specialty);
+    writeStore(store);
     return { request, specialty };
   },
 

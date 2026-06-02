@@ -21,7 +21,9 @@ function getPreferredTheme() {
     : "light";
 }
 
-function applyTheme(theme: "light" | "dark") {
+export type AppTheme = "light" | "dark";
+
+function applyTheme(theme: AppTheme) {
   document.documentElement.dataset.theme = theme;
   localStorage.setItem(THEME_STORAGE_KEY, theme);
   localStorage.setItem(LEGACY_THEME_STORAGE_KEY, theme);
@@ -31,8 +33,14 @@ export function initializeTheme() {
   applyTheme(getPreferredTheme());
 }
 
+export function getCurrentTheme(): AppTheme {
+  return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+}
+
 export function toggleTheme() {
   const currentTheme =
     document.documentElement.dataset.theme === "dark" ? "dark" : "light";
-  applyTheme(currentTheme === "dark" ? "light" : "dark");
+  const nextTheme = currentTheme === "dark" ? "light" : "dark";
+  applyTheme(nextTheme);
+  return nextTheme;
 }

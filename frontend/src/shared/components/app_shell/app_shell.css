@@ -6,8 +6,8 @@
   background:
     linear-gradient(
       90deg,
-      color-mix(in srgb, var(--color-card) 92%, transparent) 0,
-      color-mix(in srgb, var(--color-card) 92%, transparent) 280px,
+      color-mix(in srgb, var(--color-card) 88%, transparent) 0,
+      color-mix(in srgb, var(--color-card) 88%, transparent) 280px,
       transparent 280px
     );
 }
@@ -26,7 +26,7 @@
   border-right: 1px solid var(--color-border);
   border-bottom: 0;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 94%, transparent), color-mix(in srgb, var(--color-surface-elevated) 88%, transparent));
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 92%, transparent), color-mix(in srgb, var(--color-surface-elevated) 86%, transparent));
   backdrop-filter: blur(18px);
   box-shadow:
     1px 0 0 color-mix(in srgb, var(--color-border) 50%, transparent),
@@ -42,8 +42,8 @@
   border: 1px solid color-mix(in srgb, var(--color-border) 76%, transparent);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 16%, transparent), transparent 8rem),
-    color-mix(in srgb, var(--color-card) 86%, transparent);
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 11%, transparent), transparent 8rem),
+    color-mix(in srgb, var(--color-card) 90%, transparent);
   color: var(--color-text);
   font-size: 1.02rem;
   font-weight: 900;
@@ -80,7 +80,7 @@
   padding: 0.4rem;
   border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--color-surface-elevated) 74%, transparent);
+  background: color-mix(in srgb, var(--color-surface-elevated) 80%, transparent);
   box-shadow: var(--shadow-inset);
 }
 
@@ -89,6 +89,7 @@
   min-height: 42px;
   display: inline-flex;
   align-items: center;
+  gap: 0.55rem;
   justify-content: flex-start;
   padding: 0 0.9rem;
   border-radius: 10px;
@@ -103,13 +104,13 @@
 }
 
 .app-shell__nav-link:hover {
-  background: var(--color-surface-elevated);
+  background: color-mix(in srgb, var(--color-card) 86%, transparent);
   color: var(--color-text);
   transform: translateY(-1px);
 }
 
 .app-shell__nav-link--active {
-  background: var(--color-brand-light);
+  background: color-mix(in srgb, var(--color-brand-light) 82%, var(--color-card));
   color: var(--color-brand-dark);
   box-shadow:
     inset 3px 0 0 var(--color-brand),
@@ -140,7 +141,7 @@
   padding: 0.25rem 0.7rem 0.25rem 0.3rem;
   border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--color-surface-elevated) 72%, transparent);
+  background: color-mix(in srgb, var(--color-surface-elevated) 78%, transparent);
 }
 
 .app-shell__avatar {
@@ -262,13 +263,76 @@
 }
 
 .app-shell__theme-toggle {
+  display: grid !important;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem;
+  align-items: center;
+  justify-content: center;
+  border-color: color-mix(in srgb, var(--color-brand) 28%, var(--color-border)) !important;
+  background: color-mix(in srgb, var(--color-brand-light) 62%, var(--color-card)) !important;
   color: var(--color-brand-dark) !important;
+}
+
+.app-shell__theme-toggle span {
+  min-width: 2.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.app-shell__theme-toggle strong {
+  color: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
 }
 
 .app-shell__content {
   width: min(100%, 1320px);
   margin: 0 auto;
   padding: 2rem clamp(1.25rem, 3vw, 2.5rem) 3rem;
+}
+
+:root[data-theme="dark"] .app-shell {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-card) 74%, #0b1420 16%) 0,
+      color-mix(in srgb, var(--color-card) 74%, #0b1420 16%) 280px,
+      transparent 280px
+    );
+}
+
+:root[data-theme="dark"] .app-shell__topbar {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 88%, #0f1c2c 12%), color-mix(in srgb, var(--color-surface-elevated) 84%, #0b1420 14%));
+  box-shadow:
+    1px 0 0 color-mix(in srgb, var(--color-border) 52%, transparent),
+    18px 0 42px rgba(0, 0, 0, 0.22);
+}
+
+:root[data-theme="dark"] .app-shell__brand {
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 8%, transparent), transparent 8rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, #4aa3ff 8%, transparent), transparent 8rem),
+    color-mix(in srgb, var(--color-card) 86%, #0d1724 10%);
+}
+
+:root[data-theme="dark"] .app-shell__nav {
+  background: color-mix(in srgb, var(--color-surface-elevated) 86%, #0a1320 12%);
+}
+
+:root[data-theme="dark"] .app-shell__nav-link:hover {
+  background: color-mix(in srgb, var(--color-card) 88%, #4aa3ff 5%);
+}
+
+:root[data-theme="dark"] .app-shell__nav-link--active {
+  background: color-mix(in srgb, var(--color-brand-light) 76%, var(--color-card));
+  color: var(--color-brand-dark);
+}
+
+:root[data-theme="dark"] .app-shell__user {
+  background: color-mix(in srgb, var(--color-card) 86%, #0d1724 10%);
 }
 
 @media (max-width: 980px) {
@@ -349,4 +413,28 @@
   .app-shell__content {
     padding: 1rem;
   }
+}
+
+.app-shell__nav-icon {
+  width: 1.45rem;
+  height: 1.45rem;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-surface-elevated) 74%, transparent);
+  font-size: 0.94rem;
+  line-height: 1;
+}
+
+.app-shell__nav-link--active .app-shell__nav-icon {
+  background: color-mix(in srgb, var(--color-brand) 16%, var(--color-card));
+}
+
+.app-shell__theme-toggle span {
+  min-width: 4.4rem;
+}
+
+:root[data-theme="dark"] .app-shell__nav-icon {
+  background: color-mix(in srgb, var(--color-card) 80%, #4aa3ff 7%);
 }

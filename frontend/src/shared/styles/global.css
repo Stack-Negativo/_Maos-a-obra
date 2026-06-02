@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --color-brand: #c85613;
-  --color-brand-dark: #87380d;
-  --color-brand-hover: #a94710;
-  --color-brand-light: #f3ddca;
+  --color-brand: #b84f16;
+  --color-brand-dark: #73320f;
+  --color-brand-hover: #973f12;
+  --color-brand-light: #f1dfd4;
   --color-on-brand: #ffffff;
-  --color-surface: #eef2f5;
-  --color-surface-elevated: #f5f7f8;
-  --color-card: #fbfcfd;
-  --color-border: #d5dde3;
-  --color-border-strong: #aeb9c2;
-  --color-text: #17212b;
+  --color-surface: #e7ecef;
+  --color-surface-elevated: #f0f4f6;
+  --color-card: #f8fafb;
+  --color-border: #cbd6dd;
+  --color-border-strong: #9facb6;
+  --color-text: #111b24;
   --color-text-primary: var(--color-text);
-  --color-text-secondary: #52606b;
-  --color-text-muted: #7a8792;
+  --color-text-secondary: #45545f;
+  --color-text-muted: #6c7b86;
   --color-primary: var(--color-brand);
   --color-primary-hover: var(--color-brand-hover);
   --color-success: #1f7a55;
@@ -25,53 +25,53 @@
   --color-danger-bg: #f8dada;
   --color-info: #1d6398;
   --color-info-bg: #dcecf7;
-  --color-provider: #0f766e;
-  --color-provider-soft: #d9efec;
-  --color-admin: #6d40d8;
-  --color-admin-soft: #e8e1fb;
+  --color-provider: #0b7c74;
+  --color-provider-soft: #d7eeee;
+  --color-admin: #6551c8;
+  --color-admin-soft: #e5e2f7;
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 14px;
-  --shadow-card: 0 10px 24px rgba(23, 33, 43, 0.07);
-  --shadow-card-hover: 0 18px 42px rgba(23, 33, 43, 0.12);
+  --shadow-card: 0 12px 28px rgba(17, 27, 36, 0.08);
+  --shadow-card-hover: 0 18px 46px rgba(17, 27, 36, 0.13);
   --shadow-inset: inset 0 1px 0 color-mix(in srgb, #ffffff 76%, transparent);
 }
 
 :root[data-theme="dark"] {
-  --color-brand: #e87722;
-  --color-brand-dark: #ffbd84;
-  --color-brand-hover: #ff9f55;
-  --color-brand-light: #3f2d20;
-  --color-on-brand: #1a120b;
-  --color-surface: #13181d;
-  --color-surface-elevated: #192027;
-  --color-card: #202832;
-  --color-border: #3b4854;
-  --color-border-strong: #64717d;
-  --color-text: #f4f6f7;
+  --color-brand: #f29a55;
+  --color-brand-dark: #ffd7b8;
+  --color-brand-hover: #ffb06f;
+  --color-brand-light: #283342;
+  --color-on-brand: #141a22;
+  --color-surface: #0d1621;
+  --color-surface-elevated: #121d2a;
+  --color-card: #182636;
+  --color-border: #2f4053;
+  --color-border-strong: #63788c;
+  --color-text: #f3f7fb;
   --color-text-primary: var(--color-text);
-  --color-text-secondary: #d2d9de;
-  --color-text-muted: #a7b2ba;
+  --color-text-secondary: #d2deea;
+  --color-text-muted: #9fb0c1;
   --color-primary: var(--color-brand);
   --color-primary-hover: var(--color-brand-hover);
   --color-success: #7bd39c;
-  --color-success-bg: #173c28;
+  --color-success-bg: #173b33;
   --color-warning: #f4c266;
-  --color-warning-bg: #3b2c14;
+  --color-warning-bg: #3b2f18;
   --color-danger: #ff8a8a;
-  --color-danger-bg: #421b1b;
+  --color-danger-bg: #402024;
   --color-info: #8cc7ff;
-  --color-info-bg: #173047;
-  --color-provider: #37b7aa;
-  --color-provider-soft: #153f3c;
-  --color-admin: #b197ff;
-  --color-admin-soft: #2b2247;
+  --color-info-bg: #18364f;
+  --color-provider: #58d2c8;
+  --color-provider-soft: #173c46;
+  --color-admin: #b3a7ff;
+  --color-admin-soft: #282e55;
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 14px;
-  --shadow-card: 0 16px 38px rgba(0, 0, 0, 0.2);
-  --shadow-card-hover: 0 22px 52px rgba(0, 0, 0, 0.3);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --shadow-card: 0 18px 44px rgba(0, 0, 0, 0.24);
+  --shadow-card-hover: 0 24px 58px rgba(0, 0, 0, 0.34);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.09);
 }
 
 * {
@@ -90,7 +90,8 @@ body,
 body {
   font-family: "Segoe UI", Arial, Helvetica, sans-serif;
   background:
-    radial-gradient(circle at 22% -10%, color-mix(in srgb, var(--color-brand) 11%, transparent), transparent 24rem),
+    radial-gradient(circle at 18% -8%, color-mix(in srgb, var(--color-brand) 8%, transparent), transparent 24rem),
+    radial-gradient(circle at 98% 0%, color-mix(in srgb, var(--color-provider) 7%, transparent), transparent 28rem),
     linear-gradient(
       180deg,
       var(--color-surface-elevated) 0%,
@@ -102,9 +103,9 @@ body {
 
 :root[data-theme="dark"] body {
   background:
-    radial-gradient(circle at 22% -10%, color-mix(in srgb, var(--color-brand) 10%, transparent), transparent 24rem),
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-provider) 9%, transparent), transparent 26rem),
-    linear-gradient(180deg, var(--color-surface-elevated) 0%, var(--color-surface) 32rem);
+    radial-gradient(circle at 18% -10%, color-mix(in srgb, var(--color-brand) 7%, transparent), transparent 24rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, #4aa3ff 9%, transparent), transparent 28rem),
+    linear-gradient(180deg, #142033 0%, var(--color-surface) 36rem);
 }
 
 button,
@@ -247,9 +248,9 @@ button:active {
   border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 14%, transparent), transparent 17rem),
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-provider) 10%, transparent), transparent 18rem),
-    linear-gradient(135deg, color-mix(in srgb, var(--color-card) 96%, transparent), color-mix(in srgb, var(--color-surface-elevated) 92%, transparent));
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 10%, transparent), transparent 17rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-provider) 8%, transparent), transparent 18rem),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-card) 98%, transparent), color-mix(in srgb, var(--color-surface-elevated) 94%, transparent));
   box-shadow: var(--shadow-card);
 }
 
@@ -264,9 +265,9 @@ button:active {
   content: "";
   position: absolute;
   inset: 0 0 auto;
-  height: 4px;
-  background: linear-gradient(90deg, var(--color-brand), var(--color-provider), var(--color-admin));
-  opacity: 0.92;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-brand), var(--color-provider), color-mix(in srgb, var(--color-admin) 82%, var(--color-provider)));
+  opacity: 0.86;
 }
 
 .orders-page__header h1,
@@ -293,6 +294,17 @@ button:active {
   max-width: 62ch;
   color: var(--color-text-secondary);
   line-height: 1.55;
+}
+
+.orders-page,
+.dashboard-page,
+.addresses-page,
+.providers-page,
+.specialties-page,
+.profile-page,
+.order-create-page,
+.order-detail-page {
+  gap: clamp(1rem, 2vw, 1.35rem);
 }
 
 .orders-flow-card,
@@ -344,7 +356,7 @@ button:active {
 .order-detail-page__summary-card {
   border-radius: var(--radius-lg);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 98%, transparent), color-mix(in srgb, var(--color-card) 88%, var(--color-surface-elevated)));
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 99%, transparent), color-mix(in srgb, var(--color-card) 92%, var(--color-surface-elevated)));
 }
 
 .orders-flow-card:hover,
@@ -372,6 +384,30 @@ button:active {
   border-color: color-mix(in srgb, var(--color-border) 80%, transparent);
   background: color-mix(in srgb, var(--color-surface-elevated) 84%, transparent);
   box-shadow: var(--shadow-inset);
+}
+
+.dashboard-page__metric-card,
+.dashboard-card,
+.orders-flow-card,
+.provider-card,
+.specialty-card,
+.application-card,
+.orders-card,
+.order-card {
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.dashboard-page__metric-card:hover,
+.orders-flow-card:hover,
+.provider-card:hover,
+.specialty-card:hover,
+.application-card:hover,
+.orders-card:hover,
+.order-card:hover {
+  border-color: color-mix(in srgb, var(--color-brand) 28%, var(--color-border));
 }
 
 .orders-page__state,
@@ -461,9 +497,9 @@ select:focus {
 :root[data-theme="dark"] .order-create-page__header,
 :root[data-theme="dark"] .order-detail-page__header {
   background:
-    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 13%, transparent), transparent 17rem),
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-provider) 11%, transparent), transparent 18rem),
-    linear-gradient(135deg, color-mix(in srgb, var(--color-card) 96%, transparent), color-mix(in srgb, var(--color-surface-elevated) 90%, transparent));
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 7%, transparent), transparent 17rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, #4aa3ff 10%, transparent), transparent 18rem),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-card) 96%, transparent), color-mix(in srgb, var(--color-surface-elevated) 92%, transparent));
 }
 
 :root[data-theme="dark"] .orders-flow-card,
@@ -487,7 +523,48 @@ select:focus {
 :root[data-theme="dark"] .order-detail-page__section,
 :root[data-theme="dark"] .order-detail-page__summary-card {
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 96%, transparent), color-mix(in srgb, var(--color-card) 88%, var(--color-surface-elevated)));
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 98%, transparent), color-mix(in srgb, var(--color-card) 90%, var(--color-surface-elevated)));
+}
+
+:root[data-theme="dark"] .orders-page__filters,
+:root[data-theme="dark"] .providers-page__filters,
+:root[data-theme="dark"] .providers-list__toolbar,
+:root[data-theme="dark"] .orders-flow-card__panel,
+:root[data-theme="dark"] .orders-flow-card__review,
+:root[data-theme="dark"] .order-detail-page__chat-composer,
+:root[data-theme="dark"] .order-detail-page__provider-spotlight,
+:root[data-theme="dark"] .order-detail-page__payment-box,
+:root[data-theme="dark"] .profile-page__chips span,
+:root[data-theme="dark"] .profile-page__chips label {
+  background: color-mix(in srgb, var(--color-surface-elevated) 88%, #20344a 12%);
+}
+
+:root[data-theme="dark"] .orders-flow-card:hover,
+:root[data-theme="dark"] .dashboard-card:hover,
+:root[data-theme="dark"] .provider-card:hover,
+:root[data-theme="dark"] .specialty-card:hover,
+:root[data-theme="dark"] .orders-card:hover,
+:root[data-theme="dark"] .order-card:hover,
+:root[data-theme="dark"] .application-card:hover,
+:root[data-theme="dark"] .addresses-page__card:hover {
+  border-color: color-mix(in srgb, var(--color-provider) 28%, var(--color-border));
+}
+
+:root[data-theme="dark"] .orders-flow-card__candidate,
+:root[data-theme="dark"] .application-card__provider {
+  color: var(--color-text);
+}
+
+:root[data-theme="dark"] .orders-flow-card__candidate-stats span,
+:root[data-theme="dark"] .application-card__rating span {
+  border-color: color-mix(in srgb, var(--color-provider) 30%, var(--color-border));
+  background: color-mix(in srgb, var(--color-provider-soft) 72%, var(--color-card));
+  color: var(--color-text-secondary);
+}
+
+:root[data-theme="dark"] .orders-flow-card__provider-avatar,
+:root[data-theme="dark"] .application-card__avatar {
+  border: 1px solid color-mix(in srgb, var(--color-provider) 32%, var(--color-border));
 }
 
 @media (max-width: 720px) {
