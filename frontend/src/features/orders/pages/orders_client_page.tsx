@@ -374,13 +374,19 @@ export function OrdersClientPage() {
                                 getProviderInitials(application.provider.name) || "P"
                               )}
                             </span>
-                            <div>
+                            <div className="orders-flow-card__candidate-copy">
                               <strong>{application.provider.name}</strong>
-                              <span>
-                                Nota {application.provider.ratingAverage.toFixed(1)}
-                                {" - "}
-                                {application.provider.completedServices} serviços
-                              </span>
+                              <div className="orders-flow-card__candidate-stats">
+                                <span>
+                                  ⭐ Nota{" "}
+                                  <strong>
+                                    {application.provider.ratingAverage.toFixed(1)}
+                                  </strong>
+                                </span>
+                                <span>
+                                  🧾 {application.provider.completedServices} serviços
+                                </span>
+                              </div>
                             </div>
                           </div>
                           <div className="orders-flow-card__actions">

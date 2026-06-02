@@ -23,6 +23,7 @@ export function SpecialtiesPage() {
     refresh,
     createCatalogSpecialty,
     toggleCatalogSpecialty,
+    submitSpecialtyRequest,
     approveRequest,
     rejectRequest,
   } = useSpecialties();
@@ -30,11 +31,20 @@ export function SpecialtiesPage() {
   const [formDescription, setFormDescription] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [requestName, setRequestName] = useState("");
+  const [requestDescription, setRequestDescription] = useState("");
+  const [requestError, setRequestError] = useState<string | null>(null);
+  const [requestSuccess, setRequestSuccess] = useState<string | null>(null);
+  const [requestSubmitting, setRequestSubmitting] = useState(false);
   const isAdmin = user?.role === UserRole.ADMIN;
   const isProvider = user?.role === UserRole.PROVIDER;
   const pendingRequests = useMemo(
     () => requests.filter((request) => request.status === "PENDING"),
     [requests],
+  );
+  const providerRequests = useMemo(
+    () => requests.filter((request) => request.requestedBy === user?.id),
+    [requests, user?.id],
   );
   const activeCount = allSpecialties.filter(
     (specialty) => specialty.isActive,
@@ -73,6 +83,50 @@ export function SpecialtiesPage() {
       );
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleSubmitSpecialtyRequest(event: React.FormEvent) {
+    event.preventDefault();
+
+    if (!user) {
+      setRequestError("Sessao expirada. Entre novamente para solicitar.");
+      return;
+    }
+
+    if (requestName.trim().length < 3) {
+      setRequestError("Informe um nome com pelo menos 3 caracteres.");
+      return;
+    }
+
+    if (requestDescription.trim().length < 10) {
+      setRequestError("Descreva quando essa especialidade deve ser usada.");
+      return;
+    }
+
+    setRequestSubmitting(true);
+    setRequestError(null);
+    setRequestSuccess(null);
+
+    try {
+      await submitSpecialtyRequest({
+        name: requestName,
+        description: requestDescription,
+        requestedBy: user.id,
+        requestedByName: user.name,
+      });
+
+      setRequestName("");
+      setRequestDescription("");
+      setRequestSuccess("Solicitacao enviada para analise do admin.");
+    } catch (err) {
+      setRequestError(
+        err instanceof Error
+          ? err.message
+          : "Nao foi possivel enviar a solicitacao.",
+      );
+    } finally {
+      setRequestSubmitting(false);
     }
   }
 
@@ -188,7 +242,7 @@ export function SpecialtiesPage() {
                         void approveRequest(request.id);
                       }}
                     >
-                      Aprovar
+                      ✅ Aprovar
                     </button>
                     <button
                       type="button"
@@ -197,12 +251,87 @@ export function SpecialtiesPage() {
                         void rejectRequest(request.id);
                       }}
                     >
-                      Recusar
+                      ❌ Recusar
                     </button>
                   </div>
                 </article>
               ))}
             </div>
+          </section>
+        )}
+
+        {isProvider && (
+          <section className="specialties-page__panel specialties-page__panel--provider-request">
+            <div className="specialties-page__panel-header">
+              <div>
+                <h2>🧰 Solicitar nova especialidade</h2>
+                <p>
+                  Nao encontrou uma categoria que representa seu trabalho?
+                  Envie uma sugestao para o admin avaliar.
+                </p>
+              </div>
+              <strong>{providerRequests.length} enviada(s)</strong>
+            </div>
+
+            {requestError && (
+              <p className="specialties-page__form-error" role="alert">
+                {requestError}
+              </p>
+            )}
+            {requestSuccess && (
+              <p className="specialties-page__form-success" role="status">
+                {requestSuccess}
+              </p>
+            )}
+
+            <form
+              className="specialties-page__form specialties-page__form--request"
+              onSubmit={(event) => {
+                void handleSubmitSpecialtyRequest(event);
+              }}
+            >
+              <Input
+                placeholder="Ex.: Jardinagem"
+                value={requestName}
+                onChange={(event) => setRequestName(event.target.value)}
+                disabled={requestSubmitting}
+              />
+              <textarea
+                placeholder="Explique quais servicos entram nessa especialidade"
+                value={requestDescription}
+                onChange={(event) => setRequestDescription(event.target.value)}
+                disabled={requestSubmitting}
+              />
+              <button type="submit" disabled={requestSubmitting}>
+                {requestSubmitting ? "⏳ Enviando..." : "📨 Enviar sugestao"}
+              </button>
+            </form>
+
+            {providerRequests.length > 0 && (
+              <div className="specialties-page__requests specialties-page__requests--compact">
+                {providerRequests.map((request) => (
+                  <article className="specialties-page__request" key={request.id}>
+                    <div>
+                      <strong>{request.name}</strong>
+                      <p>{request.description}</p>
+                      <small>
+                        Enviada em{" "}
+                        {new Date(request.createdAt).toLocaleString("pt-BR")}
+                      </small>
+                    </div>
+                    <span
+                      className={`specialties-page__request-status specialties-page__request-status--${request.status.toLowerCase()}`}
+                    >
+                      {request.status === "PENDING"
+                        ? "⏳ Em analise"
+                        : request.status === "APPROVED"
+                          ? "✅ Aprovada"
+                          : "❌ Recusada"}
+                    </span>
+                  </article>
+                ))}
+              </div>
+            )}
           </section>
         )}
 
@@ -237,10 +366,11 @@ export function SpecialtiesPage() {
         )}
 
         {isProvider && (
-          <section className="specialties-page__panel">
-            <h2>Catálogo disponível</h2>
+          <section className="specialties-page__panel specialties-page__panel--tip">
+            <h2>✅ Catalogo disponivel</h2>
             <p>
-              Caso atenda uma categoria que ainda não aparece aqui, solicite ao administrador.
+              As especialidades aprovadas pelo admin aparecem aqui e ficam
+              disponiveis para clientes abrirem novas ordens.
             </p>
           </section>
         )}
