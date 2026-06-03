@@ -474,10 +474,12 @@ export function OrderDetailPage() {
                   </label>
                   <div className="order-detail-page__provider-line">
                     <ProviderPhoto provider={order.selectedProvider} />
-                    <p className="order-detail-page__info-value">
-                      {order.selectedProvider.name} - nota{" "}
-                      {order.selectedProvider.ratingAverage.toFixed(1)}
-                    </p>
+                    <div className="order-detail-page__provider-line-copy">
+                      <strong>{order.selectedProvider.name}</strong>
+                      <span>
+                        ⭐ Nota {order.selectedProvider.ratingAverage.toFixed(1)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -784,10 +786,10 @@ export function OrderDetailPage() {
                     >
                       <div className="order-detail-page__candidate-main">
                         <ProviderPhoto provider={application.provider} />
-                        <div>
+                        <div className="order-detail-page__candidate-copy">
                           <strong>{application.provider.name}</strong>
                           <span>
-                            {APPLICATION_STATUS_LABELS[application.status]} · nota{" "}
+                            {APPLICATION_STATUS_LABELS[application.status]} - ⭐ Nota{" "}
                             {application.provider.ratingAverage.toFixed(1)}
                           </span>
                         </div>

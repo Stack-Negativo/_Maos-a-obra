@@ -226,10 +226,12 @@ export function OrdersAdminPage() {
                   <div>
                     <strong>{provider.name}</strong>
                     <span>
-                      {provider.isSuspended ? "Suspenso" : "Ativo"} -{" "}
-                      {provider.specialties
-                        .map((specialty) => specialty.name)
-                        .join(", ") || "Sem especialidade"}
+                      <small>{provider.isSuspended ? "Suspenso" : "Ativo"}</small>
+                      <small>
+                        {provider.specialties
+                          .map((specialty) => specialty.name)
+                          .join(", ") || "Sem especialidade"}
+                      </small>
                     </span>
                   </div>
 
@@ -389,8 +391,9 @@ export function OrdersAdminPage() {
                 <div className="orders-flow-card__meta">
                   <span>{formatAddress(order)}</span>
                   <span>Candidatos: {order.applications?.length ?? 0}</span>
-                  <span>
-                    Prestador: {order.selectedProvider?.name ?? "Não vinculado"}
+                  <span className="orders-flow-card__meta-pair">
+                    <small>Prestador</small>
+                    <strong>{order.selectedProvider?.name ?? "Não vinculado"}</strong>
                   </span>
                   <span>
                     Pendência: {getPendingLabel(order)}

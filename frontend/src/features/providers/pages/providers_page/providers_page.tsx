@@ -272,8 +272,14 @@ export function ProvidersPage() {
                     </div>
 
                     <div className="providers-admin-card__meta">
-                      <span>Nota {provider.ratingAverage.toFixed(1)}</span>
-                      <span>{provider.completedServices} serviço(s)</span>
+                      <span>
+                        <small>⭐ Nota</small>
+                        <strong>{provider.ratingAverage.toFixed(1)}</strong>
+                      </span>
+                      <span>
+                        <small>🧾 Servicos</small>
+                        <strong>{provider.completedServices}</strong>
+                      </span>
                     </div>
 
                     {isAdmin && (

@@ -5,14 +5,28 @@ import { AppShell } from "@/shared/components";
 
 import { useOrdersMutations } from "../hooks";
 import {
+  ORDER_STATUS_LABELS,
   PAYMENT_STATUS_LABELS,
   OrderStatus,
 } from "../types/order_types";
-import type { Order } from "../types/order_types";
-import type { Provider } from "../types/order_types";
-import { ORDER_STATUS_LABELS } from "../types/order_types";
+import type { Order, Provider } from "../types/order_types";
 
 import "./orders_page/orders_page.css";
+
+type ClientViewMode =
+  | "active"
+  | "selection"
+  | "schedule"
+  | "confirmation"
+  | "history";
+
+const clientViewLabels: Record<ClientViewMode, string> = {
+  active: "Ativas",
+  selection: "Escolher prestador",
+  schedule: "Agendar",
+  confirmation: "Confirmar",
+  history: "Historico",
+};
 
 function toDateTimeLocalValue(value?: string) {
   if (!value) {
@@ -58,11 +72,11 @@ function ProviderMiniCard({ provider }: { provider: Provider }) {
           getProviderInitials(provider.name) || "P"
         )}
       </span>
-      <div>
-        <span>Prestador</span>
+      <div className="orders-flow-card__provider-copy">
+        <span>Prestador escolhido</span>
         <strong>{provider.name}</strong>
       </div>
-      <small>Nota {provider.ratingAverage.toFixed(1)}</small>
+      <small>⭐ Nota {provider.ratingAverage.toFixed(1)}</small>
     </div>
   );
 }
@@ -84,9 +98,7 @@ export function OrdersClientPage() {
   const [scheduleValues, setScheduleValues] = useState<Record<string, string>>(
     {},
   );
-  const [viewMode, setViewMode] = useState<
-    "active" | "selection" | "schedule" | "confirmation" | "history"
-  >("active");
+  const [viewMode, setViewMode] = useState<ClientViewMode>("active");
   const [actionError, setActionError] = useState<string | null>(null);
   const minScheduleValue = toDateTimeLocalValue(new Date().toISOString());
 
@@ -99,10 +111,37 @@ export function OrdersClientPage() {
       setActionError(
         err instanceof Error
           ? err.message
-          : "Não foi possível concluir a ação. Tente novamente.",
+          : "Nao foi possivel concluir a acao. Tente novamente.",
       );
     }
   }
+
+  const counts = {
+    active: orders.filter(
+      (order) =>
+        ![
+          OrderStatus.FINISHED,
+          OrderStatus.CANCELLED,
+          OrderStatus.EXPIRED,
+        ].includes(order.status),
+    ).length,
+    selection: orders.filter(
+      (order) => order.status === OrderStatus.AWAITING_SELECTION,
+    ).length,
+    schedule: orders.filter(
+      (order) => order.status === OrderStatus.PROVIDER_SELECTED,
+    ).length,
+    confirmation: orders.filter(
+      (order) => order.status === OrderStatus.AWAITING_CONFIRMATION,
+    ).length,
+    history: orders.filter((order) =>
+      [
+        OrderStatus.FINISHED,
+        OrderStatus.CANCELLED,
+        OrderStatus.EXPIRED,
+      ].includes(order.status),
+    ).length,
+  };
 
   const visibleOrders = useMemo(() => {
     return orders.filter((order) => {
@@ -134,87 +173,115 @@ export function OrdersClientPage() {
     });
   }, [orders, viewMode]);
 
-  const counts = {
-    active: orders.filter(
-      (order) =>
-        ![
-          OrderStatus.FINISHED,
-          OrderStatus.CANCELLED,
-          OrderStatus.EXPIRED,
-        ].includes(order.status),
-    ).length,
-    selection: orders.filter(
-      (order) => order.status === OrderStatus.AWAITING_SELECTION,
-    ).length,
-    schedule: orders.filter(
-      (order) => order.status === OrderStatus.PROVIDER_SELECTED,
-    ).length,
-    confirmation: orders.filter(
-      (order) => order.status === OrderStatus.AWAITING_CONFIRMATION,
-    ).length,
-    history: orders.filter((order) =>
-      [
-        OrderStatus.FINISHED,
-        OrderStatus.CANCELLED,
-        OrderStatus.EXPIRED,
-      ].includes(order.status),
-    ).length,
-  };
+  const workflowItems = [
+    {
+      icon: "👷",
+      label: "Escolher prestador",
+      value: counts.selection,
+      text: "Compare candidaturas e aceite o melhor profissional.",
+      mode: "selection" as const,
+    },
+    {
+      icon: "📅",
+      label: "Agendar",
+      value: counts.schedule,
+      text: "Confirme a data combinada com o prestador.",
+      mode: "schedule" as const,
+    },
+    {
+      icon: "⭐",
+      label: "Avaliar",
+      value: counts.confirmation,
+      text: "Finalize e registre como foi o atendimento.",
+      mode: "confirmation" as const,
+    },
+  ];
+
+  const nextAction =
+    counts.selection > 0
+      ? {
+          icon: "👷",
+          title: "Escolha um prestador",
+          text: "Compare as propostas recebidas e aceite o profissional ideal.",
+          mode: "selection" as const,
+        }
+      : counts.schedule > 0
+        ? {
+            icon: "📅",
+            title: "Confirme o agendamento",
+            text: "Defina data e horario para o atendimento acontecer.",
+            mode: "schedule" as const,
+          }
+        : counts.confirmation > 0
+          ? {
+              icon: "⭐",
+              title: "Avalie o servico",
+              text: "Confirme a conclusao e conte como foi a experiencia.",
+              mode: "confirmation" as const,
+            }
+          : {
+              icon: "🧾",
+              title: "Tudo em dia",
+              text: "Quando precisar, abra uma nova ordem em poucos passos.",
+              mode: "active" as const,
+            };
 
   function handleConfirmFinished(orderId: string) {
     setRatingOrderId(orderId);
   }
 
-  const workflowItems = [
-    {
-      label: "Escolher prestador",
-      value: counts.selection,
-      text: "Candidaturas aguardando sua decisão.",
-    },
-    {
-      label: "Agendar",
-      value: counts.schedule,
-      text: "Prestadores aceitos aguardando horário.",
-    },
-    {
-      label: "Confirmar finalização",
-      value: counts.confirmation,
-      text: "Atendimentos encerrados aguardando sua avaliação.",
-    },
-  ];
-
   return (
     <AppShell>
-      <section className="orders-page">
-        <header className="orders-page__header">
+      <section className="orders-page orders-page--client">
+        <header className="orders-page__header orders-page__header--client">
           <div>
             <span className="orders-page__eyebrow">Cliente</span>
             <h1>Minhas ordens</h1>
             <p>
-              Crie ordens, acompanhe candidaturas, selecione prestadores,
-              confirme agendamentos e avalie serviços finalizados.
+              Acompanhe cada etapa do atendimento: candidatura, escolha do
+              prestador, agendamento, conclusao e avaliacao.
             </p>
             <p className="orders-page__summary">
               {visibleOrders.length} ordem
-              {visibleOrders.length === 1 ? "" : "s"} nesta etapa
+              {visibleOrders.length === 1 ? "" : "s"} em{" "}
+              {clientViewLabels[viewMode].toLowerCase()}
             </p>
           </div>
 
-          <div className="orders-page__header-actions">
+          <div className="orders-page__header-actions orders-page__header-actions--client">
+            <button
+              type="button"
+              className="orders-page__next-action"
+              onClick={() => setViewMode(nextAction.mode)}
+            >
+              <span aria-hidden="true">{nextAction.icon}</span>
+              <div>
+                <strong>{nextAction.title}</strong>
+                <small>{nextAction.text}</small>
+              </div>
+            </button>
             <button
               className="orders-page__new-order-btn"
               onClick={() => navigate("/orders/create")}
             >
-              Nova ordem
+              ➕ Nova ordem
             </button>
           </div>
         </header>
 
-        <section className="orders-page__admin-workbench orders-page__admin-workbench--client">
+        <section className="orders-page__admin-workbench orders-page__admin-workbench--client orders-page__client-steps">
           {workflowItems.map((item) => (
-            <article key={item.label}>
+            <article
+              className={
+                viewMode === item.mode ? "orders-page__client-step--active" : ""
+              }
+              key={item.label}
+              onClick={() => setViewMode(item.mode)}
+            >
               <div>
-                <span>{item.label}</span>
+                <span>
+                  <span aria-hidden="true">{item.icon}</span> {item.label}
+                </span>
                 <strong>{item.value}</strong>
               </div>
               <p>{item.text}</p>
@@ -222,7 +289,7 @@ export function OrdersClientPage() {
           ))}
         </section>
 
-        <section className="orders-page__filters">
+        <section className="orders-page__filters orders-page__filters--client">
           <div className="orders-page__filter-tabs">
             <button
               className={`orders-page__filter-tab ${
@@ -230,7 +297,7 @@ export function OrdersClientPage() {
               }`}
               onClick={() => setViewMode("active")}
             >
-              Ativas ({counts.active})
+              🟢 Ativas ({counts.active})
             </button>
             <button
               className={`orders-page__filter-tab ${
@@ -238,7 +305,7 @@ export function OrdersClientPage() {
               }`}
               onClick={() => setViewMode("selection")}
             >
-              Escolher prestador ({counts.selection})
+              👷 Escolher prestador ({counts.selection})
             </button>
             <button
               className={`orders-page__filter-tab ${
@@ -246,7 +313,7 @@ export function OrdersClientPage() {
               }`}
               onClick={() => setViewMode("schedule")}
             >
-              Agendar ({counts.schedule})
+              📅 Agendar ({counts.schedule})
             </button>
             <button
               className={`orders-page__filter-tab ${
@@ -254,7 +321,7 @@ export function OrdersClientPage() {
               }`}
               onClick={() => setViewMode("confirmation")}
             >
-              Confirmar finalização ({counts.confirmation})
+              ⭐ Confirmar ({counts.confirmation})
             </button>
             <button
               className={`orders-page__filter-tab ${
@@ -262,9 +329,12 @@ export function OrdersClientPage() {
               }`}
               onClick={() => setViewMode("history")}
             >
-              Histórico ({counts.history})
+              🗂️ Historico ({counts.history})
             </button>
           </div>
+          <p className="orders-page__filter-hint">
+            Exibindo <strong>{clientViewLabels[viewMode]}</strong>
+          </p>
         </section>
 
         {actionError && (
@@ -276,10 +346,11 @@ export function OrdersClientPage() {
         {loading ? (
           <p className="orders-page__state">Carregando ordens...</p>
         ) : visibleOrders.length === 0 ? (
-          <div className="orders-page__empty">
+          <div className="orders-page__empty orders-page__empty--client">
+            <span aria-hidden="true">🧰</span>
             <p>
               {orders.length === 0
-                ? "Você ainda não tem ordens cadastradas."
+                ? "Voce ainda nao tem ordens cadastradas."
                 : "Nenhuma ordem nesta etapa no momento."}
             </p>
             {orders.length === 0 && (
@@ -288,12 +359,12 @@ export function OrdersClientPage() {
                 className="orders-page__empty-btn"
                 onClick={() => navigate("/orders/create")}
               >
-                Criar primeira ordem
+                ➕ Criar primeira ordem
               </button>
             )}
           </div>
         ) : (
-          <div className="orders-page__list">
+          <div className="orders-page__list orders-page__list--client">
             {visibleOrders.map((order) => {
               const pendingApplications =
                 order.applications?.filter(
@@ -304,11 +375,14 @@ export function OrdersClientPage() {
               const scheduleValue = getScheduleValue(order, scheduleValues);
 
               return (
-                <article className="orders-flow-card orders-flow-card--client" key={order.id}>
+                <article
+                  className="orders-flow-card orders-flow-card--client"
+                  key={order.id}
+                >
                   <div className="orders-flow-card__header">
                     <div>
                       <span className="orders-flow-card__eyebrow">
-                        {order.specialty.name}
+                        🧰 {order.specialty.name}
                       </span>
                       <h2>{order.title}</h2>
                       <p>{order.description}</p>
@@ -320,21 +394,21 @@ export function OrdersClientPage() {
 
                   <div className="orders-flow-card__meta">
                     <span>
-                      {order.address.neighborhood}, {order.address.city}
+                      📍 {order.address.neighborhood}, {order.address.city}
                     </span>
                     <span>
-                      Preferência:{" "}
+                      🕒 Preferencia:{" "}
                       {new Date(order.preferredDate).toLocaleString("pt-BR")}
                     </span>
                     {order.scheduledAt && (
                       <span>
-                        Agendamento:{" "}
+                        📅 Agendamento:{" "}
                         {new Date(order.scheduledAt).toLocaleString("pt-BR")}
                       </span>
                     )}
                     {order.review && (
                       <span>
-                        Avaliação: {order.review.rating}/5
+                        ⭐ Avaliacao: {order.review.rating}/5
                         {order.review.comment
                           ? ` - ${order.review.comment}`
                           : ""}
@@ -342,11 +416,11 @@ export function OrdersClientPage() {
                     )}
                     {order.payment && (
                       <span>
-                        Pagamento: {PAYMENT_STATUS_LABELS[order.payment.status]}
+                        💳 Pagamento: {PAYMENT_STATUS_LABELS[order.payment.status]}
                       </span>
                     )}
                     {latestHistoryEvent && (
-                      <span>Última atualização: {latestHistoryEvent.title}</span>
+                      <span>🔔 Ultima atualizacao: {latestHistoryEvent.title}</span>
                     )}
                   </div>
 
@@ -355,8 +429,8 @@ export function OrdersClientPage() {
                   )}
 
                   {pendingApplications.length > 0 && (
-                    <div className="orders-flow-card__panel">
-                      <h3>Candidatos para esta ordem</h3>
+                    <div className="orders-flow-card__panel orders-flow-card__panel--candidates">
+                      <h3>👷 Candidatos para esta ordem</h3>
                       {pendingApplications.map((application) => (
                         <div
                           className="orders-flow-card__candidate"
@@ -371,7 +445,8 @@ export function OrdersClientPage() {
                                   loading="lazy"
                                 />
                               ) : (
-                                getProviderInitials(application.provider.name) || "P"
+                                getProviderInitials(application.provider.name) ||
+                                "P"
                               )}
                             </span>
                             <div className="orders-flow-card__candidate-copy">
@@ -384,7 +459,7 @@ export function OrdersClientPage() {
                                   </strong>
                                 </span>
                                 <span>
-                                  🧾 {application.provider.completedServices} serviços
+                                  🧾 {application.provider.completedServices} servicos
                                 </span>
                               </div>
                             </div>
@@ -398,7 +473,7 @@ export function OrdersClientPage() {
                                 );
                               }}
                             >
-                              Aceitar
+                              ✅ Aceitar
                             </button>
                             <button
                               type="button"
@@ -409,7 +484,7 @@ export function OrdersClientPage() {
                                 );
                               }}
                             >
-                              Recusar
+                              ❌ Recusar
                             </button>
                           </div>
                         </div>
@@ -420,7 +495,7 @@ export function OrdersClientPage() {
                   {order.status === OrderStatus.AWAITING_SELECTION &&
                     pendingApplications.length === 0 && (
                       <div className="orders-flow-card__panel">
-                        <h3>Seleção de prestador</h3>
+                        <h3>👷 Selecao de prestador</h3>
                         <p className="orders-flow-card__hint">
                           Todas as candidaturas pendentes foram analisadas.
                         </p>
@@ -429,14 +504,14 @@ export function OrdersClientPage() {
 
                   {order.status === OrderStatus.PROVIDER_SELECTED && (
                     <div className="orders-flow-card__panel">
-                      <h3>Agendamento oficial</h3>
+                      <h3>📅 Agendamento oficial</h3>
                       <p className="orders-flow-card__hint">
-                        Confirme a data e o horário combinados com o prestador.
-                        Depois disso, a ordem fica indisponível para novas
+                        Confirme a data e o horario combinados com o prestador.
+                        Depois disso, a ordem fica indisponivel para novas
                         candidaturas.
                       </p>
                       <label className="orders-flow-card__field">
-                        Data e horário
+                        Data e horario
                         <input
                           type="datetime-local"
                           min={minScheduleValue}
@@ -458,7 +533,7 @@ export function OrdersClientPage() {
                           );
                         }}
                       >
-                        Confirmar agendamento
+                        ✅ Confirmar agendamento
                       </button>
                     </div>
                   )}
@@ -469,7 +544,7 @@ export function OrdersClientPage() {
                         type="button"
                         onClick={() => handleConfirmFinished(order.id)}
                       >
-                        Confirmar finalização
+                        ⭐ Confirmar finalizacao
                       </button>
                     )}
                     {![
@@ -485,7 +560,7 @@ export function OrdersClientPage() {
                           void runAction(() => cancelOrder(order.id));
                         }}
                       >
-                        Cancelar ordem
+                        ❌ Cancelar ordem
                       </button>
                     )}
                     <button
@@ -493,14 +568,14 @@ export function OrdersClientPage() {
                       className="orders-flow-card__ghost"
                       onClick={() => navigate(`/orders/${order.id}`)}
                     >
-                      Ver detalhes
+                      🔎 Ver detalhes
                     </button>
                   </div>
 
                   {ratingOrderId === order.id && (
                     <form className="orders-flow-card__review">
                       <label>
-                        Avaliação
+                        Avaliacao
                         <select
                           value={rating}
                           onChange={(event) =>
@@ -515,7 +590,7 @@ export function OrdersClientPage() {
                         </select>
                       </label>
                       <label>
-                        Comentário opcional
+                        Comentario opcional
                         <textarea
                           value={comment}
                           onChange={(event) => setComment(event.target.value)}
@@ -537,7 +612,7 @@ export function OrdersClientPage() {
                           });
                         }}
                       >
-                        Salvar avaliação
+                        ✅ Salvar avaliacao
                       </button>
                     </form>
                   )}

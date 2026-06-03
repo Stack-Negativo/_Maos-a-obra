@@ -61,10 +61,12 @@ export function ProviderCard({
 
       <div className="provider-card__meta">
         <span>
-          Nota <strong>{provider.ratingAverage.toFixed(1)}</strong>
+          <small>⭐ Nota</small>
+          <strong>{provider.ratingAverage.toFixed(1)}</strong>
         </span>
         <span>
-          Serviços <strong>{provider.completedServices}</strong>
+          <small>🧾 Servicos</small>
+          <strong>{provider.completedServices}</strong>
         </span>
       </div>
 
