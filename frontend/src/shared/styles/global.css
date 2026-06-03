@@ -1,0 +1,581 @@
+@import "tailwindcss";
+
+:root {
+  --color-brand: #b84f16;
+  --color-brand-dark: #73320f;
+  --color-brand-hover: #973f12;
+  --color-brand-light: #f1dfd4;
+  --color-on-brand: #ffffff;
+  --color-surface: #e7ecef;
+  --color-surface-elevated: #f0f4f6;
+  --color-card: #f8fafb;
+  --color-border: #cbd6dd;
+  --color-border-strong: #9facb6;
+  --color-text: #111b24;
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: #45545f;
+  --color-text-muted: #6c7b86;
+  --color-primary: var(--color-brand);
+  --color-primary-hover: var(--color-brand-hover);
+  --color-success: #1f7a55;
+  --color-success-bg: #dff3e9;
+  --color-warning: #9a5b08;
+  --color-warning-bg: #f5e8bf;
+  --color-danger: #aa2424;
+  --color-danger-bg: #f8dada;
+  --color-info: #1d6398;
+  --color-info-bg: #dcecf7;
+  --color-provider: #0b7c74;
+  --color-provider-soft: #d7eeee;
+  --color-admin: #6551c8;
+  --color-admin-soft: #e5e2f7;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-card: 0 12px 28px rgba(17, 27, 36, 0.08);
+  --shadow-card-hover: 0 18px 46px rgba(17, 27, 36, 0.13);
+  --shadow-inset: inset 0 1px 0 color-mix(in srgb, #ffffff 76%, transparent);
+}
+
+:root[data-theme="dark"] {
+  --color-brand: #f29a55;
+  --color-brand-dark: #ffd7b8;
+  --color-brand-hover: #ffb06f;
+  --color-brand-light: #283342;
+  --color-on-brand: #141a22;
+  --color-surface: #0d1621;
+  --color-surface-elevated: #121d2a;
+  --color-card: #182636;
+  --color-border: #2f4053;
+  --color-border-strong: #63788c;
+  --color-text: #f3f7fb;
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: #d2deea;
+  --color-text-muted: #9fb0c1;
+  --color-primary: var(--color-brand);
+  --color-primary-hover: var(--color-brand-hover);
+  --color-success: #7bd39c;
+  --color-success-bg: #173b33;
+  --color-warning: #f4c266;
+  --color-warning-bg: #3b2f18;
+  --color-danger: #ff8a8a;
+  --color-danger-bg: #402024;
+  --color-info: #8cc7ff;
+  --color-info-bg: #18364f;
+  --color-provider: #58d2c8;
+  --color-provider-soft: #173c46;
+  --color-admin: #b3a7ff;
+  --color-admin-soft: #282e55;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-card: 0 18px 44px rgba(0, 0, 0, 0.24);
+  --shadow-card-hover: 0 24px 58px rgba(0, 0, 0, 0.34);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at 18% -8%, color-mix(in srgb, var(--color-brand) 8%, transparent), transparent 24rem),
+    radial-gradient(circle at 98% 0%, color-mix(in srgb, var(--color-provider) 7%, transparent), transparent 28rem),
+    linear-gradient(
+      180deg,
+      var(--color-surface-elevated) 0%,
+      var(--color-surface) 36rem
+    );
+  color: var(--color-text);
+  text-rendering: optimizeLegibility;
+}
+
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at 18% -10%, color-mix(in srgb, var(--color-brand) 7%, transparent), transparent 24rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, #4aa3ff 9%, transparent), transparent 28rem),
+    linear-gradient(180deg, #142033 0%, var(--color-surface) 36rem);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  outline-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-brand) 42%, transparent);
+  outline-offset: 2px;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-brand) 24%, transparent);
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  text-underline-offset: 0.18em;
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid var(--color-surface);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text-muted) 55%, transparent);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-text-muted) 78%, transparent);
+}
+
+:root[data-theme="dark"] .orders-page__filters,
+:root[data-theme="dark"] .dashboard-metric,
+:root[data-theme="dark"] .dashboard-card,
+:root[data-theme="dark"] .dashboard-page__side,
+:root[data-theme="dark"] .profile-page__section,
+:root[data-theme="dark"] .profile-page__chips span,
+:root[data-theme="dark"] .profile-page__chips label,
+:root[data-theme="dark"] .orders-flow-card,
+:root[data-theme="dark"] .orders-flow-card__candidate,
+:root[data-theme="dark"] .orders-flow-card__panel,
+:root[data-theme="dark"] .orders-flow-card__review,
+:root[data-theme="dark"] .orders-page__filter-tab,
+:root[data-theme="dark"] .orders-page__refresh-btn,
+:root[data-theme="dark"] .orders-page__state,
+:root[data-theme="dark"] .orders-page__loading,
+:root[data-theme="dark"] .orders-page__empty,
+:root[data-theme="dark"] .dashboard-page__metric-card,
+:root[data-theme="dark"] .dashboard-page__section,
+:root[data-theme="dark"] .specialty-card,
+:root[data-theme="dark"] .provider-card,
+:root[data-theme="dark"] .order-card,
+:root[data-theme="dark"] .orders-card,
+:root[data-theme="dark"] .application-card,
+:root[data-theme="dark"] .order-form,
+:root[data-theme="dark"] .providers-page__filters,
+:root[data-theme="dark"] .addresses-page__form,
+:root[data-theme="dark"] .addresses-page__card,
+:root[data-theme="dark"] .input,
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select {
+  background: var(--color-card);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+:root[data-theme="dark"] .dashboard-card--highlight {
+  background: linear-gradient(
+    180deg,
+    var(--color-card) 0%,
+    color-mix(in srgb, var(--color-brand-light) 58%, var(--color-card)) 100%
+  );
+}
+
+:root[data-theme="dark"] input:disabled,
+:root[data-theme="dark"] textarea:disabled,
+:root[data-theme="dark"] select:disabled {
+  background: var(--color-surface-elevated);
+  color: var(--color-text-muted);
+}
+
+:root[data-theme="dark"] .login-form,
+:root[data-theme="dark"] .auth-layout__panel {
+  background: var(--color-card);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.orders-page__header,
+.dashboard-page__header,
+.addresses-page__header,
+.providers-page__header,
+.specialties-page__header,
+.profile-page__header,
+.order-create-page__header,
+.order-detail-page__header {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 10%, transparent), transparent 17rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-provider) 8%, transparent), transparent 18rem),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-card) 98%, transparent), color-mix(in srgb, var(--color-surface-elevated) 94%, transparent));
+  box-shadow: var(--shadow-card);
+}
+
+.orders-page__header::before,
+.dashboard-page__header::before,
+.addresses-page__header::before,
+.providers-page__header::before,
+.specialties-page__header::before,
+.profile-page__header::before,
+.order-create-page__header::before,
+.order-detail-page__header::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-brand), var(--color-provider), color-mix(in srgb, var(--color-admin) 82%, var(--color-provider)));
+  opacity: 0.86;
+}
+
+.orders-page__header h1,
+.dashboard-page__header h1,
+.addresses-page__header h1,
+.providers-page__header h1,
+.specialties-page__header h1,
+.profile-page__header h1,
+.order-create-page__header h1,
+.order-detail-page__header h1 {
+  max-width: 18ch;
+  color: var(--color-text);
+  letter-spacing: 0;
+}
+
+.orders-page__header p,
+.dashboard-page__header p,
+.addresses-page__header p,
+.providers-page__header p,
+.specialties-page__header p,
+.profile-page__header p,
+.order-create-page__header p,
+.order-detail-page__header p {
+  max-width: 62ch;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.orders-page,
+.dashboard-page,
+.addresses-page,
+.providers-page,
+.specialties-page,
+.profile-page,
+.order-create-page,
+.order-detail-page {
+  gap: clamp(1rem, 2vw, 1.35rem);
+}
+
+.orders-flow-card,
+.dashboard-panel,
+.dashboard-card,
+.dashboard-page__metric-card,
+.dashboard-page__section,
+.address-form,
+.addresses-page__form,
+.addresses-page__card,
+.providers-page__filters,
+.providers-list,
+.provider-card,
+.specialty-card,
+.orders-card,
+.order-card,
+.application-card,
+.order-form,
+.profile-page__section,
+.specialties-page__panel,
+.order-detail-page__section,
+.order-detail-page__summary-card,
+.order-detail-page__hero-card,
+.login-form,
+.register-form {
+  border-color: color-mix(in srgb, var(--color-border) 82%, transparent);
+  box-shadow: var(--shadow-card);
+}
+
+.orders-flow-card,
+.dashboard-panel,
+.dashboard-card,
+.dashboard-page__metric-card,
+.dashboard-page__section,
+.address-form,
+.addresses-page__form,
+.addresses-page__card,
+.providers-page__filters,
+.providers-list,
+.provider-card,
+.specialty-card,
+.orders-card,
+.order-card,
+.application-card,
+.order-form,
+.profile-page__section,
+.specialties-page__panel,
+.order-detail-page__section,
+.order-detail-page__summary-card {
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 99%, transparent), color-mix(in srgb, var(--color-card) 92%, var(--color-surface-elevated)));
+}
+
+.orders-flow-card:hover,
+.dashboard-card:hover,
+.provider-card:hover,
+.specialty-card:hover,
+.orders-card:hover,
+.order-card:hover,
+.application-card:hover,
+.addresses-page__card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.orders-page__filters,
+.providers-page__filters,
+.providers-list__toolbar,
+.orders-flow-card__panel,
+.orders-flow-card__review,
+.order-detail-page__chat-composer,
+.order-detail-page__provider-spotlight,
+.order-detail-page__payment-box,
+.profile-page__chips span,
+.profile-page__chips label {
+  border-color: color-mix(in srgb, var(--color-border) 80%, transparent);
+  background: color-mix(in srgb, var(--color-surface-elevated) 84%, transparent);
+  box-shadow: var(--shadow-inset);
+}
+
+.dashboard-page__metric-card,
+.dashboard-card,
+.orders-flow-card,
+.provider-card,
+.specialty-card,
+.application-card,
+.orders-card,
+.order-card {
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.dashboard-page__metric-card:hover,
+.orders-flow-card:hover,
+.provider-card:hover,
+.specialty-card:hover,
+.application-card:hover,
+.orders-card:hover,
+.order-card:hover {
+  border-color: color-mix(in srgb, var(--color-brand) 28%, var(--color-border));
+}
+
+.orders-page__state,
+.orders-page__loading,
+.orders-page__empty,
+.addresses-list__state,
+.providers-list__state,
+.specialties-page__state {
+  display: grid;
+  place-items: center;
+  min-height: 11rem;
+  padding: 2rem;
+  border: 1px dashed color-mix(in srgb, var(--color-border-strong) 72%, transparent);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--color-brand) 8%, transparent), transparent 14rem),
+    color-mix(in srgb, var(--color-card) 82%, transparent);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.input,
+input,
+textarea,
+select {
+  min-height: 44px;
+  border-color: color-mix(in srgb, var(--color-border) 88%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-card) 92%, var(--color-surface-elevated));
+  color: var(--color-text);
+}
+
+textarea {
+  min-height: 6rem;
+}
+
+.input:hover,
+input:hover,
+textarea:hover,
+select:hover {
+  border-color: color-mix(in srgb, var(--color-brand) 42%, var(--color-border));
+}
+
+.input:focus-within,
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-brand) 14%, transparent);
+}
+
+.orders-flow-card__status,
+.provider-card__status,
+.application-card__status,
+.specialty-card__header span,
+.orders-card__status,
+.order-card__status {
+  border-radius: 999px;
+  box-shadow: var(--shadow-inset);
+}
+
+.orders-flow-card__actions button,
+.orders-flow-card__panel button,
+.orders-flow-card__review button,
+.address-form__submit,
+.address-form__secondary,
+.providers-list__toolbar button,
+.provider-card__actions button,
+.specialty-card button,
+.application-card__btn,
+.orders-page__header-actions a,
+.orders-page__header-actions button,
+.addresses-page__header-actions button,
+.providers-page__header button,
+.specialties-page__header button,
+.dashboard-card a {
+  min-height: 42px;
+  border-radius: 10px;
+}
+
+:root[data-theme="dark"] .orders-page__header,
+:root[data-theme="dark"] .dashboard-page__header,
+:root[data-theme="dark"] .addresses-page__header,
+:root[data-theme="dark"] .providers-page__header,
+:root[data-theme="dark"] .specialties-page__header,
+:root[data-theme="dark"] .profile-page__header,
+:root[data-theme="dark"] .order-create-page__header,
+:root[data-theme="dark"] .order-detail-page__header {
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 7%, transparent), transparent 17rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, #4aa3ff 10%, transparent), transparent 18rem),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-card) 96%, transparent), color-mix(in srgb, var(--color-surface-elevated) 92%, transparent));
+}
+
+:root[data-theme="dark"] .orders-flow-card,
+:root[data-theme="dark"] .dashboard-panel,
+:root[data-theme="dark"] .dashboard-card,
+:root[data-theme="dark"] .dashboard-page__metric-card,
+:root[data-theme="dark"] .dashboard-page__section,
+:root[data-theme="dark"] .address-form,
+:root[data-theme="dark"] .addresses-page__form,
+:root[data-theme="dark"] .addresses-page__card,
+:root[data-theme="dark"] .providers-page__filters,
+:root[data-theme="dark"] .providers-list,
+:root[data-theme="dark"] .provider-card,
+:root[data-theme="dark"] .specialty-card,
+:root[data-theme="dark"] .orders-card,
+:root[data-theme="dark"] .order-card,
+:root[data-theme="dark"] .application-card,
+:root[data-theme="dark"] .order-form,
+:root[data-theme="dark"] .profile-page__section,
+:root[data-theme="dark"] .specialties-page__panel,
+:root[data-theme="dark"] .order-detail-page__section,
+:root[data-theme="dark"] .order-detail-page__summary-card {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 98%, transparent), color-mix(in srgb, var(--color-card) 90%, var(--color-surface-elevated)));
+}
+
+:root[data-theme="dark"] .orders-page__filters,
+:root[data-theme="dark"] .providers-page__filters,
+:root[data-theme="dark"] .providers-list__toolbar,
+:root[data-theme="dark"] .orders-flow-card__panel,
+:root[data-theme="dark"] .orders-flow-card__review,
+:root[data-theme="dark"] .order-detail-page__chat-composer,
+:root[data-theme="dark"] .order-detail-page__provider-spotlight,
+:root[data-theme="dark"] .order-detail-page__payment-box,
+:root[data-theme="dark"] .profile-page__chips span,
+:root[data-theme="dark"] .profile-page__chips label {
+  background: color-mix(in srgb, var(--color-surface-elevated) 88%, #20344a 12%);
+}
+
+:root[data-theme="dark"] .orders-flow-card:hover,
+:root[data-theme="dark"] .dashboard-card:hover,
+:root[data-theme="dark"] .provider-card:hover,
+:root[data-theme="dark"] .specialty-card:hover,
+:root[data-theme="dark"] .orders-card:hover,
+:root[data-theme="dark"] .order-card:hover,
+:root[data-theme="dark"] .application-card:hover,
+:root[data-theme="dark"] .addresses-page__card:hover {
+  border-color: color-mix(in srgb, var(--color-provider) 28%, var(--color-border));
+}
+
+:root[data-theme="dark"] .orders-flow-card__candidate,
+:root[data-theme="dark"] .application-card__provider {
+  color: var(--color-text);
+}
+
+:root[data-theme="dark"] .orders-flow-card__candidate-stats span,
+:root[data-theme="dark"] .application-card__rating span {
+  border-color: color-mix(in srgb, var(--color-provider) 30%, var(--color-border));
+  background: color-mix(in srgb, var(--color-provider-soft) 72%, var(--color-card));
+  color: var(--color-text-secondary);
+}
+
+:root[data-theme="dark"] .orders-flow-card__provider-avatar,
+:root[data-theme="dark"] .application-card__avatar {
+  border: 1px solid color-mix(in srgb, var(--color-provider) 32%, var(--color-border));
+}
+
+@media (max-width: 720px) {
+  .orders-page__header h1,
+  .dashboard-page__header h1,
+  .addresses-page__header h1,
+  .providers-page__header h1,
+  .specialties-page__header h1,
+  .profile-page__header h1,
+  .order-create-page__header h1,
+  .order-detail-page__header h1 {
+    max-width: none;
+  }
+}

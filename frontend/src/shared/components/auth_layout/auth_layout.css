@@ -1,0 +1,19 @@
+.auth_layout {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-info) 14%, transparent), transparent 34%),
+    linear-gradient(180deg, var(--color-surface-elevated), var(--color-surface));
+}
+
+.auth_layout_content {
+  width: 100%;
+  max-width: 420px;
+}

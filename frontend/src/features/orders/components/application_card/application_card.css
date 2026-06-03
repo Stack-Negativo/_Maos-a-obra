@@ -1,0 +1,212 @@
+.application-card {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 1rem;
+  padding: 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.application-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--color-provider);
+}
+
+.application-card:hover {
+  border-color: var(--color-brand);
+  box-shadow: var(--shadow-card-hover), var(--shadow-inset);
+  transform: translateY(-1px);
+}
+
+.application-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.application-card__provider {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.application-card__avatar {
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--color-provider-soft);
+  color: var(--color-provider);
+  font-size: 0.82rem;
+  font-weight: 900;
+  box-shadow: var(--shadow-inset);
+}
+
+.application-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.application-card__name {
+  display: block;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 1rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.application-card__provider-copy {
+  display: grid;
+  gap: 0.38rem;
+  min-width: 0;
+}
+
+.application-card__rating {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.application-card__rating span {
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--color-provider) 24%, var(--color-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-provider-soft) 42%, var(--color-card));
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.application-card__rating small {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.application-card__rating strong {
+  color: var(--color-provider);
+  font-size: 0.8rem;
+}
+
+.application-card__status {
+  flex-shrink: 0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: var(--shadow-inset);
+}
+
+.application-card__status--pending {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.application-card__status--success {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.application-card__status--danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.application-card__bio {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.application-card__specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.application-card__specialty-tag {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-elevated);
+  color: var(--color-text-secondary);
+  font-size: 0.74rem;
+  font-weight: 800;
+  box-shadow: var(--shadow-inset);
+}
+
+.application-card__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.application-card__btn {
+  height: 40px;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.application-card__btn:hover:not(:disabled) {
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 12%, transparent);
+  transform: translateY(-1px);
+}
+
+.application-card__btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.application-card__btn--accept {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.application-card__btn--accept:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.application-card__btn--reject {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.application-card__btn--reject:hover:not(:disabled) {
+  opacity: 0.85;
+}

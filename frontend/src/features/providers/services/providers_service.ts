@@ -1,0 +1,190 @@
+import type { Specialty } from "@/features/specialties/types/specialty_types";
+import { providerApi } from "@/api/providers";
+import type { ProviderApiResponse } from "@/api/providers";
+import { isMockMode } from "@/shared/mocks/mock_mode";
+import { mockStore } from "@/shared/mocks/mock_store";
+import axios from "axios";
+
+import type { ProviderPayload, ProviderProfile } from "../types/provider_types";
+
+export const PROVIDERS_CHANGED_EVENT = "maos-a-obra:providers-changed";
+
+export function notifyProvidersChanged() {
+  window.dispatchEvent(new Event(PROVIDERS_CHANGED_EVENT));
+}
+
+function createProviderPhoto(seed: string) {
+  const photos = [
+    "/provider-photos/rafael-eletricista.png",
+    "/provider-photos/lucas-hidraulica.png",
+    "/provider-photos/paula-pinturas.png",
+  ];
+  const hash = Array.from(seed).reduce(
+    (sum, character) => sum + character.charCodeAt(0),
+    0,
+  );
+  return photos[hash % photos.length];
+}
+
+function mapApiProvider(provider: ProviderApiResponse): ProviderProfile {
+  const name = provider.user?.full_name ?? provider.user_id;
+
+  return {
+    id: provider.id,
+    userId: provider.user_id,
+    name,
+    photoUrl: createProviderPhoto(name),
+    bio: provider.bio ?? "",
+    specialties: provider.specialties.map((item) => ({
+      id: item.specialty.id,
+      name: item.specialty.name,
+      description: item.specialty.description ?? "",
+      isActive: item.specialty.is_active,
+    })),
+    ratingAverage: provider.rating_average ?? 0,
+    completedServices: provider.total_reviews ?? 0,
+    isSuspended: provider.is_suspended ?? false,
+  };
+}
+
+function isAdminSession() {
+  try {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) {
+      return false;
+    }
+
+    const user = JSON.parse(storedUser) as { role?: string; isAdmin?: boolean };
+    return user.role === "ADMIN" || user.isAdmin === true;
+  } catch {
+    return false;
+  }
+}
+
+export async function listProviders(): Promise<ProviderProfile[]> {
+  if (isMockMode()) {
+    return mockStore.listProviders();
+  }
+
+  const response = isAdminSession()
+    ? await providerApi.listAdmin()
+    : await providerApi.list();
+
+  if (!response.success) {
+    throw new Error(response.error?.message ?? "Falha ao carregar prestadores");
+  }
+
+  return response.data.map(mapApiProvider);
+}
+
+export async function createProviderProfile(
+  payload: ProviderPayload,
+): Promise<ProviderProfile> {
+  if (isMockMode()) {
+    const provider = mockStore.createProviderProfile(payload);
+    notifyProvidersChanged();
+    return provider;
+  }
+
+  const response = await providerApi.register({
+    bio: payload.bio,
+    specialty_ids: payload.specialties.map((specialty) => specialty.id),
+  });
+
+  if (!response.success) {
+    throw new Error(response.error?.message ?? "Falha ao cadastrar prestador");
+  }
+
+  notifyProvidersChanged();
+  return mapApiProvider(response.data);
+}
+
+export function upsertMockProviderProfile(input: {
+  id?: string;
+  userId?: string;
+  name: string;
+  bio: string;
+  specialties: Specialty[];
+}) {
+  return {
+    id: input.id ?? input.userId ?? "",
+    userId: input.userId,
+    name: input.name,
+    photoUrl: createProviderPhoto(input.name),
+    bio: input.bio,
+    specialties: input.specialties,
+    ratingAverage: 0,
+    completedServices: 0,
+    isSuspended: false,
+  };
+}
+
+export async function suspendProvider(providerId: string) {
+  if (isMockMode()) {
+    const provider = mockStore.suspendProvider(providerId);
+    notifyProvidersChanged();
+    return provider;
+  }
+
+  const response = await providerApi.suspend(providerId);
+
+  if (!response.success) {
+    throw new Error(response.error?.message ?? "Falha ao suspender prestador");
+  }
+
+  notifyProvidersChanged();
+  return mapApiProvider(response.data);
+}
+
+export async function unsuspendProvider(providerId: string) {
+  if (isMockMode()) {
+    const provider = mockStore.unsuspendProvider(providerId);
+    notifyProvidersChanged();
+    return provider;
+  }
+
+  const response = await providerApi.unsuspend(providerId);
+
+  if (!response.success) {
+    throw new Error(response.error?.message ?? "Falha ao reativar prestador");
+  }
+
+  notifyProvidersChanged();
+  return mapApiProvider(response.data);
+}
+
+export async function deleteProvider(providerId: string) {
+  if (isMockMode()) {
+    mockStore.deleteProvider(providerId);
+    notifyProvidersChanged();
+    return;
+  }
+
+  try {
+    await providerApi.delete(providerId);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const data = error.response?.data as
+        | {
+            detail?: string;
+            error?: {
+              message?: string;
+            };
+          }
+        | undefined;
+
+      throw Object.assign(
+        new Error(
+          data?.error?.message ??
+            data?.detail ??
+            "Falha ao excluir prestador",
+        ),
+        { cause: error },
+      );
+    }
+
+    throw error;
+  }
+
+  notifyProvidersChanged();
+}

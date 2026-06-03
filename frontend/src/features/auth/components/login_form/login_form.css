@@ -1,0 +1,135 @@
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-form::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-brand), var(--color-provider));
+}
+
+.login-form__header {
+  text-align: center;
+}
+
+.login-form__header h1 {
+  color: var(--color-text);
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.login-form__header p {
+  margin-top: 0.45rem;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.login-form__fields {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.login-form__field-group {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.login-form__field-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.login-form__demo {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-info);
+  border-radius: 8px;
+  background: var(--color-info-bg);
+  color: var(--color-info);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  box-shadow: var(--shadow-inset);
+}
+
+.login-form__demo strong {
+  color: var(--color-text);
+}
+
+.login-form__demo div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.login-form__demo button {
+  min-height: 34px;
+  padding: 0 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--color-info) 45%, var(--color-border));
+  border-radius: 8px;
+  background: var(--color-card);
+  color: var(--color-info);
+  font-size: 0.78rem;
+  font-weight: 850;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.login-form__demo button:hover {
+  border-color: var(--color-info);
+  background: color-mix(in srgb, var(--color-info-bg) 66%, var(--color-card));
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--color-info) 12%, transparent);
+  transform: translateY(-1px);
+}
+
+.login-form__submit {
+  width: 100%;
+  min-height: 46px;
+  padding: 0.85rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 18%, transparent);
+  transition:
+    background-color 0.2s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.login-form__submit:hover {
+  background: var(--color-brand-hover);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-brand) 22%, transparent);
+  transform: translateY(-1px);
+}
+
+.login-form__submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+@media (max-width: 420px) {
+  .login-form__demo div {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,202 @@
+.provider-card {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-card);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.provider-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--color-provider);
+}
+
+.provider-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-provider);
+  box-shadow: var(--shadow-card-hover), var(--shadow-inset);
+}
+
+.provider-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.provider-card__identity {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+  min-width: 0;
+}
+
+.provider-card__avatar {
+  display: inline-flex;
+  width: 46px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--color-provider-soft);
+  color: var(--color-provider);
+  font-size: 0.82rem;
+  font-weight: 900;
+  box-shadow: var(--shadow-inset);
+  overflow: hidden;
+}
+
+.provider-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.provider-card__top strong {
+  display: block;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 1rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.provider-card__top p {
+  margin-top: 0.35rem;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.provider-card__status {
+  flex-shrink: 0;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  font-size: 0.74rem;
+  font-weight: 800;
+  box-shadow: var(--shadow-inset);
+}
+
+.provider-card__status--suspended {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.provider-card__specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.provider-card__specialties span {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface-elevated);
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  font-weight: 800;
+  box-shadow: var(--shadow-inset);
+}
+
+.provider-card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.86rem;
+}
+
+.provider-card__meta strong {
+  color: var(--color-text);
+}
+
+.provider-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.provider-card__actions button {
+  min-height: 38px;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--color-brand);
+  border-radius: 8px;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-size: 0.82rem;
+  font-weight: 850;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    background 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.provider-card__meta span {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-inset);
+}
+
+.provider-card__meta small {
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.provider-card__actions button:hover:not(:disabled) {
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-brand) 16%, transparent);
+  transform: translateY(-1px);
+}
+
+.provider-card__actions button:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
+.provider-card__actions .provider-card__danger {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.provider-card__actions .provider-card__danger:hover:not(:disabled) {
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-danger) 14%, transparent);
+}
+
+@media (max-width: 560px) {
+  .provider-card__top,
+  .provider-card__identity {
+    display: grid;
+  }
+
+  .provider-card__meta {
+    grid-template-columns: 1fr;
+  }
+}
