@@ -101,6 +101,13 @@
   font-weight: 800;
 }
 
+.application-card__rating small {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
 .application-card__rating strong {
   color: var(--color-provider);
   font-size: 0.8rem;

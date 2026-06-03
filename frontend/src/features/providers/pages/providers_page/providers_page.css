@@ -351,14 +351,15 @@
 
 .providers-admin-card__identity {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.75rem;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 0.85rem;
   align-items: start;
+  min-width: 0;
 }
 
 .providers-admin-card__avatar {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -379,8 +380,13 @@
 
 .providers-admin-card__main strong,
 .providers-admin-card__actions strong {
+  display: block;
+  overflow: hidden;
   color: var(--color-text);
   font-size: 0.94rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .providers-admin-card__main p {
@@ -414,6 +420,10 @@
 
 .providers-admin-card__chips span,
 .providers-admin-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  min-height: 30px;
   padding: 0.35rem 0.6rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
@@ -422,6 +432,22 @@
   font-size: 0.78rem;
   font-weight: 750;
   box-shadow: var(--shadow-inset);
+}
+
+.providers-admin-card__meta span {
+  background: color-mix(in srgb, var(--color-provider-soft) 36%, var(--color-card));
+}
+
+.providers-admin-card__meta small {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.providers-admin-card__meta strong {
+  color: var(--color-text);
+  font-size: 0.82rem;
 }
 
 .providers-admin-card__actions {

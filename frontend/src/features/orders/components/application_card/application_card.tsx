@@ -59,9 +59,13 @@ export function ApplicationCard({
             </strong>
             <div className="application-card__rating">
               <span>
-                ⭐ Nota <strong>{provider.ratingAverage.toFixed(1)}</strong>
+                <small>⭐ Nota</small>
+                <strong>{provider.ratingAverage.toFixed(1)}</strong>
               </span>
-              <span>🧾 {provider.completedServices} serviços</span>
+              <span>
+                <small>🧾 Servicos</small>
+                <strong>{provider.completedServices}</strong>
+              </span>
             </div>
           </div>
         </div>

@@ -95,11 +95,21 @@
 .addresses-list {
   display: grid;
   gap: 1rem;
-  padding: 1.15rem;
+  padding: 1.2rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
   box-shadow: var(--shadow-card), var(--shadow-inset);
+}
+
+.address-form h2::before {
+  content: "📍";
+  margin-right: 0.45rem;
+}
+
+.addresses-list h2::before {
+  content: "🗂️";
+  margin-right: 0.45rem;
 }
 
 .address-form {
@@ -184,12 +194,16 @@
 }
 
 .addresses-list__state {
-  padding: 1rem;
+  min-height: 9rem;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-surface-elevated);
   color: var(--color-text-secondary);
   box-shadow: var(--shadow-inset);
+  text-align: center;
 }
 
 .addresses-list__items {
@@ -204,7 +218,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1rem 1rem 1rem 1.1rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
@@ -213,6 +227,10 @@
     border-color 0.15s ease,
     box-shadow 0.15s ease,
     transform 0.15s ease;
+}
+
+.address-card > div:first-child {
+  min-width: 0;
 }
 
 .address-card::before {
@@ -255,6 +273,12 @@
 .address-card strong {
   display: block;
   color: var(--color-text);
+  font-size: 0.98rem;
+}
+
+.address-card strong::before {
+  content: "📍";
+  margin-right: 0.4rem;
 }
 
 .address-card p,
@@ -275,6 +299,19 @@
     background 0.16s ease,
     color 0.16s ease,
     transform 0.16s ease;
+}
+
+.address-card__actions button:first-child::before {
+  content: "✏️ ";
+}
+
+.address-card__actions button:last-child::before {
+  content: "🗑️ ";
+}
+
+:root[data-theme="dark"] .dashboard-metric::after,
+:root[data-theme="dark"] .dashboard-queue a::before {
+  background: color-mix(in srgb, var(--color-card) 88%, #4aa3ff 6%);
 }
 
 .address-card__actions button:first-child {

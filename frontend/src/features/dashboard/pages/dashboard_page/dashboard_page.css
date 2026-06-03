@@ -82,7 +82,8 @@
   overflow: hidden;
   display: grid;
   gap: 0.35rem;
-  padding: 1rem;
+  min-height: 132px;
+  padding: 1rem 3.25rem 1rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
@@ -91,6 +92,22 @@
     border-color 0.16s ease,
     box-shadow 0.16s ease,
     transform 0.16s ease;
+}
+
+.dashboard-metric::after {
+  content: "📌";
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 2.1rem;
+  height: 2.1rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--color-brand) 18%, var(--color-border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-brand-light) 54%, var(--color-card));
+  font-size: 1rem;
+  box-shadow: var(--shadow-inset);
 }
 
 .dashboard-metric::before {
@@ -130,6 +147,12 @@
   color: var(--color-warning);
 }
 
+.dashboard-metric--warning::after {
+  content: "⏳";
+  border-color: color-mix(in srgb, var(--color-warning) 28%, var(--color-border));
+  background: var(--color-warning-bg);
+}
+
 .dashboard-metric--warning::before {
   background: var(--color-warning);
 }
@@ -138,12 +161,24 @@
   color: var(--color-success);
 }
 
+.dashboard-metric--success::after {
+  content: "✅";
+  border-color: color-mix(in srgb, var(--color-success) 28%, var(--color-border));
+  background: var(--color-success-bg);
+}
+
 .dashboard-metric--success::before {
   background: var(--color-success);
 }
 
 .dashboard-metric--info strong {
   color: var(--color-info);
+}
+
+.dashboard-metric--info::after {
+  content: "💬";
+  border-color: color-mix(in srgb, var(--color-info) 28%, var(--color-border));
+  background: var(--color-info-bg);
 }
 
 .dashboard-metric--info::before {
@@ -166,11 +201,16 @@
 .dashboard-panel {
   display: grid;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1.1rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
   box-shadow: var(--shadow-card), var(--shadow-inset);
+}
+
+.dashboard-panel__header h2::before {
+  content: "🧭";
+  margin-right: 0.45rem;
 }
 
 .dashboard-panel__header {
@@ -241,6 +281,18 @@
   box-shadow: var(--shadow-inset);
 }
 
+.dashboard-queue a::before {
+  content: "➡️";
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-card) 82%, transparent);
+  box-shadow: var(--shadow-inset);
+}
+
 .dashboard-health span {
   color: var(--color-text-secondary);
   font-size: 0.78rem;
@@ -268,7 +320,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.15rem;
+  padding: 1.2rem;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   background: var(--color-card);
@@ -277,6 +329,11 @@
     border-color 0.15s ease,
     box-shadow 0.15s ease,
     transform 0.15s ease;
+}
+
+.dashboard-card strong::before {
+  content: "✨";
+  margin-right: 0.45rem;
 }
 
 .dashboard-card:hover {
