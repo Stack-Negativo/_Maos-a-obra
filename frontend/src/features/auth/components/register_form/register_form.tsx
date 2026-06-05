@@ -58,11 +58,13 @@ export function RegisterForm() {
       setError((currentError) =>
         currentError === SPECIALTIES_ERROR ? null : currentError,
       );
+      return activeSpecialties;
     } catch (err) {
       console.error(err);
       setSpecialtyOptions([]);
       setSpecialtyIds([]);
       setError(SPECIALTIES_ERROR);
+      return [];
     } finally {
       setSpecialtiesLoading(false);
     }
@@ -87,8 +89,8 @@ export function RegisterForm() {
       return true;
     }
 
-    await loadSpecialties();
-    return specialtyOptions.length > 0;
+    const loadedSpecialties = await loadSpecialties();
+    return loadedSpecialties.length > 0;
   }
 
   function validateRegister() {

@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --color-brand: #b84f16;
-  --color-brand-dark: #73320f;
-  --color-brand-hover: #973f12;
-  --color-brand-light: #f1dfd4;
+  --color-brand: #a94918;
+  --color-brand-dark: #69300f;
+  --color-brand-hover: #873812;
+  --color-brand-light: #f0ddd2;
   --color-on-brand: #ffffff;
-  --color-surface: #e7ecef;
-  --color-surface-elevated: #f0f4f6;
-  --color-card: #f8fafb;
-  --color-border: #cbd6dd;
-  --color-border-strong: #9facb6;
+  --color-surface: #e8edf1;
+  --color-surface-elevated: #f3f6f8;
+  --color-card: #fbfcfd;
+  --color-border: #c8d3da;
+  --color-border-strong: #93a4af;
   --color-text: #111b24;
   --color-text-primary: var(--color-text);
   --color-text-secondary: #45545f;
@@ -32,23 +32,23 @@
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 14px;
-  --shadow-card: 0 12px 28px rgba(17, 27, 36, 0.08);
-  --shadow-card-hover: 0 18px 46px rgba(17, 27, 36, 0.13);
+  --shadow-card: 0 14px 34px rgba(17, 27, 36, 0.08);
+  --shadow-card-hover: 0 20px 52px rgba(17, 27, 36, 0.14);
   --shadow-inset: inset 0 1px 0 color-mix(in srgb, #ffffff 76%, transparent);
 }
 
 :root[data-theme="dark"] {
-  --color-brand: #f29a55;
-  --color-brand-dark: #ffd7b8;
-  --color-brand-hover: #ffb06f;
-  --color-brand-light: #283342;
-  --color-on-brand: #141a22;
-  --color-surface: #0d1621;
-  --color-surface-elevated: #121d2a;
-  --color-card: #182636;
-  --color-border: #2f4053;
-  --color-border-strong: #63788c;
-  --color-text: #f3f7fb;
+  --color-brand: #f4a15f;
+  --color-brand-dark: #ffd8ba;
+  --color-brand-hover: #ffb473;
+  --color-brand-light: #243247;
+  --color-on-brand: #101824;
+  --color-surface: #0c1521;
+  --color-surface-elevated: #101b2a;
+  --color-card: #172538;
+  --color-border: #31465b;
+  --color-border-strong: #668097;
+  --color-text: #f5f8fb;
   --color-text-primary: var(--color-text);
   --color-text-secondary: #d2deea;
   --color-text-muted: #9fb0c1;
@@ -62,10 +62,10 @@
   --color-danger-bg: #402024;
   --color-info: #8cc7ff;
   --color-info-bg: #18364f;
-  --color-provider: #58d2c8;
-  --color-provider-soft: #173c46;
-  --color-admin: #b3a7ff;
-  --color-admin-soft: #282e55;
+  --color-provider: #66d8cf;
+  --color-provider-soft: #153d48;
+  --color-admin: #b7b0ff;
+  --color-admin-soft: #29315a;
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -90,8 +90,8 @@ body,
 body {
   font-family: "Segoe UI", Arial, Helvetica, sans-serif;
   background:
-    radial-gradient(circle at 18% -8%, color-mix(in srgb, var(--color-brand) 8%, transparent), transparent 24rem),
-    radial-gradient(circle at 98% 0%, color-mix(in srgb, var(--color-provider) 7%, transparent), transparent 28rem),
+    radial-gradient(circle at 18% -8%, color-mix(in srgb, var(--color-brand) 7%, transparent), transparent 24rem),
+    radial-gradient(circle at 98% 0%, color-mix(in srgb, var(--color-provider) 6%, transparent), transparent 28rem),
     linear-gradient(
       180deg,
       var(--color-surface-elevated) 0%,
@@ -103,9 +103,9 @@ body {
 
 :root[data-theme="dark"] body {
   background:
-    radial-gradient(circle at 18% -10%, color-mix(in srgb, var(--color-brand) 7%, transparent), transparent 24rem),
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, #4aa3ff 9%, transparent), transparent 28rem),
-    linear-gradient(180deg, #142033 0%, var(--color-surface) 36rem);
+    radial-gradient(circle at 18% -10%, color-mix(in srgb, var(--color-brand) 6%, transparent), transparent 24rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, #4aa3ff 10%, transparent), transparent 28rem),
+    linear-gradient(180deg, #111d2e 0%, var(--color-surface) 38rem);
 }
 
 button,
@@ -356,7 +356,7 @@ button:active {
 .order-detail-page__summary-card {
   border-radius: var(--radius-lg);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 99%, transparent), color-mix(in srgb, var(--color-card) 92%, var(--color-surface-elevated)));
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 99%, transparent), color-mix(in srgb, var(--color-card) 94%, var(--color-surface-elevated)));
 }
 
 .orders-flow-card:hover,
@@ -523,7 +523,7 @@ select:focus {
 :root[data-theme="dark"] .order-detail-page__section,
 :root[data-theme="dark"] .order-detail-page__summary-card {
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 98%, transparent), color-mix(in srgb, var(--color-card) 90%, var(--color-surface-elevated)));
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 96%, #223652 4%), color-mix(in srgb, var(--color-card) 88%, var(--color-surface-elevated)));
 }
 
 :root[data-theme="dark"] .orders-page__filters,
@@ -565,6 +565,18 @@ select:focus {
 :root[data-theme="dark"] .orders-flow-card__provider-avatar,
 :root[data-theme="dark"] .application-card__avatar {
   border: 1px solid color-mix(in srgb, var(--color-provider) 32%, var(--color-border));
+}
+
+:root[data-theme="dark"] .orders-flow-card__meta span,
+:root[data-theme="dark"] .orders-card__meta-item,
+:root[data-theme="dark"] .provider-card__meta span,
+:root[data-theme="dark"] .providers-admin-card__meta span,
+:root[data-theme="dark"] .orders-page__provider-management-row span small,
+:root[data-theme="dark"] .order-detail-page__provider-line-copy span,
+:root[data-theme="dark"] .order-detail-page__candidate-copy span {
+  background: color-mix(in srgb, var(--color-surface-elevated) 78%, #2b4662 22%);
+  border-color: color-mix(in srgb, var(--color-border) 70%, var(--color-provider) 18%);
+  color: var(--color-text-secondary);
 }
 
 @media (max-width: 720px) {
