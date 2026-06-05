@@ -133,3 +133,25 @@
     grid-template-columns: 1fr;
   }
 }
+
+.login-form {
+  border-radius: var(--radius-lg);
+}
+
+.login-form__demo {
+  border-color: color-mix(in srgb, var(--color-info) 36%, var(--color-border));
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-info) 10%, transparent), transparent 9rem),
+    color-mix(in srgb, var(--color-info-bg) 74%, var(--color-card));
+}
+
+.login-form__demo button,
+.login-form__submit {
+  border-radius: 10px;
+}
+
+:root[data-theme="dark"] .login-form__demo {
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, #4aa3ff 10%, transparent), transparent 9rem),
+    color-mix(in srgb, var(--color-card) 86%, var(--color-info-bg));
+}

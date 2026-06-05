@@ -207,3 +207,45 @@
   text-decoration: none;
   font-weight: 800;
 }
+
+.register-form {
+  border-radius: var(--radius-lg);
+}
+
+.register-form__role-card,
+.register-form__provider-fields,
+.register-form__submit {
+  border-radius: 10px;
+}
+
+.register-form__role-card--active {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-brand) 12%, transparent), transparent 8rem),
+    color-mix(in srgb, var(--color-brand-light) 78%, var(--color-card));
+  box-shadow: var(--shadow-inset);
+}
+
+.register-form__provider-fields {
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-provider) 8%, transparent), transparent 10rem),
+    color-mix(in srgb, var(--color-surface-elevated) 86%, var(--color-card));
+}
+
+.register-form__specialties label:has(input:checked) {
+  border-color: color-mix(in srgb, var(--color-provider) 46%, var(--color-border));
+  background: color-mix(in srgb, var(--color-provider-soft) 68%, var(--color-card));
+  color: var(--color-provider);
+  box-shadow: var(--shadow-inset);
+}
+
+:root[data-theme="dark"] .register-form__role-card--active {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-brand) 10%, transparent), transparent 8rem),
+    color-mix(in srgb, var(--color-card) 88%, var(--color-brand-light));
+}
+
+:root[data-theme="dark"] .register-form__provider-fields {
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-provider) 8%, transparent), transparent 10rem),
+    color-mix(in srgb, var(--color-card) 88%, var(--color-surface-elevated));
+}

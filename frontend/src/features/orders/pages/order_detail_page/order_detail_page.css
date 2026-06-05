@@ -734,3 +734,60 @@
     font-size: 1.35rem;
   }
 }
+
+.order-detail-page__hero,
+.order-detail-page__section,
+.order-detail-page__summary-card {
+  border-radius: var(--radius-lg);
+}
+
+.order-detail-page__hero {
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 9%, transparent), transparent 16rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-provider) 7%, transparent), transparent 16rem),
+    color-mix(in srgb, var(--color-card) 96%, var(--color-surface-elevated));
+}
+
+.order-detail-page__summary-card {
+  min-height: 104px;
+}
+
+.order-detail-page__section {
+  padding: 1.15rem;
+}
+
+.order-detail-page__provider-spotlight {
+  border-radius: var(--radius-lg);
+}
+
+.order-detail-page__chat-message {
+  border-radius: 12px;
+}
+
+.order-detail-page__timeline-item {
+  border-radius: 10px;
+}
+
+.order-detail-page__payment-box {
+  border-radius: 12px;
+}
+
+:root[data-theme="dark"] .order-detail-page__hero {
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-brand) 7%, transparent), transparent 16rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, #4aa3ff 9%, transparent), transparent 16rem),
+    color-mix(in srgb, var(--color-card) 92%, var(--color-surface-elevated));
+}
+
+:root[data-theme="dark"] .order-detail-page__chat-message--client,
+:root[data-theme="dark"] .order-detail-page__chat-message--admin {
+  background: color-mix(in srgb, var(--color-card) 82%, var(--color-brand-light));
+}
+
+:root[data-theme="dark"] .order-detail-page__chat-message--provider {
+  background: color-mix(in srgb, var(--color-card) 82%, var(--color-provider-soft));
+}
+
+:root[data-theme="dark"] .order-detail-page__timeline-item {
+  background: color-mix(in srgb, var(--color-card) 82%, var(--color-surface-elevated));
+}

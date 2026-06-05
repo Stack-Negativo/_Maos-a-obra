@@ -1380,3 +1380,108 @@
     width: 100%;
   }
 }
+
+.orders-page__filter-tabs {
+  gap: 0.55rem;
+}
+
+.orders-page__filter-tab {
+  min-height: 38px;
+  padding: 0.48rem 0.85rem;
+  line-height: 1.2;
+}
+
+.orders-flow-card {
+  gap: 1.05rem;
+  padding: 1.1rem;
+}
+
+.orders-flow-card__header {
+  gap: 1.1rem;
+}
+
+.orders-flow-card__header h2 {
+  font-size: 1.06rem;
+}
+
+.orders-flow-card__meta,
+.orders-flow-card__actions {
+  gap: 0.62rem;
+}
+
+.orders-flow-card__meta span {
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.orders-flow-card__actions button,
+.orders-flow-card__panel button,
+.orders-flow-card__review button,
+.orders-flow-card__link {
+  min-height: 40px;
+  padding: 0.58rem 0.9rem;
+  white-space: nowrap;
+}
+
+.orders-flow-card__panel,
+.orders-flow-card__review {
+  gap: 0.85rem;
+  padding: 0.95rem;
+}
+
+.orders-flow-card__candidate {
+  align-items: center;
+  padding: 0.9rem;
+}
+
+.orders-flow-card__candidate-copy {
+  gap: 0.42rem;
+}
+
+.orders-flow-card__provider-mini {
+  padding: 0.9rem;
+}
+
+.orders-page__admin-workbench article {
+  gap: 0.65rem;
+  padding: 1.05rem;
+}
+
+.orders-page__provider-management-row {
+  padding: 0.95rem;
+}
+
+.orders-page__provider-actions {
+  flex-wrap: wrap;
+  gap: 0.55rem !important;
+}
+
+:root[data-theme="dark"] .orders-page__filter-tab.active {
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-brand) 16%, transparent);
+}
+
+:root[data-theme="dark"] .orders-flow-card__panel--candidates {
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-provider) 9%, transparent), transparent 12rem),
+    color-mix(in srgb, var(--color-card) 84%, var(--color-surface-elevated));
+}
+
+@media (max-width: 560px) {
+  .orders-flow-card__provider-mini {
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+
+  .orders-flow-card__provider-mini small {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    width: fit-content;
+  }
+
+  .orders-flow-card__actions button,
+  .orders-flow-card__panel button,
+  .orders-flow-card__review button,
+  .orders-flow-card__link {
+    width: 100%;
+    justify-content: center;
+  }
+}
