@@ -1370,6 +1370,35 @@
   background: color-mix(in srgb, var(--color-brand-light) 72%, var(--color-card));
 }
 
+.orders-page__next-action--provider {
+  border-color: color-mix(in srgb, var(--color-provider) 34%, var(--color-border));
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-provider) 13%, transparent), transparent 9rem),
+    color-mix(in srgb, var(--color-card) 88%, transparent);
+}
+
+.orders-page__next-action--provider > span {
+  background: color-mix(in srgb, var(--color-provider-soft) 74%, var(--color-card));
+}
+
+.orders-page__next-action--admin {
+  border-color: color-mix(in srgb, var(--color-admin) 34%, var(--color-border));
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-admin) 12%, transparent), transparent 9rem),
+    color-mix(in srgb, var(--color-card) 88%, transparent);
+}
+
+.orders-page__next-action--admin > span {
+  background: color-mix(in srgb, var(--color-admin-soft) 74%, var(--color-card));
+}
+
+:root[data-theme="dark"] .orders-page__next-action--provider,
+:root[data-theme="dark"] .orders-page__next-action--admin {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, #4aa3ff 9%, transparent), transparent 9rem),
+    color-mix(in srgb, var(--color-card) 94%, var(--color-surface-elevated)) !important;
+}
+
 @media (max-width: 860px) {
   .orders-page__header-actions--client,
   .orders-page__client-steps {
@@ -1484,4 +1513,76 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+.orders-page__header {
+  padding: clamp(1.15rem, 2vw, 1.55rem);
+  border-radius: var(--radius-lg);
+}
+
+.orders-page__header h1 {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  line-height: 1.1;
+}
+
+.orders-page__summary {
+  margin-top: 0.7rem;
+  box-shadow: var(--shadow-inset);
+}
+
+.orders-page__filters {
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 96%, transparent), color-mix(in srgb, var(--color-surface-elevated) 72%, var(--color-card)));
+}
+
+.orders-page__filter-tab {
+  border-color: color-mix(in srgb, var(--color-border) 86%, transparent);
+  background: color-mix(in srgb, var(--color-card) 86%, transparent);
+  box-shadow: var(--shadow-inset);
+}
+
+.orders-page__filter-tab.active {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #ffffff 34%, transparent),
+    0 10px 22px color-mix(in srgb, var(--color-brand) 16%, transparent);
+}
+
+.orders-flow-card {
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 98%, transparent), color-mix(in srgb, var(--color-card) 92%, var(--color-surface-elevated)));
+}
+
+.orders-flow-card__status,
+.orders-flow-card__meta span,
+.orders-flow-card__candidate-stats span,
+.orders-flow-card__provider-mini small {
+  box-shadow: var(--shadow-inset);
+}
+
+.orders-page__admin-summary div,
+.orders-page__admin-workbench article,
+.orders-page__provider-management,
+.orders-page__provider-context {
+  border-radius: var(--radius-lg);
+}
+
+.orders-page__empty,
+.orders-page__state,
+.orders-page__loading {
+  border-style: dashed;
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--color-brand) 8%, transparent), transparent 14rem),
+    color-mix(in srgb, var(--color-card) 86%, transparent);
+}
+
+:root[data-theme="dark"] .orders-page__filters {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 92%, #20344a 8%), color-mix(in srgb, var(--color-surface-elevated) 84%, var(--color-card)));
+}
+
+:root[data-theme="dark"] .orders-flow-card {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-card) 94%, #243a55 6%), color-mix(in srgb, var(--color-card) 86%, var(--color-surface-elevated)));
 }

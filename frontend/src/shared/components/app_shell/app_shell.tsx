@@ -70,8 +70,8 @@ export function AppShell({ children }: AppShellProps) {
   const visibleNavItems =
     effectiveRole === UserRole.ADMIN
       ? [
-          { icon: "📊", label: "Administracao", to: orderRoute },
-          { icon: "🧰", label: "Catalogo", to: "/specialties" },
+          { icon: "⌁", label: "Administração", to: orderRoute },
+          { icon: "▦", label: "Catálogo", to: "/specialties" },
           { icon: "👷", label: "Prestadores", to: "/providers" },
           { icon: "👤", label: "Perfil", to: "/profile" },
         ]
@@ -82,14 +82,14 @@ export function AppShell({ children }: AppShellProps) {
             { icon: "👤", label: "Perfil", to: "/profile" },
           ]
         : [
-            { icon: "📍", label: "Enderecos", to: "/addresses" },
+            { icon: "⌖", label: "Endereços", to: "/addresses" },
             { icon: "🧾", label: "Minhas Ordens", to: orderRoute },
             { icon: "👤", label: "Perfil", to: "/profile" },
           ];
 
   function resetMockData() {
     const confirmed = window.confirm(
-      "Reiniciar o ambiente de apresentacao e voltar para as contas iniciais?",
+      "Restaurar o ambiente de apresentação e voltar para as contas iniciais?",
     );
 
     if (!confirmed) {
@@ -111,10 +111,10 @@ export function AppShell({ children }: AppShellProps) {
           <span className="app-shell__brand-icon" aria-hidden="true">
             MO
           </span>
-          <span>Maos a Obra</span>
+          <span>Mãos à Obra</span>
         </Link>
 
-        <nav className="app-shell__nav" aria-label="Navegacao principal">
+        <nav className="app-shell__nav" aria-label="Navegação principal">
           {visibleNavItems.map((item) => (
             <NavLink
               key={item.to}
@@ -156,9 +156,7 @@ export function AppShell({ children }: AppShellProps) {
               }
               onClick={() => setTheme(toggleTheme())}
             >
-              <span aria-hidden="true">
-                {theme === "dark" ? "🌙 Noite" : "☀️ Dia"}
-              </span>
+              <span aria-hidden="true">{theme === "dark" ? "☾" : "☀"}</span>
               <strong>{theme === "dark" ? "Escuro" : "Claro"}</strong>
             </button>
             {isMockMode() && (
@@ -166,13 +164,13 @@ export function AppShell({ children }: AppShellProps) {
                 type="button"
                 className="app-shell__reset-demo"
                 onClick={resetMockData}
-                title="Reiniciar ambiente de apresentacao"
+                title="Restaurar ambiente de apresentação"
               >
-                🔄 Reiniciar
+                Restaurar
               </button>
             )}
             <button type="button" onClick={signOut}>
-              🚪 Sair
+              Sair
             </button>
           </div>
         </div>

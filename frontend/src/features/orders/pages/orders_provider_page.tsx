@@ -235,6 +235,35 @@ export function OrdersProviderPage() {
     },
   ];
 
+  const nextAction =
+    counts.accepted > 0
+      ? {
+          icon: "✅",
+          title: "Atendimentos aceitos",
+          text: "Inicie ou encerre os serviços que já foram combinados.",
+          mode: "accepted" as const,
+        }
+      : counts.available > 0
+        ? {
+            icon: "🧾",
+            title: "Novas oportunidades",
+            text: "Veja ordens compatíveis e envie candidatura em poucos cliques.",
+            mode: "available" as const,
+          }
+        : counts.applications > 0
+          ? {
+              icon: "⏳",
+              title: "Acompanhe respostas",
+              text: "Suas candidaturas ficam aqui até o cliente decidir.",
+              mode: "applications" as const,
+            }
+          : {
+              icon: "✨",
+              title: "Tudo em dia",
+              text: "Quando surgir uma ordem compatível, ela aparece neste painel.",
+              mode: "available" as const,
+            };
+
   return (
     <AppShell>
       <section className="orders-page">
@@ -254,6 +283,19 @@ export function OrdersProviderPage() {
               {openOrdersCount} ordem{openOrdersCount === 1 ? "" : "s"} aberta
               {openOrdersCount === 1 ? "" : "s"} para candidatura
             </p>
+          </div>
+          <div className="orders-page__header-actions orders-page__header-actions--client">
+            <button
+              type="button"
+              className="orders-page__next-action orders-page__next-action--provider"
+              onClick={() => setViewMode(nextAction.mode)}
+            >
+              <span aria-hidden="true">{nextAction.icon}</span>
+              <div>
+                <strong>{nextAction.title}</strong>
+                <small>{nextAction.text}</small>
+              </div>
+            </button>
           </div>
         </header>
 

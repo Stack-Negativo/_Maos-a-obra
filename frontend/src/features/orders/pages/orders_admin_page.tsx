@@ -135,6 +135,34 @@ export function OrdersAdminPage() {
   const awaitingConfirmationOrders = orders.filter(
     (order) => order.status === OrderStatus.AWAITING_CONFIRMATION,
   );
+  const adminNextAction =
+    awaitingSelectionOrders.length > 0
+      ? {
+          icon: "👷",
+          title: "Clientes precisam escolher",
+          text: "Filtre ordens com candidaturas pendentes de decisão.",
+          status: OrderStatus.AWAITING_SELECTION,
+        }
+      : awaitingScheduleOrders.length > 0
+        ? {
+            icon: "📅",
+            title: "Agendamentos pendentes",
+            text: "Acompanhe ordens com prestador aceito aguardando horário.",
+            status: OrderStatus.PROVIDER_SELECTED,
+          }
+        : awaitingConfirmationOrders.length > 0
+          ? {
+              icon: "⭐",
+              title: "Finalização pendente",
+              text: "Veja atendimentos esperando confirmação do cliente.",
+              status: OrderStatus.AWAITING_CONFIRMATION,
+            }
+          : {
+              icon: "✅",
+              title: "Operação estável",
+              text: "O funil está sem bloqueios críticos no momento.",
+              status: null,
+            };
 
   return (
     <AppShell>
@@ -152,6 +180,19 @@ export function OrdersAdminPage() {
               {totalProviders} prestador{totalProviders === 1 ? "" : "es"} no
               sistema
             </p>
+          </div>
+          <div className="orders-page__header-actions orders-page__header-actions--client">
+            <button
+              type="button"
+              className="orders-page__next-action orders-page__next-action--admin"
+              onClick={() => setFilterStatus(adminNextAction.status)}
+            >
+              <span aria-hidden="true">{adminNextAction.icon}</span>
+              <div>
+                <strong>{adminNextAction.title}</strong>
+                <small>{adminNextAction.text}</small>
+              </div>
+            </button>
           </div>
         </header>
 
